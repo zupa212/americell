@@ -3,6 +3,8 @@ import "./globals.css";
 import { buildMetadata, VIEWPORT } from "@/lib/seo";
 import StructuredData from "@/components/structured-data";
 import { Toaster } from "@/components/ui/sonner";
+import SmoothScroll from "@/components/smooth-scroll";
+import SiteBackground from "@/components/site-background";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,9 +30,10 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-page text-ink">
+      <body className="relative min-h-full flex flex-col text-foreground">
+        <SiteBackground />
         <StructuredData />
-        {children}
+        <SmoothScroll>{children}</SmoothScroll>
         <Toaster position="top-center" richColors />
       </body>
     </html>

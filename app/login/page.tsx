@@ -3,9 +3,11 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { login, type AuthState } from "@/app/actions/auth";
-import AuroraBackground from "@/components/ui/aurora-background";
 import { BorderBeam } from "@/components/ui/border-beam";
+import { ShineBorder } from "@/components/ui/shine-border";
 import { AuroraText } from "@/components/ui/aurora-text";
+import { Particles } from "@/components/ui/particles";
+import Reveal from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,84 +19,124 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
 
 const initial: AuthState = { error: null };
+
+// Frosted-glass surface recipe — floats over the global aurora (SiteBackground).
+const glassCard =
+  "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
+
+// Smooth, legible glass inputs.
+const glassInput =
+  "border-white/50 bg-white/60 backdrop-blur-md transition-all duration-300 focus-visible:bg-white/80 focus-visible:ring-brand/40";
 
 export default function LoginPage() {
   const [state, action, pending] = useActionState(login, initial);
 
   return (
     <main className="relative flex min-h-[80vh] flex-col items-center justify-center overflow-hidden px-6 py-16">
-      <AuroraBackground className="opacity-70" />
-      <Link
-        href="/"
-        className="mb-8 text-lg font-bold tracking-tight text-foreground"
-      >
-        <AuroraText>Americell</AuroraText>
-      </Link>
-      <Card className="relative w-full max-w-sm rounded-2xl border py-6 shadow-card">
-        <BorderBeam
-          size={80}
-          duration={8}
-          colorFrom="var(--color-brand)"
-          colorTo="var(--color-brand-2)"
-        />
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold tracking-tight">
-            Καλώς όρισες ξανά
-          </CardTitle>
-          <CardDescription>
-            Συνδέσου στον λογαριασμό σου Americell.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form action={action} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                required
-                autoComplete="email"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Κωδικός</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                required
-                minLength={8}
-                autoComplete="current-password"
-              />
-            </div>
+      {/* Ambient particles drifting behind the glass for depth. */}
+      <Particles
+        className="pointer-events-none absolute inset-0 -z-[1]"
+        quantity={48}
+        ease={80}
+        color="#2b6bff"
+        staticity={60}
+      />
 
-            {state.error ? (
-              <Alert variant="destructive">
-                <AlertDescription>{state.error}</AlertDescription>
-              </Alert>
-            ) : null}
+      <Reveal className="flex w-full flex-col items-center">
+        <Link
+          href="/"
+          className="mb-8 text-lg font-bold tracking-tight text-foreground"
+        >
+          <AuroraText>Americell</AuroraText>
+        </Link>
 
-            <Button
-              type="submit"
-              size="lg"
-              disabled={pending}
-              className="h-11 w-full rounded-full"
-            >
-              {pending ? "Σύνδεση…" : "Σύνδεση"}
-            </Button>
-          </form>
+        <Card
+          className={cn(
+            "relative w-full max-w-sm overflow-hidden py-6",
+            glassCard,
+            "transition-all duration-300 hover:bg-white/70 hover:-translate-y-1 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)]",
+          )}
+        >
+          <ShineBorder
+            className="rounded-3xl"
+            borderWidth={1}
+            duration={12}
+            shineColor={["var(--color-brand)", "var(--color-brand-2)"]}
+          />
+          <BorderBeam
+            size={80}
+            duration={8}
+            colorFrom="var(--color-brand)"
+            colorTo="var(--color-brand-2)"
+          />
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
+              Καλώς όρισες ξανά
+            </CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Συνδέσου στον λογαριασμό σου Americell.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form action={action} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  className={glassInput}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="password">Κωδικός</Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  minLength={8}
+                  autoComplete="current-password"
+                  className={glassInput}
+                />
+              </div>
 
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            Δεν έχεις λογαριασμό;{" "}
-            <Link href="/signup" className="font-medium text-brand">
-              Δημιούργησε έναν
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
+              {state.error ? (
+                <Alert
+                  variant="destructive"
+                  className="border-white/50 bg-white/60 backdrop-blur-md"
+                >
+                  <AlertDescription>{state.error}</AlertDescription>
+                </Alert>
+              ) : null}
+
+              <Button
+                type="submit"
+                size="lg"
+                disabled={pending}
+                className="h-11 w-full rounded-full transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-16px_rgba(43,107,255,0.5)]"
+              >
+                {pending ? "Σύνδεση…" : "Σύνδεση"}
+              </Button>
+            </form>
+
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+              Δεν έχεις λογαριασμό;{" "}
+              <Link
+                href="/signup"
+                className="font-medium text-brand transition-colors duration-300 hover:text-brand-2"
+              >
+                Δημιούργησε έναν
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
+      </Reveal>
     </main>
   );
 }

@@ -1,22 +1,21 @@
 import { Quote } from "lucide-react";
-import AuroraBackground from "@/components/ui/aurora-background";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
 import Reveal from "@/components/ui/reveal";
+import { ShineBorder } from "@/components/ui/shine-border";
 import { TESTIMONIALS } from "@/lib/site";
+import { cn } from "@/lib/utils";
+
+const glassCard = cn(
+  "relative h-full overflow-hidden rounded-3xl border border-white/50 bg-white/60 p-7 backdrop-blur-xl",
+  "ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]",
+  "transition-all duration-300 hover:bg-white/70 hover:-translate-y-1 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)]",
+);
 
 export default function Testimonials() {
   return (
     <section
       id="clients"
-      className="relative isolate overflow-hidden bg-background py-24 sm:py-32"
+      className="relative isolate overflow-hidden py-24 sm:py-32"
     >
-      <AuroraBackground className="opacity-70" />
-
       <div className="mx-auto w-full max-w-6xl px-6">
         <Reveal className="max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-wide text-brand-2">
@@ -32,7 +31,7 @@ export default function Testimonials() {
           </p>
         </Reveal>
 
-        <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3">
+        <ul className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3">
           {TESTIMONIALS.map((testimonial, index) => (
             <Reveal
               key={testimonial.name}
@@ -40,36 +39,39 @@ export default function Testimonials() {
               delay={0.1 * index}
               className="list-none"
             >
-              <Card className="h-full gap-0 rounded-xl border shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-card">
-                <CardHeader>
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-brand/10 text-brand">
-                    <Quote
-                      aria-hidden="true"
-                      className="h-5 w-5"
-                      fill="currentColor"
-                      strokeWidth={0}
-                    />
-                  </span>
-                </CardHeader>
+              <figure className={glassCard}>
+                <ShineBorder
+                  className="rounded-3xl"
+                  borderWidth={1}
+                  duration={16}
+                  shineColor={["#2b6bff", "#7aa2ff", "#b9c9ff"]}
+                />
 
-                <CardContent className="flex-1 pt-4">
-                  <blockquote className="text-base leading-relaxed text-foreground">
-                    “{testimonial.quote}”
-                  </blockquote>
-                </CardContent>
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/50 bg-white/60 text-brand backdrop-blur-md ring-1 ring-white/40">
+                  <Quote
+                    aria-hidden="true"
+                    className="h-5 w-5"
+                    fill="currentColor"
+                    strokeWidth={0}
+                  />
+                </span>
 
-                <CardFooter className="mt-6 flex-col items-start gap-0.5 border-t bg-transparent pt-5">
+                <blockquote className="mt-4 flex-1 text-base leading-relaxed text-foreground">
+                  “{testimonial.quote}”
+                </blockquote>
+
+                <figcaption className="mt-6 flex flex-col items-start gap-0.5 border-t border-white/40 pt-5">
                   <div className="text-sm font-bold text-foreground">
                     {testimonial.name}
                   </div>
                   <div className="text-sm text-muted-foreground">
                     {testimonial.role}
                   </div>
-                </CardFooter>
-              </Card>
+                </figcaption>
+              </figure>
             </Reveal>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );

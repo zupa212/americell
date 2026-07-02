@@ -82,7 +82,8 @@ html {
 }
 
 body {
-  background: var(--color-page);
+  /* transparent so the fixed <SiteBackground/> shows through the glass UI */
+  background: transparent;
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -211,7 +212,19 @@ body {
     background-position: calc(100% + var(--shiny-width)) 0;
     }
   }
-}
+  --animate-shine: shine var(--duration) infinite linear
+;
+  @keyframes shine {
+  0% {
+    background-position: 0% 0%;
+    }
+  50% {
+    background-position: 100% 100%;
+    }
+  to {
+    background-position: 0% 0%;
+    }
+  }}
 
 :root {
   --background: oklch(1 0 0);

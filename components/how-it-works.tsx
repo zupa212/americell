@@ -1,6 +1,5 @@
 import { STEPS } from "@/lib/site";
 import Reveal from "@/components/ui/reveal";
-import AuroraBackground from "@/components/ui/aurora-background";
 import {
   Card,
   CardHeader,
@@ -9,16 +8,22 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AuroraText } from "@/components/ui/aurora-text";
+import { ShineBorder } from "@/components/ui/shine-border";
 import { cn } from "@/lib/utils";
+
+const glassSurface =
+  "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
+
+const glassHover =
+  "transition-all duration-300 hover:bg-white/70 hover:-translate-y-1 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)]";
 
 export default function HowItWorks() {
   return (
     <section
       id="how"
       aria-labelledby="how-heading"
-      className="relative overflow-hidden bg-background"
+      className="relative overflow-hidden"
     >
-      <AuroraBackground className="opacity-70" />
       <div className="relative mx-auto w-full max-w-6xl px-6 py-24 sm:py-32">
         <Reveal className="max-w-2xl" as="div">
           <header>
@@ -54,14 +59,20 @@ export default function HowItWorks() {
             <Reveal key={step.n} as="li" delay={i * 0.1}>
               <Card
                 className={cn(
-                  "h-full gap-4 p-8 transition duration-300",
-                  "hover:-translate-y-1 hover:shadow-lg hover:shadow-brand/10"
+                  "relative h-full gap-4 overflow-hidden p-8",
+                  glassSurface,
+                  glassHover
                 )}
               >
-                <CardHeader className="gap-4 px-0">
+                <ShineBorder
+                  shineColor={["#2b6bff", "#7aa2ff", "#c7d7ff"]}
+                  borderWidth={1}
+                  duration={14}
+                />
+                <CardHeader className="relative gap-4 px-0">
                   <Badge
                     aria-hidden="true"
-                    className="h-14 w-14 rounded-full bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-xl font-bold text-white shadow-lg shadow-brand/25"
+                    className="h-14 w-14 rounded-full bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-xl font-bold text-white shadow-lg shadow-brand/25 ring-1 ring-white/40"
                   >
                     {step.n}
                   </Badge>

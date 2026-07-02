@@ -30,28 +30,30 @@ import {
 import { Separator } from "@/components/ui/separator";
 
 /**
- * SiteHeader — sticky, translucent top navigation for the Americell site.
+ * SiteHeader — sticky, frosted-glass top navigation for the Americell site.
  *
- * Left: gradient brand mark + wordmark. Center (md+): shadcn NavigationMenu
- * with the primary nav anchors. Right: a language DropdownMenu, a "Σύνδεση"
- * outline Button, and a "Ξεκίνα τώρα" primary Button. On mobile the links
- * collapse into a hamburger-triggered shadcn Sheet.
+ * The bar floats over the global aurora background as a frosted glass panel
+ * (bg-white/60 + backdrop-blur-xl + a soft white hairline border). Left:
+ * gradient brand mark + wordmark. Center (md+): shadcn NavigationMenu with the
+ * primary nav anchors, each with a smooth hover. Right: a language
+ * DropdownMenu, a "Σύνδεση" outline Button, and a "Ξεκίνα τώρα" primary Button.
+ * On mobile the links collapse into a hamburger-triggered shadcn Sheet.
  */
 export default function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/70 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-white/40 bg-white/60 shadow-sm backdrop-blur-xl">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6">
         {/* Brand */}
         <a
           href="#top"
-          className="group flex items-center gap-2.5 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="group flex items-center gap-2.5 rounded-lg outline-none transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           aria-label={`${SITE.name} — Αρχική`}
         >
           <span
             aria-hidden="true"
-            className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-base font-bold text-white shadow-sm shadow-brand/20 transition-transform duration-300 group-hover:scale-105"
+            className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-base font-bold text-white shadow-sm shadow-brand/20 ring-1 ring-white/40 transition-transform duration-300 group-hover:scale-105"
           >
             <span className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
             <span className="relative">A</span>
@@ -68,7 +70,10 @@ export default function SiteHeader() {
               <NavigationMenuItem key={link.href}>
                 <NavigationMenuLink
                   href={link.href}
-                  className="px-3 py-2 font-medium text-muted-foreground hover:text-foreground"
+                  className={cn(
+                    "rounded-full px-3 py-2 font-medium text-muted-foreground",
+                    "transition-all duration-300 hover:bg-white/60 hover:text-foreground hover:backdrop-blur-md",
+                  )}
                 >
                   {NAV_LABELS_EL[link.href] ?? link.label}
                 </NavigationMenuLink>
@@ -86,7 +91,7 @@ export default function SiteHeader() {
                 <Button
                   variant="ghost"
                   size="lg"
-                  className="hidden text-muted-foreground hover:text-foreground sm:inline-flex"
+                  className="hidden text-muted-foreground transition-all duration-300 hover:bg-white/60 hover:text-foreground hover:backdrop-blur-md sm:inline-flex"
                   aria-label="Επιλογή γλώσσας, τρέχουσα Ελληνικά"
                 />
               }
@@ -94,7 +99,10 @@ export default function SiteHeader() {
               <Globe className="h-4 w-4" aria-hidden="true" />
               <span>Ελληνικά</span>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuContent
+              align="end"
+              className="w-40 border-white/50 bg-white/70 backdrop-blur-xl"
+            >
               {LANGUAGES.map((lang) => (
                 <DropdownMenuItem key={lang}>{lang}</DropdownMenuItem>
               ))}
@@ -105,7 +113,7 @@ export default function SiteHeader() {
           <Button
             variant="outline"
             size="lg"
-            className="hidden sm:inline-flex"
+            className="hidden border-white/50 bg-white/60 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/70 sm:inline-flex"
             render={<a href="/login" />}
             nativeButton={false}
           >
@@ -115,7 +123,7 @@ export default function SiteHeader() {
           {/* Get started (primary) */}
           <Button
             size="lg"
-            className="bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white shadow-sm shadow-brand/25 hover:opacity-95"
+            className="bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white shadow-sm shadow-brand/25 ring-1 ring-white/30 transition-all duration-300 hover:-translate-y-0.5 hover:opacity-95 hover:shadow-[0_16px_40px_-16px_rgba(43,107,255,0.55)]"
             render={<a href="/signup" />}
             nativeButton={false}
           >
@@ -129,19 +137,22 @@ export default function SiteHeader() {
                 <Button
                   variant="outline"
                   size="icon-lg"
-                  className="md:hidden"
+                  className="border-white/50 bg-white/60 backdrop-blur-md transition-all duration-300 hover:bg-white/70 md:hidden"
                   aria-label="Άνοιγμα μενού"
                 />
               }
             >
               <Menu className="h-5 w-5" aria-hidden="true" />
             </SheetTrigger>
-            <SheetContent side="right" className="w-full gap-0 sm:max-w-sm">
+            <SheetContent
+              side="right"
+              className="w-full gap-0 border-white/40 bg-white/70 backdrop-blur-xl sm:max-w-sm"
+            >
               <SheetHeader>
                 <SheetTitle className="flex items-center gap-2.5">
                   <span
                     aria-hidden="true"
-                    className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-base font-bold text-white shadow-sm shadow-brand/20"
+                    className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-base font-bold text-white shadow-sm shadow-brand/20 ring-1 ring-white/40"
                   >
                     A
                   </span>
@@ -162,7 +173,7 @@ export default function SiteHeader() {
                     render={
                       <a
                         href={link.href}
-                        className="rounded-xl px-3 py-2.5 text-base font-medium text-foreground transition hover:bg-brand/[0.06]"
+                        className="rounded-xl px-3 py-2.5 text-base font-medium text-foreground transition-all duration-300 hover:bg-white/60 hover:backdrop-blur-md"
                       >
                         {NAV_LABELS_EL[link.href] ?? link.label}
                       </a>
@@ -171,13 +182,13 @@ export default function SiteHeader() {
                 ))}
               </nav>
 
-              <Separator className="my-4" />
+              <Separator className="my-4 bg-white/50" />
 
               <div className="flex flex-col gap-2 px-4 pb-4">
                 <Button
                   variant="outline"
                   size="lg"
-                  className="h-11 w-full"
+                  className="h-11 w-full border-white/50 bg-white/60 backdrop-blur-md transition-all duration-300 hover:bg-white/70"
                   render={<a href="/login" onClick={() => setMenuOpen(false)} />}
                   nativeButton={false}
                 >
@@ -185,7 +196,7 @@ export default function SiteHeader() {
                 </Button>
                 <Button
                   size="lg"
-                  className="h-11 w-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white shadow-sm shadow-brand/25 hover:opacity-95"
+                  className="h-11 w-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white shadow-sm shadow-brand/25 ring-1 ring-white/30 transition-all duration-300 hover:opacity-95 hover:shadow-[0_16px_40px_-16px_rgba(43,107,255,0.55)]"
                   render={
                     <a href="/signup" onClick={() => setMenuOpen(false)} />
                   }

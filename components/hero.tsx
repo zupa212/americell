@@ -12,11 +12,12 @@ import {
 import { Settings, Pause, Send } from "lucide-react";
 import { SITE } from "@/lib/site";
 import Reveal from "@/components/ui/reveal";
-import AuroraBackground from "@/components/ui/aurora-background";
 import { AuroraText } from "@/components/ui/aurora-text";
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
 import { BorderBeam } from "@/components/ui/border-beam";
+import { ShineBorder } from "@/components/ui/shine-border";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { Particles } from "@/components/ui/particles";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -27,10 +28,17 @@ import { cn } from "@/lib/utils";
  * shared <Reveal> client wrapper, and the floating app tiles bob via the
  * CSS keyframe utilities (animate-float / animate-float-slow) defined in
  * globals.css. The heavy lifting for premium accents is composed from
- * Magic UI + shadcn components (AuroraBackground, AuroraText, BorderBeam,
- * AnimatedShinyText, ShimmerButton, Button) — each client-internal where it
- * needs to be. Brand logos (react-icons/si) + a lucide gear are used
- * decoratively; all copy stays honest about real-device management,
+ * Magic UI + shadcn components (AuroraText, BorderBeam, ShineBorder,
+ * Particles, AnimatedShinyText, ShimmerButton, Button) — each client-internal
+ * where it needs to be.
+ *
+ * GLASSMORPHISM: the <section> is fully transparent so the persistent global
+ * <SiteBackground/> (light wash + drifting aurora + dot grid, fixed behind
+ * everything) shows through. Surfaces above it are frosted glass; the eyebrow
+ * is a glass pill and the phone sits in a relative container carrying a
+ * BorderBeam, a ShineBorder edge, a faint glass reflection, and ambient
+ * <Particles/> for depth. Brand logos (react-icons/si) + a lucide gear are
+ * used decoratively; all copy stays honest about real-device management,
  * automation, and testing. No network images.
  */
 
@@ -154,12 +162,15 @@ function FloatingTile({ tile }: { tile: FloatingTile }) {
           className="absolute inset-0 -z-10 rounded-2xl opacity-70 blur-xl transition-opacity duration-500 group-hover:opacity-100"
           style={{ background: gradient }}
         />
-        <div
-          className="flex h-14 w-14 items-center justify-center rounded-2xl shadow-xl shadow-black/20 ring-1 ring-white/30 transition-transform duration-300 group-hover:scale-105 sm:h-16 sm:w-16"
-          style={{ background: gradient }}
-          title={name}
-        >
-          <Icon className="h-6 w-6 text-white sm:h-7 sm:w-7" aria-hidden="true" />
+        {/* frosted glass shell hosting the brand-colored chip */}
+        <div className="rounded-[1.15rem] border border-white/50 bg-white/40 p-1 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.28)] ring-1 ring-white/40 backdrop-blur-md transition-transform duration-300 group-hover:scale-105">
+          <div
+            className="flex h-12 w-12 items-center justify-center rounded-2xl shadow-lg shadow-black/20 ring-1 ring-white/30 sm:h-14 sm:w-14"
+            style={{ background: gradient }}
+            title={name}
+          >
+            <Icon className="h-6 w-6 text-white sm:h-7 sm:w-7" aria-hidden="true" />
+          </div>
         </div>
       </div>
     </div>
@@ -174,8 +185,14 @@ function PhoneMockup() {
         aria-hidden="true"
         className="pointer-events-none absolute -inset-10 -z-10 rounded-[4rem] bg-gradient-to-br from-brand/30 via-brand-2/25 to-brand-soft/30 blur-3xl"
       />
-      {/* phone frame — relative container carrying the animated BorderBeam */}
-      <div className="relative h-full w-full overflow-hidden rounded-[3rem] bg-foreground p-[10px] shadow-2xl shadow-brand-2/25 ring-1 ring-black/5">
+      {/* relative glass container — carries the animated BorderBeam,
+          the ShineBorder edge and a faint glass reflection */}
+      <div className="relative h-full w-full overflow-hidden rounded-[3rem] bg-foreground p-[10px] shadow-[0_30px_90px_-30px_rgba(43,107,255,0.45)] ring-1 ring-black/5">
+        {/* faint glass reflection sweeping across the frame */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-30 rounded-[3rem] bg-gradient-to-tr from-transparent via-white/10 to-white/25"
+        />
         {/* screen */}
         <div className="relative h-full w-full overflow-hidden rounded-[2.4rem] bg-gradient-to-b from-[#081a44] via-[#12306e] to-[#1d4ed8]">
           {/* dynamic island */}
@@ -222,7 +239,7 @@ function PhoneMockup() {
 
           {/* automation running glass card */}
           <div className="absolute inset-x-5 bottom-24">
-            <div className="rounded-2xl bg-white/10 p-4 ring-1 ring-white/20 backdrop-blur-md">
+            <div className="rounded-2xl border border-white/20 bg-white/10 p-4 ring-1 ring-white/20 backdrop-blur-md">
               <div className="flex items-center gap-2">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-glow rounded-full bg-emerald-300" />
@@ -263,6 +280,18 @@ function PhoneMockup() {
           </div>
         </div>
 
+        {/* shimmering glass edge tracing the frame */}
+        <ShineBorder
+          borderWidth={2}
+          duration={12}
+          shineColor={[
+            "var(--color-brand, #2b6bff)",
+            "var(--color-brand-2, #7c3aed)",
+            "var(--color-brand-soft, #60a5fa)",
+          ]}
+          className="rounded-[3rem]"
+        />
+
         {/* animated border beam tracing the phone frame */}
         <BorderBeam
           size={140}
@@ -285,22 +314,19 @@ function PhoneMockup() {
 
 export default function Hero() {
   return (
+    // Transparent section — the global <SiteBackground/> (aurora + dot grid)
+    // shows through the frosted glass surfaces above it.
     <section id="top" className="relative overflow-hidden">
-      {/* vivid aurora — prominent behind the hero centerpiece */}
-      <AuroraBackground />
-
-      {/* soft radial background glows — layered on top of the aurora */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/2 top-24 h-[440px] w-[440px] -translate-x-1/2 animate-glow rounded-full bg-brand/15 blur-3xl" />
-        <div className="absolute left-[14%] top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-brand-2/15 blur-3xl" />
-        <div className="absolute right-[12%] top-1/3 h-72 w-72 rounded-full bg-destructive/10 blur-3xl" />
-      </div>
-
       <div className="mx-auto w-full max-w-6xl px-6 py-20 sm:py-28">
-        {/* eyebrow — AnimatedShinyText pill */}
+        {/* eyebrow — AnimatedShinyText inside a frosted glass pill */}
         <Reveal>
           <div className="flex justify-center">
-            <div className="group rounded-full border bg-card px-4 py-1.5 text-sm shadow-soft transition-colors hover:bg-muted">
+            <div
+              className={cn(
+                "group rounded-full border border-white/50 bg-white/60 px-4 py-1.5 text-sm backdrop-blur-md ring-1 ring-white/40",
+                "shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/70",
+              )}
+            >
               <AnimatedShinyText className="inline-flex items-center justify-center text-brand">
                 Αληθινές συσκευές ΗΠΑ, πλήρως απομακρυσμένα
               </AnimatedShinyText>
@@ -330,7 +356,7 @@ export default function Hero() {
             <Link href="/signup" className="inline-flex">
               <ShimmerButton
                 background="var(--foreground)"
-                className="h-12 px-7 text-sm font-medium shadow-soft"
+                className="h-12 px-7 text-sm font-medium shadow-soft transition-all duration-300 hover:-translate-y-0.5"
               >
                 Ξεκίνα τώρα
               </ShimmerButton>
@@ -338,7 +364,7 @@ export default function Hero() {
             <Button
               variant="ghost"
               size="lg"
-              className="h-12 rounded-full px-6 text-sm font-medium text-muted-foreground"
+              className="h-12 rounded-full px-6 text-sm font-medium text-muted-foreground transition-all duration-300 hover:-translate-y-0.5"
               render={<a href="#pricing" />}
               nativeButton={false}
             >
@@ -347,10 +373,18 @@ export default function Hero() {
           </div>
         </Reveal>
 
-        {/* the visual: phone + floating tiles */}
+        {/* the visual: phone + floating tiles + ambient particles */}
         <Reveal delay={0.2}>
           <div className="relative mt-20 flex justify-center sm:mt-24">
             <div className="relative">
+              {/* ambient particles drifting behind the phone for depth */}
+              <Particles
+                className="pointer-events-none absolute -inset-24 -z-10"
+                quantity={70}
+                ease={80}
+                color="#2b6bff"
+                staticity={40}
+              />
               {TILES.map((tile) => (
                 <FloatingTile key={tile.name} tile={tile} />
               ))}

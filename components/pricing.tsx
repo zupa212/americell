@@ -4,10 +4,11 @@ import { useState } from "react";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Reveal from "@/components/ui/reveal";
-import AuroraBackground from "@/components/ui/aurora-background";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BorderBeam } from "@/components/ui/border-beam";
+import { ShineBorder } from "@/components/ui/shine-border";
+import { MagicCard } from "@/components/ui/magic-card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -25,6 +26,12 @@ import {
   type Cycle,
   type Device,
 } from "@/lib/devices";
+
+// Shared frosted-glass recipe — floats over the global <SiteBackground/> aurora.
+const GLASS =
+  "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
+const GLASS_HOVER =
+  "transition-all duration-300 hover:bg-white/70 hover:-translate-y-1 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)]";
 
 export default function Pricing() {
   const [cycle, setCycle] = useState<Cycle>("monthly");
@@ -71,11 +78,8 @@ export default function Pricing() {
     <section
       id="pricing"
       aria-labelledby="pricing-heading"
-      className="relative isolate overflow-hidden bg-background py-24 sm:py-32"
+      className="relative isolate py-24 sm:py-32"
     >
-      {/* Subtle aurora wash behind the whole pricing section */}
-      <AuroraBackground className="opacity-70" />
-
       <div className="mx-auto w-full max-w-6xl px-6">
         {/* Section header */}
         <Reveal className="mx-auto max-w-2xl text-center">
@@ -105,16 +109,16 @@ export default function Pricing() {
             onValueChange={(value) => setCycle(value as Cycle)}
             aria-label="Κύκλος χρέωσης"
           >
-            <TabsList className="h-11 rounded-full bg-card p-1 shadow-soft ring-1 ring-border backdrop-blur">
+            <TabsList className="h-11 rounded-full border border-white/50 bg-white/60 p-1 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)] ring-1 ring-white/40 backdrop-blur-md">
               <TabsTrigger
                 value="monthly"
-                className="min-w-[7rem] rounded-full px-5 data-active:bg-gradient-to-r data-active:from-brand data-active:to-brand-2 data-active:text-white data-active:shadow-glow"
+                className="min-w-[7rem] rounded-full px-5 transition-all duration-300 data-active:bg-gradient-to-r data-active:from-brand data-active:to-brand-2 data-active:text-white data-active:shadow-glow"
               >
                 Μηνιαία
               </TabsTrigger>
               <TabsTrigger
                 value="annual"
-                className="min-w-[7rem] gap-2 rounded-full px-5 data-active:bg-gradient-to-r data-active:from-brand data-active:to-brand-2 data-active:text-white data-active:shadow-glow"
+                className="min-w-[7rem] gap-2 rounded-full px-5 transition-all duration-300 data-active:bg-gradient-to-r data-active:from-brand data-active:to-brand-2 data-active:text-white data-active:shadow-glow"
               >
                 Ετήσια
                 <Badge
@@ -138,108 +142,132 @@ export default function Pricing() {
 
             return (
               <Reveal as="article" key={device.id} delay={0.08 * index}>
-                <Card
+                <MagicCard
                   className={cn(
-                    "relative h-full gap-0 rounded-2xl py-0 ring-1 transition duration-300",
-                    isPopular
-                      ? "shadow-glow ring-brand/25 lg:-translate-y-2"
-                      : "shadow-soft ring-border hover:-translate-y-1 hover:ring-brand-2/30",
+                    "h-full rounded-3xl",
+                    isPopular ? "lg:-translate-y-2" : "",
                   )}
+                  gradientColor="rgba(43,107,255,0.12)"
+                  gradientFrom="var(--color-brand)"
+                  gradientTo="var(--color-brand-2)"
+                  gradientOpacity={0.55}
                 >
-                  {/* Beam accent reserved for the most-popular card */}
-                  {isPopular && (
-                    <BorderBeam
-                      size={70}
-                      duration={7}
-                      colorFrom="var(--color-brand)"
-                      colorTo="var(--color-brand-2)"
-                    />
-                  )}
-
-                  {/* Accent top bar driven by device.accent */}
-                  <div
-                    aria-hidden="true"
-                    className="absolute inset-x-0 top-0 h-1 rounded-t-2xl"
-                    style={{ backgroundColor: device.accent }}
-                  />
-
-                  <CardHeader className="px-7 pt-8 sm:px-8">
-                    {isPopular && (
-                      <Badge className="absolute right-6 top-6 bg-gradient-to-r from-brand to-brand-2 uppercase tracking-wide text-white shadow-glow">
-                        Πιο δημοφιλές
-                      </Badge>
+                  <Card
+                    className={cn(
+                      "relative h-full gap-0 border-0 bg-transparent py-0 shadow-none",
+                      // Frosted glass surface floating over the aurora.
+                      GLASS,
+                      isPopular
+                        ? "bg-white/70 ring-white/60 shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)]"
+                        : GLASS_HOVER,
                     )}
-                    <CardTitle className="text-xl font-bold tracking-tight text-foreground">
-                      {device.name}
-                    </CardTitle>
-                    <CardDescription className="mt-1.5 text-sm text-muted-foreground">
-                      {device.os} · {device.location}
-                    </CardDescription>
-                  </CardHeader>
-
-                  <CardContent className="flex-1 px-7 sm:px-8">
-                    {/* Price */}
-                    <div className="mt-7 flex items-baseline gap-1.5">
-                      <span className="text-5xl font-extrabold tracking-tight text-foreground">
-                        ${perMonth}
-                      </span>
-                      <span className="text-sm font-medium text-muted-foreground">
-                        /μήνα
-                      </span>
-                    </div>
-                    <p className="mt-1.5 h-5 text-sm text-muted-foreground">
-                      {cycle === "annual"
-                        ? `χρέωση $${annualTotal}/έτος`
-                        : "χρέωση μηνιαία"}
-                    </p>
-
-                    {/* Spec line as a check row */}
-                    <div className="mt-7 flex items-start gap-2.5 border-t border-border pt-6">
-                      <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand/15 to-brand-2/15">
-                        <Check
-                          className="h-3.5 w-3.5 text-brand"
-                          aria-hidden="true"
+                  >
+                    {/* Shine + beam accents reserved for the most-popular card */}
+                    {isPopular && (
+                      <>
+                        <ShineBorder
+                          borderWidth={1.5}
+                          duration={12}
+                          shineColor={[
+                            "var(--color-brand)",
+                            "var(--color-brand-2)",
+                            "var(--color-brand-soft)",
+                          ]}
                         />
-                      </span>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {device.specs}
-                      </p>
-                    </div>
-                  </CardContent>
+                        <BorderBeam
+                          size={70}
+                          duration={7}
+                          colorFrom="var(--color-brand)"
+                          colorTo="var(--color-brand-2)"
+                        />
+                      </>
+                    )}
 
-                  <CardFooter className="mt-8 border-t-0 bg-transparent px-7 pb-8 sm:px-8">
-                    <Button
-                      type="button"
-                      onClick={() => handleCheckout(device)}
-                      disabled={isPending}
-                      aria-label={`Απόκτησε ${device.name}`}
-                      className={cn(
-                        "group/cta h-12 w-full rounded-full px-6 text-sm font-semibold",
-                        isPopular
-                          ? "bg-gradient-to-r from-brand to-brand-2 text-white shadow-glow hover:opacity-95"
-                          : "bg-foreground text-background hover:bg-foreground/90",
+                    {/* Accent top bar driven by device.accent */}
+                    <div
+                      aria-hidden="true"
+                      className="absolute inset-x-0 top-0 h-1 rounded-t-3xl"
+                      style={{ backgroundColor: device.accent }}
+                    />
+
+                    <CardHeader className="px-7 pt-8 sm:px-8">
+                      {isPopular && (
+                        <Badge className="absolute right-6 top-6 bg-gradient-to-r from-brand to-brand-2 uppercase tracking-wide text-white shadow-glow">
+                          Πιο δημοφιλές
+                        </Badge>
                       )}
-                    >
-                      {isPending ? (
-                        <>
-                          <Loader2
-                            className="h-4 w-4 animate-spin"
+                      <CardTitle className="text-xl font-bold tracking-tight text-foreground">
+                        {device.name}
+                      </CardTitle>
+                      <CardDescription className="mt-1.5 text-sm text-muted-foreground">
+                        {device.os} · {device.location}
+                      </CardDescription>
+                    </CardHeader>
+
+                    <CardContent className="flex-1 px-7 sm:px-8">
+                      {/* Price */}
+                      <div className="mt-7 flex items-baseline gap-1.5">
+                        <span className="text-5xl font-extrabold tracking-tight text-foreground">
+                          ${perMonth}
+                        </span>
+                        <span className="text-sm font-medium text-muted-foreground">
+                          /μήνα
+                        </span>
+                      </div>
+                      <p className="mt-1.5 h-5 text-sm text-muted-foreground">
+                        {cycle === "annual"
+                          ? `χρέωση $${annualTotal}/έτος`
+                          : "χρέωση μηνιαία"}
+                      </p>
+
+                      {/* Spec line as a check row */}
+                      <div className="mt-7 flex items-start gap-2.5 border-t border-white/50 pt-6">
+                        <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand/15 to-brand-2/15">
+                          <Check
+                            className="h-3.5 w-3.5 text-brand"
                             aria-hidden="true"
                           />
-                          Έναρξη…
-                        </>
-                      ) : (
-                        <>
-                          Απόκτησέ το
-                          <ArrowRight
-                            className="h-4 w-4 transition-transform group-hover/cta:translate-x-0.5"
-                            aria-hidden="true"
-                          />
-                        </>
-                      )}
-                    </Button>
-                  </CardFooter>
-                </Card>
+                        </span>
+                        <p className="text-sm leading-relaxed text-muted-foreground">
+                          {device.specs}
+                        </p>
+                      </div>
+                    </CardContent>
+
+                    <CardFooter className="mt-8 border-t-0 bg-transparent px-7 pb-8 sm:px-8">
+                      <Button
+                        type="button"
+                        onClick={() => handleCheckout(device)}
+                        disabled={isPending}
+                        aria-label={`Απόκτησε ${device.name}`}
+                        className={cn(
+                          "group/cta h-12 w-full rounded-full px-6 text-sm font-semibold transition-all duration-300",
+                          isPopular
+                            ? "bg-gradient-to-r from-brand to-brand-2 text-white shadow-glow hover:opacity-95"
+                            : "bg-foreground text-background hover:bg-foreground/90",
+                        )}
+                      >
+                        {isPending ? (
+                          <>
+                            <Loader2
+                              className="h-4 w-4 animate-spin"
+                              aria-hidden="true"
+                            />
+                            Έναρξη…
+                          </>
+                        ) : (
+                          <>
+                            Απόκτησέ το
+                            <ArrowRight
+                              className="h-4 w-4 transition-transform group-hover/cta:translate-x-0.5"
+                              aria-hidden="true"
+                            />
+                          </>
+                        )}
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </MagicCard>
               </Reveal>
             );
           })}
