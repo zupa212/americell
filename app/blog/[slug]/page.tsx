@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronRight } from "lucide-react";
-import PageShell from "@/components/page-shell";
 import Reveal from "@/components/ui/reveal";
 import Article from "@/components/blog/article";
 import { POSTS, getPostBySlug } from "@/lib/blog";
@@ -12,6 +10,7 @@ import {
   SITE_URL,
   buildMetadata,
 } from "@/lib/seo";
+import { cn } from "@/lib/utils";
 
 type PageProps = { params: Promise<{ slug: string }> };
 
@@ -80,6 +79,21 @@ function blogPostingJsonLd(post: NonNullable<ReturnType<typeof getPostBySlug>>) 
   };
 }
 
+/**
+ * Format an ISO `YYYY-MM-DD` date as a long US English date. The `T00:00:00`
+ * anchor keeps the day stable regardless of the build machine's timezone.
+ */
+function formatDate(iso: string): string {
+  return new Date(`${iso}T00:00:00`).toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+const focusRing =
+  "rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900";
+
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params;
   const post = getPostBySlug(slug);
@@ -91,63 +105,98 @@ export default async function BlogPostPage({ params }: PageProps) {
   const jsonLd = JSON.stringify(blogPostingJsonLd(post));
 
   return (
-    <PageShell>
+    // Opaque near-white canvas that fully covers the global aurora background.
+    // Deliberately monochrome, typography-first — the editorial counterpoint to
+    // the colorful glassmorphism marketing site.
+    <main className="relative min-h-screen bg-neutral-50 text-neutral-900">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd }}
       />
-      <div className="mx-auto w-full max-w-3xl px-6 py-12 sm:py-16">
-        {/* Breadcrumb */}
+
+      <div className="mx-auto w-full max-w-3xl px-6 py-16 sm:py-24">
+        {/* Editorial header: breadcrumb, title, meta */}
         <Reveal>
-          <nav aria-label="Breadcrumb" className="mb-8">
-            <ol className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
-              <li>
-                <Link
-                  href="/"
-                  className="rounded-sm transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-                >
-                  Home
-                </Link>
-              </li>
-              <ChevronRight
-                aria-hidden="true"
-                className="h-4 w-4 flex-none text-line"
-              />
-              <li>
-                <Link
-                  href="/blog"
-                  className="rounded-sm transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-                >
-                  Blog
-                </Link>
-              </li>
-              <ChevronRight
-                aria-hidden="true"
-                className="h-4 w-4 flex-none text-line"
-              />
-              <li aria-current="page" className="min-w-0 truncate text-foreground">
-                {post.title}
-              </li>
-            </ol>
-          </nav>
+          <header>
+            <nav aria-label="Breadcrumb">
+              <ol className="flex flex-wrap items-center gap-2 text-sm text-neutral-500">
+                <li>
+                  <Link
+                    href="/"
+                    className={cn(
+                      "transition-colors hover:text-neutral-900",
+                      focusRing,
+                    )}
+                  >
+                    Home
+                  </Link>
+                </li>
+                <li aria-hidden="true" className="text-neutral-300">
+                  /
+                </li>
+                <li>
+                  <Link
+                    href="/blog"
+                    className={cn(
+                      "transition-colors hover:text-neutral-900",
+                      focusRing,
+                    )}
+                  >
+                    Blog
+                  </Link>
+                </li>
+              </ol>
+            </nav>
+
+            <h1 className="mt-8 text-4xl font-bold leading-[1.08] tracking-tight text-neutral-900 sm:text-5xl">
+              {post.title}
+            </h1>
+
+            <div className="mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-neutral-500">
+              <time dateTime={post.date}>{formatDate(post.date)}</time>
+              <span aria-hidden="true" className="text-neutral-300">
+                ·
+              </span>
+              <span>{post.readingMinutes} min read</span>
+            </div>
+          </header>
         </Reveal>
 
+        {/* Article body */}
         <Reveal delay={0.05}>
-          <Article post={post} />
+          <div className="mt-12">
+            <Article post={post} />
+          </div>
         </Reveal>
 
-        {/* Back to index */}
+        {/* Thin divider + B&W text CTA */}
         <Reveal delay={0.1}>
-          <div className="mt-10 flex justify-center">
+          <div className="mt-16 border-t border-neutral-200 pt-10">
+            <p className="text-base text-neutral-500">
+              Rent a real, remote-controlled US iPhone or Android — operated
+              straight from your browser for app testing, QA, localization and
+              growth work.
+            </p>
             <Link
-              href="/blog"
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/60 px-5 py-2.5 text-sm font-medium text-foreground backdrop-blur-xl ring-1 ring-white/40 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+              href="/signup"
+              className={cn(
+                "group mt-5 inline-flex items-center gap-2 text-base font-semibold text-neutral-900",
+                "underline decoration-neutral-300 decoration-2 underline-offset-4",
+                "transition-colors hover:decoration-neutral-900",
+                focusRing,
+              )}
             >
-              ← All articles
+              Get started
+              <span
+                aria-hidden="true"
+                className="transition-transform duration-200 group-hover:translate-x-0.5"
+              >
+                →
+              </span>
             </Link>
           </div>
         </Reveal>
       </div>
-    </PageShell>
+    </main>
   );
 }

@@ -3,121 +3,121 @@ import type { BlogPost } from "@/lib/blog";
 export const post: BlogPost = {
   slug: "remote-phone-app-testing-qa",
   title:
-    "Remote phone control για app testing & QA: αληθινές συσκευές vs emulators",
+    "Remote Phone Control for App Testing & QA: Real Devices vs. Emulators",
   description:
-    "App testing σε πραγματικές συσκευές ΗΠΑ vs emulators: γιατί το αληθινό hardware κερδίζει σε QA, store review και localization, με πρακτικό remote workflow.",
+    "App testing on real US devices vs. emulators: why real hardware wins for QA, store review, and localization, plus a practical remote workflow.",
   keywords: [
-    "app testing σε πραγματικές συσκευές",
-    "QA σε iPhone και Android",
-    "emulators vs αληθινές συσκευές",
-    "remote testing ΗΠΑ",
+    "app testing on real devices",
+    "QA on iPhone and Android",
+    "emulators vs real devices",
+    "remote testing US",
     "localization testing",
     "app store review",
-    "τηλεχειρισμός τηλεφώνου",
+    "remote phone control",
   ],
   date: "2026-07-06",
-  author: "Ομάδα Americell",
+  author: "Americell Team",
   readingMinutes: 6,
-  body: `Το **app testing σε πραγματικές συσκευές** είναι η διαφορά ανάμεσα σε ένα build που «περνάει στο emulator» και σε ένα προϊόν που πραγματικά δουλεύει στα χέρια των χρηστών σου στις ΗΠΑ. Οι emulators και οι simulators είναι εξαιρετικοί για γρήγορα, επαναλαμβανόμενα smoke tests — αλλά δεν αναπαράγουν πιστά τη συμπεριφορά πραγματικού hardware, πραγματικών δικτύων και πραγματικών app stores. Σε αυτόν τον οδηγό εξηγούμε, από τη σκοπιά ομάδων QA και development, γιατί οι αληθινές συσκευές ΗΠΑ είναι μονόδρομος για σοβαρό ποιοτικό έλεγχο και πώς στήνεις ένα ρεαλιστικό remote testing workflow.
+  body: `**App testing on real devices** is the difference between a build that "passes on the emulator" and a product that actually works in the hands of your users in the US. Emulators and simulators are excellent for fast, repeatable smoke tests — but they don't faithfully reproduce the behavior of real hardware, real networks, and real app stores. In this guide we explain, from the perspective of QA and development teams, why real US devices are essential for serious quality assurance and how to set up a realistic remote testing workflow.
 
-## Emulators vs αληθινές συσκευές: τι πραγματικά διαφέρει
+## Emulators vs. real devices: what actually differs
 
-Η συζήτηση δεν είναι «emulator ή τίποτα». Είναι για το πού τελειώνει η αξιοπιστία του emulator και πού ξεκινά ο πραγματικός κίνδυνος να ξεφύγει ένα bug στην παραγωγή.
+This isn't an "emulator or nothing" debate. It's about where the emulator's reliability ends and where the real risk of a bug slipping into production begins.
 
-### Πού λάμπουν οι emulators
+### Where emulators shine
 
-- **Ταχύτητα & κόστος**: στήνεις δεκάδες configurations χωρίς hardware.
-- **CI pipelines**: ιδανικοί για unit και integration tests σε κάθε commit.
-- **Reproducibility**: καθαρό state με ένα κλικ, χωρίς «βρώμικες» συσκευές.
+- **Speed & cost**: spin up dozens of configurations without hardware.
+- **CI pipelines**: ideal for unit and integration tests on every commit.
+- **Reproducibility**: a clean state with one click, no "dirty" devices.
 
-Για τα πρώτα επίπεδα της πυραμίδας του testing, ο emulator είναι σωστή επιλογή και δεν πρέπει να τον εγκαταλείψεις.
+For the lower tiers of the testing pyramid, the emulator is the right choice, and you shouldn't abandon it.
 
-### Πού σε προδίδουν
+### Where they let you down
 
-Το πρόβλημα ξεκινά όταν εμπιστεύεσαι τον emulator για πράγματα που *δεν* μπορεί να προσομοιώσει πιστά:
+The problem starts when you trust the emulator for things it *can't* simulate faithfully:
 
-- **Πραγματική απόδοση**: thermal throttling, μνήμη υπό πίεση, GPU συμπεριφορά σε mid-range Android — ένας emulator σε δυνατό desktop τα κρύβει όλα.
-- **Κάμερα, αισθητήρες, βιομετρικά**: Face ID / Touch ID, GPS, accelerometer, push σε πραγματικές συνθήκες.
-- **Δίκτυο**: πραγματικά carrier & Wi-Fi profiles των ΗΠΑ, απώλεια πακέτων, εναλλαγή 5G/LTE.
-- **App store πραγματικότητα**: πώς εμφανίζεται και συμπεριφέρεται η εφαρμογή όταν εγκαθίσταται από το πραγματικό store, όχι από ένα sideloaded build.
+- **Real performance**: thermal throttling, memory under pressure, GPU behavior on mid-range Android — an emulator running on a powerful desktop hides all of it.
+- **Camera, sensors, biometrics**: Face ID / Touch ID, GPS, accelerometer, and push under real conditions.
+- **Network**: real US carrier and Wi-Fi profiles, packet loss, 5G/LTE handoffs.
+- **App store reality**: how the app looks and behaves when installed from the real store, not from a sideloaded build.
 
-Αν θέλεις μια πιο βασική εισαγωγή στην ιδέα, δες [τι είναι ο τηλεχειρισμός τηλεφώνου](/blog/ti-einai-o-tilecheirismos-tilefonou).
+If you want a more basic introduction to the concept, see [what remote phone control is](/blog/ti-einai-o-tilecheirismos-tilefonou).
 
-### Συχνά bugs που ξεφεύγουν από τους emulators
+### Common bugs that slip past emulators
 
-Στην πράξη, αυτές είναι κατηγορίες προβλημάτων που βλέπουμε να «περνούν πράσινα» στον emulator και μετά να σκάνε σε πραγματικό hardware:
+In practice, these are the categories of problems we see pass "green" on the emulator and then break on real hardware:
 
-- **Timing & race conditions** που εμφανίζονται μόνο υπό πραγματικό network latency ή αργότερο I/O.
-- **Λανθασμένα permission prompts** ή flows που κρασάρουν όταν ο χρήστης απορρίπτει μια άδεια.
-- **Push notifications** που φτάνουν με καθυστέρηση, διπλά ή καθόλου εκτός sandbox.
-- **Layout σε πραγματικά DPI**: κομμένα κείμενα, notch/safe-area, gesture navigation.
-- **Battery & background**: εργασίες που σκοτώνει το OS όταν η εφαρμογή πάει στο background.
+- **Timing & race conditions** that only appear under real network latency or slower I/O.
+- **Broken permission prompts** or flows that crash when the user denies a permission.
+- **Push notifications** that arrive late, duplicated, or not at all outside the sandbox.
+- **Layout at real DPI**: clipped text, notch/safe-area issues, gesture navigation.
+- **Battery & background**: tasks the OS kills when the app moves to the background.
 
-Κανένα από αυτά δεν είναι εξωτικό — απλώς απαιτεί μια πραγματική συσκευή για να το δεις πριν φτάσει στους χρήστες.
+None of these are exotic — they just require a real device to catch them before they reach your users.
 
-## Γιατί το «ΗΠΑ» έχει σημασία για το QA σου
+## Why "US" matters for your QA
 
-Πολλές ομάδες εκτός ΗΠΑ testάρουν αποκλειστικά στο τοπικό τους περιβάλλον και μετά απορούν γιατί οι Αμερικανοί χρήστες αναφέρουν προβλήματα. Μια πραγματική συσκευή ΗΠΑ σού δίνει το *ίδιο context* με τους χρήστες που θέλεις να εξυπηρετήσεις:
+Many teams outside the US test exclusively on their local setup and then wonder why American users report issues. A real US device gives you the *same context* as the users you want to serve:
 
-- **App store availability**: features, ρυθμίσεις και εκδόσεις εφαρμογών που περιορίζονται ανά περιοχή.
-- **Localization & currency**: σωστό formatting για ημερομηνίες, νούμερα και τιμές σε δολάρια (\\$).
-- **Geofenced λειτουργίες**: onboarding flows, συμμόρφωση και περιεχόμενο που αλλάζουν ανά χώρα.
-- **Carrier-specific συμπεριφορά**: SMS/OTP delivery, RCS, push σε US networks.
+- **App store availability**: features, settings, and app versions that are region-restricted.
+- **Localization & currency**: correct formatting for dates, numbers, and prices in dollars (\\$).
+- **Geofenced features**: onboarding flows, compliance, and content that change by country.
+- **Carrier-specific behavior**: SMS/OTP delivery, RCS, and push on US networks.
 
-Αυτό είναι νόμιμο, καθημερινό QA: δοκιμάζεις **δικές σου** εφαρμογές και **δικούς σου** λογαριασμούς στο περιβάλλον όπου ζουν οι πελάτες σου. Δεν πρόκειται για απόκρυψη ταυτότητας ή παράκαμψη κανόνων των πλατφορμών — είναι απλώς πρόσβαση σε πραγματικό αμερικανικό context.
+This is legitimate, everyday QA: you test **your own** apps and **your own** accounts in the environment where your customers live. It's not about hiding your identity or bypassing platform rules — it's simply access to real US context.
 
-## Ένα ρεαλιστικό remote testing workflow
+## A realistic remote testing workflow
 
-Με το Americell, η ομάδα σου χειρίζεται ένα αληθινό iPhone ή Android ΗΠΑ απευθείας από τον browser. Ένα τυπικό QA workflow μοιάζει κάπως έτσι:
+With Americell, your team controls a real US iPhone or Android directly from the browser. A typical QA workflow looks something like this:
 
-1. **Provision**: δεσμεύεις μια πραγματική συσκευή ΗΠΑ (iOS ή Android) για την ομάδα σου.
-2. **Install**: εγκαθιστάς το build είτε μέσω TestFlight/internal track είτε από το store για pre-release checks.
-3. **Drive**: αναλαμβάνει ο tester — tap, swipe, typing, screenshots — σαν να κρατά το τηλέφωνο στο χέρι.
-4. **Observe**: παρακολουθείς πραγματική απόδοση, network calls και store συμπεριφορά, όχι προσομοιωμένη.
-5. **Repeat & log**: καταγράφεις bugs με πραγματικά screenshots από πραγματικό hardware.
-6. **Handoff**: περνάς τη συσκευή σε άλλον συνάδελφο χωρίς να ταξιδέψει φυσικό device.
+1. **Provision**: reserve a real US device (iOS or Android) for your team.
+2. **Install**: deploy the build either through a TestFlight/internal track or from the store for pre-release checks.
+3. **Drive**: the tester takes over — tap, swipe, typing, screenshots — just like holding the phone in hand.
+4. **Observe**: watch real performance, network calls, and store behavior, not a simulation.
+5. **Repeat & log**: file bugs with real screenshots from real hardware.
+6. **Handoff**: pass the device to another colleague without shipping a physical device.
 
-Το ίδιο μοντέλο «πραγματικό iPhone/Android από τον browser» το αναλύουμε βήμα-βήμα στο [πώς χειρίζεσαι πραγματικά iPhone & Android από τον browser](/blog/pragmatika-iphone-android-ipa-apo-browser).
+We break down the same "real iPhone/Android from the browser" model step by step in [how to control real iPhone & Android devices from the browser](/blog/pragmatika-iphone-android-ipa-apo-browser).
 
-### Γιατί remote αντί για φυσικό device lab
+### Why remote instead of a physical device lab
 
-Το να συντηρείς ένα δικό σου device lab με US συσκευές σημαίνει αγορές hardware, SIM cards, ενημερώσεις OS και logistics. Το remote μοντέλο αφαιρεί όλο αυτό το βάρος: κοινή πρόσβαση για distributed ομάδες, χωρίς μετακίνηση συσκευών, με σταθερό US περιβάλλον διαθέσιμο 24/7.
+Maintaining your own device lab with US devices means buying hardware, SIM cards, OS updates, and logistics. The remote model removes all of that burden: shared access for distributed teams, no device shipping, and a stable US environment available 24/7.
 
 ## App store review & pre-submission checks
 
-Ένα από τα πιο δαπανηρά λάθη είναι να ανακαλύψεις ένα store-level πρόβλημα *μετά* την υποβολή, όταν το review χρειάζεται μέρες.
+One of the most expensive mistakes is discovering a store-level issue *after* submission, when review takes days.
 
 ### iOS / TestFlight
 
-Σε πραγματικό iPhone ελέγχεις πράγματα που ο simulator συχνά προσπερνά: permission prompts (κάμερα, τοποθεσία, notifications), In-App Purchase flows σε sandbox, deep links, universal links και τη συμπεριφορά της εφαρμογής κατά την εγκατάσταση από TestFlight. Πιάνεις νωρίς rejections που θα σε γύριζαν πίσω στο review.
+On a real iPhone you can check things the simulator often skips: permission prompts (camera, location, notifications), In-App Purchase flows in sandbox, deep links, universal links, and how the app behaves when installed from TestFlight. You catch rejections early — the kind that would otherwise send you back into review.
 
 ### Android
 
-Στο Android η κατακερματισμένη πραγματικότητα των συσκευών είναι ο μεγάλος κίνδυνος. Πραγματικό hardware αποκαλύπτει διαφορές σε OEM overlays, background limits, battery optimizations και storage/permission μοντέλα που ένας καθαρός emulator απλώς δεν έχει.
+On Android, device fragmentation is the big risk. Real hardware surfaces differences in OEM overlays, background limits, battery optimizations, and storage/permission models that a clean emulator simply doesn't have.
 
-## Localization & περιφερειακά edge cases
+## Localization & regional edge cases
 
-Η localization δεν είναι μόνο μετάφραση strings. Σε μια πραγματική συσκευή ΗΠΑ βλέπεις:
+Localization isn't just translating strings. On a real US device you can see:
 
-- **Formatting**: MM/DD/YYYY ημερομηνίες, imperial μονάδες, US αριθμοί τηλεφώνου.
-- **Νόμισμα & τιμές**: σωστή εμφάνιση σε δολάρια, φόροι/χρεώσεις ανά πολιτεία στα payment flows.
-- **Content & compliance**: banners, consent και onboarding που ενεργοποιούνται μόνο σε US locale.
-- **Πληκτρολόγιο & input**: US keyboard, autocorrect και βιομετρικό input σε πραγματικές συνθήκες.
+- **Formatting**: MM/DD/YYYY dates, imperial units, US phone numbers.
+- **Currency & pricing**: correct dollar display, plus state taxes/fees in payment flows.
+- **Content & compliance**: banners, consent, and onboarding that trigger only in a US locale.
+- **Keyboard & input**: US keyboard, autocorrect, and biometric input under real conditions.
 
-Αυτά είναι ακριβώς τα edge cases που «δεν εμφανίζονται ποτέ» στο dev μηχάνημά σου και μετά σπάνε για κάθε Αμερικανό χρήστη.
+These are exactly the edge cases that "never show up" on your dev machine and then break for every American user.
 
-## Πότε emulator, πότε πραγματική συσκευή
+## When to use an emulator vs. a real device
 
-Έντιμα: δεν χρειάζεσαι πραγματικό US τηλέφωνο για κάθε test. Ένας υγιής συνδυασμός μοιάζει έτσι:
+Honestly: you don't need a real US phone for every test. A healthy mix looks like this:
 
-- **Emulator/CI**: unit tests, γρήγορα regression checks, πολλαπλά screen sizes σε κάθε commit.
-- **Πραγματική συσκευή ΗΠΑ**: pre-release QA, store review checks, performance, localization και οτιδήποτε αγγίζει carrier, βιομετρικά ή region-locked features.
+- **Emulator/CI**: unit tests, fast regression checks, multiple screen sizes on every commit.
+- **Real US device**: pre-release QA, store review checks, performance, localization, and anything that touches carrier, biometrics, or region-locked features.
 
-Ο στόχος δεν είναι να αντικαταστήσεις τους emulators, αλλά να κλείσεις το κενό αξιοπιστίας που αφήνουν πριν το release. Αν διαχειρίζεσαι πολλά περιβάλλοντα ή λογαριασμούς, δες και πώς οργανώνεις [τη διαχείριση λογαριασμών σε πραγματικές συσκευές](/blog/diaxeirisi-logariasmon-pragmatikes-syskeues-ipa).
+The goal isn't to replace emulators but to close the reliability gap they leave before release. If you manage many environments or accounts, also see how to organize [account management on real US devices](/blog/diaxeirisi-logariasmon-pragmatikes-syskeues-ipa).
 
-## Ξεκίνα το QA σε πραγματικές συσκευές ΗΠΑ
+## Start QA on real US devices
 
-Αν η ομάδα σου βασίζεται μόνο σε emulators, αργά ή γρήγορα ένα bug που αφορά hardware, δίκτυο ή store θα φτάσει στους χρήστες σου. Με το Americell αποκτάς remote πρόσβαση σε αληθινά iPhone και Android ΗΠΑ, ώστε το testing σου να αντικατοπτρίζει την πραγματικότητα των πελατών σου.
+If your team relies on emulators alone, sooner or later a bug involving hardware, network, or the store will reach your users. With Americell you get remote access to real US iPhone and Android devices, so your testing reflects the reality your customers experience.
 
-Δες τα [πλάνα και τις τιμές](/#pricing) και βάλε αληθινές συσκευές στο QA pipeline σου σήμερα.`,
+See the [plans and pricing](/#pricing) and put real devices into your QA pipeline today.`,
 };

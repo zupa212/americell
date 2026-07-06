@@ -2,8 +2,7 @@ import type { ComponentPropsWithoutRef } from "react";
 import Link from "next/link";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { CalendarDays, Clock } from "lucide-react";
-import { cn } from "@/lib/cn";
+import { cn } from "@/lib/utils";
 import type { BlogPost } from "@/lib/blog";
 
 /**
@@ -21,12 +20,13 @@ function formatDate(iso: string): string {
 /**
  * Anchor renderer for Markdown links. Internal (`/…`, `#…`) links use the
  * Next.js client router; external links open in a new tab with safe `rel`.
+ * Monochrome: near-black text with a black underline that darkens on hover.
  */
 function MarkdownLink({ href, children }: ComponentPropsWithoutRef<"a">) {
   const url = href ?? "#";
   const isInternal = url.startsWith("/") || url.startsWith("#");
   const classes =
-    "font-medium text-brand underline decoration-brand/30 underline-offset-2 transition-colors hover:decoration-brand hover:text-brand-2";
+    "font-medium text-neutral-900 underline decoration-neutral-400 underline-offset-[3px] transition-colors hover:decoration-neutral-900";
 
   if (isInternal) {
     return (
@@ -43,7 +43,11 @@ function MarkdownLink({ href, children }: ComponentPropsWithoutRef<"a">) {
   );
 }
 
-/** Inline vs. fenced code. Fenced blocks carry a `language-*` class. */
+/**
+ * Inline vs. fenced code. Fenced blocks carry a `language-*` class and are
+ * placed inside the styled `<pre>` block below, so they render plain here.
+ * Inline code gets a gray monospace chip.
+ */
 function MarkdownCode({
   className,
   children,
@@ -51,119 +55,143 @@ function MarkdownCode({
   const isBlock = /language-/.test(className ?? "");
   if (isBlock) {
     return (
-      <code className={cn("font-mono text-[0.85em]", className)}>
+      <code className={cn("font-mono text-[0.85em] text-neutral-800", className)}>
         {children}
       </code>
     );
   }
   return (
-    <code className="rounded-md border border-white/50 bg-white/70 px-1.5 py-0.5 font-mono text-[0.85em] text-brand">
+    <code className="rounded border border-neutral-200 bg-neutral-100 px-1.5 py-0.5 font-mono text-[0.85em] text-neutral-700">
       {children}
     </code>
   );
 }
 
-// Element → styled renderer map for react-markdown. Typography tuned for
-// comfortable long-form reading inside the frosted-glass container.
+// Shared body-copy sizing so paragraphs, lists and quotes read as one column.
+const bodyText = "text-[1.075rem] leading-[1.8] text-neutral-800";
+
+// Element → styled renderer map for react-markdown. Strictly black & white,
+// editorial typography tuned for comfortable long-form reading.
 const markdownComponents: Components = {
   h2: ({ children }) => (
-    <h2 className="mt-12 scroll-mt-24 text-2xl font-bold tracking-tight text-foreground sm:text-[1.65rem]">
+    <h2 className="mt-14 scroll-mt-24 text-2xl font-bold tracking-tight text-neutral-900 sm:text-[1.75rem]">
       {children}
     </h2>
   ),
   h3: ({ children }) => (
-    <h3 className="mt-8 scroll-mt-24 text-xl font-semibold tracking-tight text-foreground">
+    <h3 className="mt-10 scroll-mt-24 text-xl font-bold tracking-tight text-neutral-900">
       {children}
     </h3>
   ),
-  p: ({ children }) => (
-    <p className="mt-5 leading-[1.75] text-muted-foreground">{children}</p>
-  ),
+  p: ({ children }) => <p className={cn("mt-6", bodyText)}>{children}</p>,
   a: MarkdownLink,
   ul: ({ children }) => (
-    <ul className="mt-5 list-disc space-y-2 pl-6 leading-[1.75] text-muted-foreground marker:text-brand">
+    <ul
+      className={cn(
+        "mt-6 list-disc space-y-2.5 pl-6 marker:text-neutral-400",
+        bodyText,
+      )}
+    >
       {children}
     </ul>
   ),
   ol: ({ children }) => (
-    <ol className="mt-5 list-decimal space-y-2 pl-6 leading-[1.75] text-muted-foreground marker:text-brand marker:font-semibold">
+    <ol
+      className={cn(
+        "mt-6 list-decimal space-y-2.5 pl-6 marker:font-medium marker:text-neutral-400",
+        bodyText,
+      )}
+    >
       {children}
     </ol>
   ),
-  li: ({ children }) => <li className="pl-1">{children}</li>,
+  li: ({ children }) => <li className="pl-1.5">{children}</li>,
   strong: ({ children }) => (
-    <strong className="font-semibold text-foreground">{children}</strong>
+    <strong className="font-semibold text-neutral-900">{children}</strong>
   ),
+  em: ({ children }) => <em className="italic">{children}</em>,
   blockquote: ({ children }) => (
-    <blockquote className="mt-6 rounded-r-xl border-l-4 border-brand/60 bg-white/50 py-1 pl-5 pr-4 italic text-muted-foreground">
+    <blockquote
+      className={cn(
+        "mt-8 border-l-2 border-neutral-900 pl-5 italic text-neutral-700 [&_p]:mt-0",
+        bodyText,
+      )}
+    >
       {children}
     </blockquote>
   ),
   code: MarkdownCode,
-  hr: () => <hr className="my-10 border-t border-white/50" />,
+  pre: ({ children }) => (
+    <pre className="mt-6 overflow-x-auto rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-sm leading-relaxed">
+      {children}
+    </pre>
+  ),
+  hr: () => <hr className="my-14 border-t border-neutral-200" />,
   table: ({ children }) => (
-    <div className="mt-6 overflow-x-auto rounded-2xl border border-white/50 ring-1 ring-white/40">
+    <div className="mt-8 overflow-x-auto rounded-xl border border-neutral-200">
       <table className="w-full border-collapse text-left text-sm">
         {children}
       </table>
     </div>
   ),
   thead: ({ children }) => (
-    <thead className="bg-white/60 text-foreground">{children}</thead>
+    <thead className="bg-neutral-50 text-neutral-900">{children}</thead>
   ),
   th: ({ children }) => (
-    <th className="border-b border-white/50 px-4 py-3 font-semibold">
+    <th className="border-b border-neutral-200 px-4 py-3 font-semibold">
       {children}
     </th>
   ),
   td: ({ children }) => (
-    <td className="border-b border-white/30 px-4 py-3 align-top text-muted-foreground">
+    <td className="border-b border-neutral-200 px-4 py-3 align-top text-neutral-700">
       {children}
     </td>
   ),
 };
 
 /**
- * Renders a full blog post: title, meta row (date · reading time) and the
- * Markdown body (GitHub-flavored via `remark-gfm`) inside a frosted-glass
- * article container that floats over the global aurora background.
+ * Renders a full blog post: title, meta row (date · reading time · author) and
+ * the Markdown body (GitHub-flavored via `remark-gfm`).
+ *
+ * Design is deliberately black & white and typography-first — an opaque
+ * near-white reading surface that covers the site's global aurora, near-black
+ * text, gray meta and hairline rules. No brand gradient, glass/backdrop-blur
+ * or colorful accents: a premium-magazine reader, not the marketing site.
  */
 export default function Article({ post }: { post: BlogPost }) {
   return (
     <article
       className={cn(
-        "relative overflow-hidden rounded-3xl border border-white/50 bg-white/60 p-6 backdrop-blur-xl",
-        "ring-1 ring-white/40 shadow-[0_20px_70px_-30px_rgba(30,41,120,0.35)]",
-        "sm:p-10",
+        "relative overflow-hidden rounded-3xl border border-neutral-200 bg-white text-neutral-900",
+        "px-6 py-10 shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:px-10 sm:py-14",
       )}
     >
-      <header className="border-b border-white/50 pb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl sm:leading-tight">
-          {post.title}
-        </h1>
-        <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5">
-            <CalendarDays aria-hidden="true" className="h-4 w-4 text-brand" />
+      <div className="mx-auto max-w-2xl">
+        <header className="border-b border-neutral-200 pb-8">
+          <h1 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-[2.5rem] sm:leading-[1.1]">
+            {post.title}
+          </h1>
+          <div className="mt-6 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm text-neutral-500">
             <time dateTime={post.date}>{formatDate(post.date)}</time>
-          </span>
-          <span aria-hidden="true" className="text-line">
-            ·
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <Clock aria-hidden="true" className="h-4 w-4 text-brand" />
-            {post.readingMinutes} min read
-          </span>
-          <span aria-hidden="true" className="text-line">
-            ·
-          </span>
-          <span>{post.author}</span>
-        </div>
-      </header>
+            <span aria-hidden="true" className="text-neutral-300">
+              ·
+            </span>
+            <span>{post.readingMinutes} min read</span>
+            <span aria-hidden="true" className="text-neutral-300">
+              ·
+            </span>
+            <span>{post.author}</span>
+          </div>
+        </header>
 
-      <div className="mt-2">
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
-          {post.body}
-        </ReactMarkdown>
+        <div className="mt-2">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={markdownComponents}
+          >
+            {post.body}
+          </ReactMarkdown>
+        </div>
       </div>
     </article>
   );
