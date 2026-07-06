@@ -1,0 +1,240 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import {
+  Check,
+  Copy,
+  ExternalLink,
+  KeyRound,
+  Loader2,
+  Maximize,
+  RefreshCw,
+  ShieldCheck,
+  TriangleAlert,
+} from "lucide-react";
+import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
+
+function formatRemaining(ms: number): string {
+  if (ms <= 0) return "έληξε";
+  const total = Math.floor(ms / 1000);
+  const d = Math.floor(total / 86400);
+  const h = Math.floor((total % 86400) / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  if (d > 0) return `${d}μ ${h}ω`;
+  if (h > 0) return `${h}ω ${m}λ`;
+  return `${m}λ`;
+}
+
+/**
+ * Embeds the live device stream in an <iframe> inside Americell chrome
+ * (white-label). The stream URL carries a 4h token; once it goes stale the
+ * customer re-enters the PIN inside the frame to re-mint a fresh session. A
+ * "new tab" affordance stays available as a fallback if the provider blocks
+ * framing, but the default experience never leaves americell.*.
+ */
+export default function StreamViewer({
+  streamUrl,
+  rentalId,
+  model,
+  platform,
+  expiresAt,
+  streamMintedAt,
+}: {
+  streamUrl: string;
+  rentalId: string;
+  model: string;
+  platform: string;
+  expiresAt: string | null;
+  streamMintedAt: string | null;
+}) {
+  const frameRef = useRef<HTMLIFrameElement>(null);
+  const [pin, setPin] = useState<string | null>(null);
+  const [pinLoading, setPinLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [nowMs, setNowMs] = useState<number | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  useEffect(() => {
+    const tick = () => setNowMs(Date.now());
+    const first = setTimeout(tick, 0);
+    const id = setInterval(tick, 1000);
+    return () => {
+      clearTimeout(first);
+      clearInterval(id);
+    };
+  }, []);
+
+  const expiresMs = expiresAt ? Date.parse(expiresAt) : null;
+  const mintedMs = streamMintedAt ? Date.parse(streamMintedAt) : null;
+  const countdown =
+    nowMs == null || expiresMs == null ? "—" : formatRemaining(expiresMs - nowMs);
+  const tokenFresh =
+    nowMs != null && mintedMs != null && nowMs - mintedMs < FOUR_HOURS_MS;
+
+  function fullscreen() {
+    const el = frameRef.current;
+    if (el?.requestFullscreen) {
+      el.requestFullscreen().catch(() => {
+        toast.error("Δεν ήταν δυνατή η πλήρης οθόνη.");
+      });
+    }
+  }
+
+  function reloadStream() {
+    setReloadKey((k) => k + 1);
+  }
+
+  async function revealPin() {
+    if (pin) return;
+    setPinLoading(true);
+    try {
+      const res = await fetch(`/api/rentals/${rentalId}/pin`, {
+        cache: "no-store",
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        pin?: string;
+        error?: string;
+      };
+      if (res.ok && data.pin) {
+        setPin(data.pin);
+      } else {
+        toast.error(data.error ?? "Δεν ήταν δυνατή η ανάκτηση του PIN.");
+      }
+    } catch {
+      toast.error("Σφάλμα δικτύου. Δοκίμασε ξανά.");
+    } finally {
+      setPinLoading(false);
+    }
+  }
+
+  async function copyPin() {
+    if (!pin) return;
+    try {
+      await navigator.clipboard.writeText(pin);
+      setCopied(true);
+      toast.success("Το PIN αντιγράφηκε.");
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      toast.error("Δεν ήταν δυνατή η αντιγραφή.");
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Control bar */}
+      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/50 bg-white/55 px-3 py-2 backdrop-blur-xl">
+        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-foreground">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+          </span>
+          Ζωντανά · {platform === "iphone" ? "iPhone" : "Android"} {model}
+        </span>
+
+        <span
+          className={cn(
+            "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
+            tokenFresh
+              ? "bg-emerald-50/70 text-emerald-700"
+              : "bg-amber-50/70 text-amber-700",
+          )}
+        >
+          {tokenFresh ? (
+            <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+          ) : (
+            <TriangleAlert className="h-3.5 w-3.5" aria-hidden="true" />
+          )}
+          {tokenFresh ? "Ζωντανός σύνδεσμος" : "Βάλε το PIN στη συσκευή"}
+        </span>
+
+        <span className="text-xs text-muted-foreground">Λήγει σε {countdown}</span>
+
+        <div className="ml-auto flex items-center gap-1.5">
+          {pin ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={copyPin}
+              className="gap-1.5 rounded-full border-white/50 bg-white/60 font-mono tracking-[0.2em] backdrop-blur-md"
+            >
+              {copied ? (
+                <Check className="h-3.5 w-3.5" aria-hidden="true" />
+              ) : (
+                <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+              )}
+              {pin}
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={revealPin}
+              disabled={pinLoading}
+              className="gap-1.5 rounded-full border-white/50 bg-white/60 backdrop-blur-md"
+            >
+              {pinLoading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+              ) : (
+                <KeyRound className="h-3.5 w-3.5" aria-hidden="true" />
+              )}
+              PIN
+            </Button>
+          )}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={reloadStream}
+            className="gap-1.5 rounded-full border-white/50 bg-white/60 backdrop-blur-md"
+          >
+            <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="hidden sm:inline">Ανανέωση</span>
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            onClick={fullscreen}
+            className="gap-1.5 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white"
+          >
+            <Maximize className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="hidden sm:inline">Πλήρης οθόνη</span>
+          </Button>
+        </div>
+      </div>
+
+      {/* The stream itself — framed in Americell glass. */}
+      <div className="relative overflow-hidden rounded-3xl border border-white/50 bg-black/90 shadow-[0_20px_70px_-24px_rgba(30,41,120,0.45)] ring-1 ring-white/30">
+        <iframe
+          key={reloadKey}
+          ref={frameRef}
+          src={streamUrl}
+          title={`Americell — τηλεχειρισμός ${model}`}
+          className="h-[72vh] w-full border-0 bg-black"
+          allow="autoplay; fullscreen; clipboard-read; clipboard-write; accelerometer; gyroscope"
+          referrerPolicy="no-referrer"
+        />
+      </div>
+
+      {/* Fallback if the provider blocks embedding. */}
+      <p className="text-center text-xs text-muted-foreground">
+        Δεν φορτώνει η ζωντανή προβολή;{" "}
+        <a
+          href={streamUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 font-medium text-brand hover:text-brand-2"
+        >
+          Άνοιξε σε νέα καρτέλα
+          <ExternalLink className="h-3 w-3" aria-hidden="true" />
+        </a>
+      </p>
+    </div>
+  );
+}

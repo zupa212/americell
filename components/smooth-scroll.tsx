@@ -15,7 +15,17 @@ export default function SmoothScroll({
   return (
     <ReactLenis
       root
-      options={{ lerp: 0.1, duration: 1.15, smoothWheel: true, anchors: true }}
+      options={{
+        // Buttery "ultra-smooth" feel: expo-out easing over a slightly longer
+        // duration, momentum on wheel + touch. transform-based → GPU-friendly.
+        duration: 1.35,
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+        wheelMultiplier: 1,
+        touchMultiplier: 2,
+        syncTouch: true,
+        anchors: true,
+      }}
     >
       {children}
     </ReactLenis>
