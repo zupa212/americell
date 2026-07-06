@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
+import { AuroraText } from "@/components/ui/aurora-text";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { Particles } from "@/components/ui/particles";
 import Reveal from "@/components/ui/reveal";
@@ -13,10 +15,12 @@ import { cn } from "@/lib/utils";
  * A hero-style FROSTED GLASS panel floating over the global <SiteBackground/>
  * (aurora + dot grid). The section wrapper is transparent so the aurora shows
  * through; the panel itself is frosted glass with a <ShineBorder/> + <BorderBeam/>
- * accent and ambient <Particles/> behind the glass. Holds the Greek headline, a
- * one-line subhead, and a <ShimmerButton> CTA linking to /signup. Animated
- * content is wrapped in the <Reveal> client wrapper so this file stays a
- * Server Component.
+ * accent and ambient <Particles/> behind the glass. Holds an English, Apple-grade
+ * headline ("Put a real US phone to work today.") with a flashy blue→violet→cyan
+ * <AuroraText> keyword, a one-line subhead, and a <ShimmerButton> CTA linking to
+ * /signup. Animated content is wrapped in the <Reveal> client wrapper so this
+ * file stays a Server Component. Honest positioning — real US devices you drive
+ * live from the browser for testing, QA, localization, and growth teams.
  */
 export default function CallToAction() {
   return (
@@ -46,27 +50,46 @@ export default function CallToAction() {
           <ShineBorder
             borderWidth={1}
             duration={14}
-            shineColor={["#2b6bff", "#7c5cff", "#8fb8ff"]}
+            shineColor={["#2b6bff", "#7c3aed", "#22d3ee"]}
             className="rounded-3xl"
           />
           <BorderBeam
             size={140}
             duration={8}
             colorFrom="#2b6bff"
-            colorTo="#7c5cff"
+            colorTo="#22d3ee"
             className="opacity-70"
           />
 
-          <div className="relative mx-auto max-w-2xl">
+          <div className="relative mx-auto max-w-3xl">
+            {/* eyebrow — flashy frosted pill */}
+            <div className="flex justify-center">
+              <div
+                className={cn(
+                  "inline-flex items-center rounded-full px-3.5 py-1 text-sm",
+                  "border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40",
+                  "shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]",
+                )}
+              >
+                <AnimatedShinyText className="inline-flex items-center justify-center text-brand">
+                  Live in minutes · no installs
+                </AnimatedShinyText>
+              </div>
+            </div>
+
             <h2
               id="cta-heading"
-              className="text-balance text-4xl leading-[1.05] font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl"
+              className="mt-6 text-balance text-5xl font-semibold leading-[1.02] tracking-[-0.03em] text-foreground sm:text-6xl lg:text-7xl"
             >
-              Βάλε ένα αληθινό τηλέφωνο ΗΠΑ στη δουλειά σήμερα.
+              Put a real{" "}
+              <AuroraText colors={["#2b6bff", "#7c3aed", "#22d3ee"]}>
+                US phone
+              </AuroraText>{" "}
+              to work today.
             </h2>
-            <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Διαχειρίζεσαι, αυτοματοποιείς και ελέγχεις ένα αληθινό smartphone
-              ΗΠΑ από οπουδήποτε, ανά πάσα στιγμή.
+            <p className="mx-auto mt-5 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
+              Real iPhone &amp; Android hardware in the US, driven live from your
+              browser — built for app testing, QA, localization, and growth teams.
             </p>
 
             <div className="mt-10 flex justify-center">
@@ -79,7 +102,7 @@ export default function CallToAction() {
                   shimmerColor="#ffffff"
                   className="px-8 py-3 text-base font-medium text-white shadow-lg shadow-brand/20"
                 >
-                  Ξεκίνα τώρα
+                  Get started
                 </ShimmerButton>
               </Link>
             </div>

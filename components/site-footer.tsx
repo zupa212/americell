@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 import Reveal from "@/components/ui/reveal";
 import { Separator } from "@/components/ui/separator";
+import { AuroraText } from "@/components/ui/aurora-text";
 import { cn } from "@/lib/utils";
 import { SITE } from "@/lib/site";
 
@@ -10,26 +11,27 @@ type FooterColumn = { heading: string; links: FooterLink[] };
 
 const COLUMNS: FooterColumn[] = [
   {
-    heading: "Προϊόν",
+    heading: "Product",
     links: [
-      { label: "Πώς λειτουργεί", href: "/#how" },
-      { label: "Τιμές", href: "/#pricing" },
-      { label: "Πελάτες", href: "/#clients" },
+      { label: "How it works", href: "/#how" },
+      { label: "Pricing", href: "/#pricing" },
+      { label: "Clients", href: "/#clients" },
     ],
   },
   {
-    heading: "Εταιρεία",
+    heading: "Company",
     links: [
-      { label: "Σχετικά", href: "/about" },
-      { label: "Επικοινωνία", href: "/contact" },
+      { label: "About", href: "/about" },
+      { label: "Blog", href: "/blog" },
+      { label: "Contact", href: "/contact" },
     ],
   },
   {
-    heading: "Νομικά",
+    heading: "Legal",
     links: [
-      { label: "Όροι", href: "/terms" },
-      { label: "Απόρρητο", href: "/privacy" },
-      { label: "Αποδεκτή χρήση", href: "/acceptable-use" },
+      { label: "Terms", href: "/terms" },
+      { label: "Privacy", href: "/privacy" },
+      { label: "Acceptable use", href: "/acceptable-use" },
     ],
   },
 ];
@@ -47,8 +49,14 @@ export default function SiteFooter() {
         "supports-[backdrop-filter]:bg-white/40",
       )}
     >
+      {/* Flashy animated gradient hairline riding the top edge */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand to-transparent bg-[length:200%_auto] animate-gradient"
+      />
+
       <h2 id="footer-heading" className="sr-only">
-        Υποσέλιδο {SITE.name}
+        {SITE.name} footer
       </h2>
 
       <div className="mx-auto w-full max-w-6xl px-6 py-16 sm:py-20">
@@ -58,16 +66,16 @@ export default function SiteFooter() {
             <a
               href="#top"
               className="group inline-flex items-center gap-2.5 rounded-full text-foreground transition-all duration-300 hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
-              aria-label={`${SITE.name} — επιστροφή στην κορυφή`}
+              aria-label={`${SITE.name} — back to top`}
             >
               {/* Brand mark */}
               <span
                 aria-hidden="true"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-white shadow-md shadow-brand/25 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-lg group-hover:shadow-brand/40"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] text-white shadow-md shadow-brand/25 ring-1 ring-white/40 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-lg group-hover:shadow-brand/40 group-hover:animate-gradient"
               >
                 <svg
                   viewBox="0 0 24 24"
-                  className="h-4 w-4"
+                  className="h-4.5 w-4.5"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth={2}
@@ -79,25 +87,28 @@ export default function SiteFooter() {
                 </svg>
               </span>
               {/* Wordmark */}
-              <span className="bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-clip-text text-lg font-bold tracking-tight text-transparent">
-                {SITE.name}
+              <span className="text-2xl font-bold tracking-tight">
+                <AuroraText>{SITE.name}</AuroraText>
               </span>
             </a>
 
-            {/* One-line description */}
-            <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
+            {/* Bold one-line statement */}
+            <p className="mt-5 max-w-sm text-balance text-xl font-semibold leading-tight tracking-tight text-foreground">
               {SITE.tagline}
+            </p>
+            <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground">
+              {SITE.subtagline}
             </p>
           </div>
 
           {/* Link columns */}
           <nav
-            aria-label="Υποσέλιδο"
+            aria-label="Footer"
             className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:col-span-7"
           >
             {COLUMNS.map((column) => (
               <div key={column.heading}>
-                <h3 className="text-xs font-semibold uppercase tracking-wide text-brand">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-brand">
                   {column.heading}
                 </h3>
                 <ul role="list" className="mt-4 space-y-3">
@@ -105,7 +116,7 @@ export default function SiteFooter() {
                     <li key={link.label}>
                       <Link
                         href={link.href}
-                        className="rounded-sm text-sm text-muted-foreground transition-all duration-300 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+                        className="inline-block rounded-sm text-sm font-medium text-muted-foreground transition-all duration-300 hover:translate-x-0.5 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
                       >
                         {link.label}
                       </Link>
@@ -134,10 +145,9 @@ export default function SiteFooter() {
               <ShieldCheck strokeWidth={2} className="h-5 w-5" />
             </span>
             <span>
-              <span className="font-medium text-foreground">{SITE.name}</span>{" "}
-              προορίζεται για νόμιμη χρήση πραγματικών συσκευών. Είσαι
-              υπεύθυνος/η για τη συμμόρφωση με τους όρους κάθε εφαρμογής ή
-              πλατφόρμας που χρησιμοποιείς.
+              <span className="font-semibold text-foreground">{SITE.name}</span>{" "}
+              is for legitimate real-device use. You are responsible for
+              complying with the terms of any app or platform you use.
             </span>
           </p>
         </Reveal>
@@ -148,9 +158,8 @@ export default function SiteFooter() {
           <p className="text-sm text-muted-foreground">
             &copy; {year} {SITE.name}.
           </p>
-          <p className="text-sm text-muted-foreground">
-            Αληθινές συσκευές ΗΠΑ για πρακτορεία, δοκιμαστές εφαρμογών &amp;
-            ομάδες ανάπτυξης.
+          <p className="text-sm font-medium text-muted-foreground">
+            Real US devices for agencies, QA &amp; growth teams.
           </p>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { deactivate } from "@/lib/cellgods";
 import { getRentalForUser, markDeactivated } from "@/lib/rentals";
+import { logEvent } from "@/lib/logs";
 
 /**
  * POST /api/rentals/[id]/cancel — customer-initiated cancel of a live rental
@@ -49,6 +50,17 @@ export async function POST(
     await deactivate(rental.cellgodsOrderId);
   }
   await markDeactivated(rental.stripeSessionId);
+
+  // Audit: customer-initiated cancel (best-effort, never blocks the response).
+  await logEvent({
+    actorType: "customer",
+    actorEmail: session.user.email,
+    actorId: session.user.id,
+    action: "rental.cancelled",
+    targetType: "rental",
+    targetId: rental.id,
+    metadata: { phoneId: rental.phoneId, period: rental.billingPeriod },
+  });
 
   return Response.json({ ok: true }, { headers: NO_STORE });
 }

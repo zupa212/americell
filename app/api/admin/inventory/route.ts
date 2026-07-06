@@ -16,16 +16,16 @@ import {
 
 const NO_STORE = { "Cache-Control": "no-store" } as const;
 
-/** Greek copy for a `CellgodsError.status` (RESELLER_PLAN §6.3); status 0 (network) → generic. */
-const CELLGODS_STATUS_EL: Record<number, string> = {
-  400: "Μη έγκυρο αίτημα",
-  401: "Λείπει το κλειδί API",
-  402: "Ανεπαρκές υπόλοιπο — πρόσθεσε πίστωση",
-  403: "Μη έγκυρο κλειδί API",
-  404: "Δεν βρέθηκε",
-  409: "Η συσκευή δεν είναι πλέον διαθέσιμη",
-  429: "Πολλά αιτήματα",
-  500: "Σφάλμα διακομιστή",
+/** English copy for a `CellgodsError.status` (RESELLER_PLAN §6.3); status 0 (network) → generic. */
+const CELLGODS_STATUS_EN: Record<number, string> = {
+  400: "Invalid request",
+  401: "Missing API key",
+  402: "Insufficient balance — add credit",
+  403: "Invalid API key",
+  404: "Not found",
+  409: "Device is no longer available",
+  429: "Too many requests",
+  500: "Server error",
 };
 
 export async function GET() {
@@ -35,8 +35,8 @@ export async function GET() {
       {
         error:
           gate.status === 401
-            ? "Παρακαλώ συνδέσου."
-            : "Δεν έχεις πρόσβαση.",
+            ? "Please sign in."
+            : "You don't have access.",
       },
       { status: gate.status, headers: NO_STORE },
     );
@@ -44,7 +44,7 @@ export async function GET() {
 
   if (!isCellgodsConfigured) {
     return Response.json(
-      { error: "Λείπει το κλειδί API" },
+      { error: "Missing API key" },
       { status: 503, headers: NO_STORE },
     );
   }
@@ -56,12 +56,12 @@ export async function GET() {
     if (e instanceof CellgodsError) {
       const status = e.status || 500;
       return Response.json(
-        { error: CELLGODS_STATUS_EL[status] ?? "Σφάλμα διακομιστή" },
+        { error: CELLGODS_STATUS_EN[status] ?? "Server error" },
         { status, headers: NO_STORE },
       );
     }
     return Response.json(
-      { error: "Σφάλμα διακομιστή" },
+      { error: "Server error" },
       { status: 500, headers: NO_STORE },
     );
   }

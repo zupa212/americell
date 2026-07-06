@@ -61,7 +61,7 @@ function webSiteNode(): JsonLdNode {
     name: SITE_NAME,
     description: SITE.subtagline,
     publisher: { "@id": ORGANIZATION_ID },
-    inLanguage: "el-GR",
+    inLanguage: "en-US",
   };
 }
 
@@ -69,14 +69,14 @@ function serviceNode(): JsonLdNode {
   return {
     "@type": "Service",
     "@id": `${SITE_URL}/#service`,
-    name: "Ενοικίαση & τηλεχειρισμός πραγματικών τηλεφώνων ΗΠΑ",
+    name: "Real US phone rental & remote control",
     serviceType: "Remote US phone rental (cloud phones)",
     description: SITE.subtagline,
     provider: { "@id": ORGANIZATION_ID },
     areaServed: { "@type": "Country", name: "United States" },
     audience: {
       "@type": "Audience",
-      audienceType: "Πρακτορεία, δοκιμαστές εφαρμογών, ομάδες ανάπτυξης",
+      audienceType: "Agencies, app testers, development teams",
     },
     offers: {
       "@type": "Offer",

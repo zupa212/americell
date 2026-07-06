@@ -21,18 +21,21 @@ const GLASS =
   "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
 const GLASS_HOVER =
   "transition-all duration-300 hover:bg-white/70 hover:-translate-y-1 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)]";
+// Animated brand gradient text — flashy, minimal; honors prefers-reduced-motion.
+const GRADIENT_TEXT =
+  "bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] bg-clip-text text-transparent animate-gradient";
 
 /** One selectable rental duration — mirrors `DURATIONS` from `@/lib/pricing`. */
 type DurationOption = {
   period: BillingPeriod;
   days: number;
-  labelEl: string;
+  label: string;
 };
 
 type PricingGridProps = {
   /** Client-safe live catalog — retail cents only, NO wholesale. */
   phones: PublicRetailPhone[];
-  /** The three rental durations with Greek labels (server passes `DURATIONS`). */
+  /** The three rental durations with English labels (server passes `DURATIONS`). */
   durations: readonly DurationOption[];
 };
 
@@ -52,7 +55,7 @@ export default function PricingGrid({ phones, durations }: PricingGridProps) {
   const [pendingId, setPendingId] = useState<string | null>(null);
 
   const activeLabel =
-    durations.find((d) => d.period === period)?.labelEl ?? "";
+    durations.find((d) => d.period === period)?.label ?? "";
 
   const handleCheckout = async (phone: PublicRetailPhone) => {
     setPendingId(phone.phoneId);
@@ -78,11 +81,11 @@ export default function PricingGrid({ phones, durations }: PricingGridProps) {
 
       toast(
         data.demo
-          ? "Οι πληρωμές είναι σε λειτουργία demo — δεν έχει ρυθμιστεί ακόμα."
-          : (data.error ?? "Δεν ήταν δυνατή η έναρξη πληρωμής. Δοκίμασε ξανά."),
+          ? "Payments are in demo mode — not configured yet."
+          : (data.error ?? "Couldn't start checkout. Please try again."),
       );
     } catch {
-      toast("Σφάλμα δικτύου. Δοκίμασε ξανά.");
+      toast("Network error. Please try again.");
     } finally {
       setPendingId(null);
     }
@@ -92,12 +95,12 @@ export default function PricingGrid({ phones, durations }: PricingGridProps) {
     return (
       <Reveal delay={0.08} className="mx-auto mt-14 max-w-xl">
         <div className={cn(GLASS, "p-8 text-center sm:p-10")}>
-          <h3 className="text-xl font-bold text-foreground">
-            Καμία συσκευή διαθέσιμη αυτή τη στιγμή
+          <h3 className="text-2xl font-extrabold tracking-tight text-foreground">
+            No devices available right now
           </h3>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Όλες οι συσκευές μας δεσμεύτηκαν προσωρινά. Ανανέωσε τη σελίδα σε λίγο —
-            το απόθεμα αλλάζει συνεχώς.
+            Every phone is in use at the moment. Refresh in a little while —
+            inventory changes constantly.
           </p>
         </div>
       </Reveal>
@@ -111,16 +114,16 @@ export default function PricingGrid({ phones, durations }: PricingGridProps) {
         <Tabs
           value={period}
           onValueChange={(value) => setPeriod(value as BillingPeriod)}
-          aria-label="Διάρκεια ενοικίασης"
+          aria-label="Rental duration"
         >
           <TabsList className="h-11 rounded-full border border-white/50 bg-white/60 p-1 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)] ring-1 ring-white/40 backdrop-blur-md">
             {durations.map((d) => (
               <TabsTrigger
                 key={d.period}
                 value={d.period}
-                className="min-w-[7rem] rounded-full px-5 transition-all duration-300 data-active:bg-gradient-to-r data-active:from-brand data-active:to-brand-2 data-active:text-white data-active:shadow-glow"
+                className="min-w-[7rem] rounded-full px-5 font-semibold transition-all duration-300 data-active:bg-gradient-to-r data-active:from-brand data-active:to-brand-2 data-active:text-white data-active:shadow-glow"
               >
-                {d.labelEl}
+                {d.label}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -177,7 +180,7 @@ export default function PricingGrid({ phones, durations }: PricingGridProps) {
                       >
                         A
                       </span>
-                      <h3 className="truncate text-xl font-bold tracking-tight text-foreground">
+                      <h3 className="truncate text-xl font-extrabold tracking-tight text-foreground">
                         {phone.model}
                       </h3>
                     </div>
@@ -209,21 +212,26 @@ export default function PricingGrid({ phones, durations }: PricingGridProps) {
                             : "text-muted-foreground",
                         )}
                       >
-                        {phone.available ? "Διαθέσιμο τώρα" : "Μη διαθέσιμο"}
+                        {phone.available ? "Available now" : "Unavailable"}
                       </span>
                     </span>
                     <Badge
-                      title="Πραγματική συσκευή ΗΠΑ, επαληθευμένη από την Americell"
+                      title="Real US device, verified by Americell"
                       className="border-brand/20 bg-brand/10 text-brand"
                     >
                       <BadgeCheck aria-hidden="true" />
-                      Americell verified
+                      Real US device
                     </Badge>
                   </div>
 
                   {/* Price for the selected duration */}
                   <div className="mt-7 flex items-baseline gap-1.5">
-                    <span className="text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl">
+                    <span
+                      className={cn(
+                        "text-4xl font-extrabold tracking-tight sm:text-5xl",
+                        GRADIENT_TEXT,
+                      )}
+                    >
                       {price}
                     </span>
                     <span className="text-sm font-medium text-muted-foreground">
@@ -240,8 +248,8 @@ export default function PricingGrid({ phones, durations }: PricingGridProps) {
                       />
                     </span>
                     <p className="text-sm leading-relaxed text-muted-foreground">
-                      Αληθινή συσκευή ΗΠΑ · PIN και ζωντανός σύνδεσμος ελέγχου
-                      αμέσως μετά την πληρωμή.
+                      Real US device · PIN and a live control link the moment
+                      you pay.
                     </p>
                   </div>
 
@@ -251,7 +259,7 @@ export default function PricingGrid({ phones, durations }: PricingGridProps) {
                       type="button"
                       onClick={() => handleCheckout(phone)}
                       disabled={isPending || !phone.available}
-                      aria-label={`Απόκτησε ${phone.model}`}
+                      aria-label={`Get ${phone.model}`}
                       className={cn(
                         "group/cta h-12 w-full rounded-full px-6 text-sm font-semibold transition-all duration-300",
                         phone.available
@@ -265,18 +273,18 @@ export default function PricingGrid({ phones, durations }: PricingGridProps) {
                             className="h-4 w-4 animate-spin"
                             aria-hidden="true"
                           />
-                          Έναρξη…
+                          Starting…
                         </>
                       ) : phone.available ? (
                         <>
-                          Απόκτησέ το
+                          Get this phone
                           <ArrowRight
                             className="h-4 w-4 transition-transform group-hover/cta:translate-x-0.5"
                             aria-hidden="true"
                           />
                         </>
                       ) : (
-                        "Μη διαθέσιμο"
+                        "Unavailable"
                       )}
                     </Button>
                   </div>

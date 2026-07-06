@@ -25,30 +25,30 @@ export const SITE_NAME = "Americell" as const;
 
 /** Default page title used when a route does not supply its own. */
 export const DEFAULT_TITLE =
-  "Americell — Αληθινά τηλέφωνα ΗΠΑ που ελέγχεις από οπουδήποτε" as const;
+  "Americell — Real US phones you control from anywhere" as const;
 
 /**
  * Rich, benefit-led default description. Kept near ~155 characters so it is
  * unlikely to be truncated in search-result snippets.
  */
 export const DEFAULT_DESCRIPTION =
-  "Η Americell σού δίνει αληθινά, φυσικά smartphone ΗΠΑ σε datacenter ΗΠΑ — έλεγξέ τα ζωντανά στον browser σου, αυτοματοποίησε επαναλαμβανόμενες ροές και διαχειρίσου έναν ολόκληρο στόλο από ένα dashboard. Χωρίς emulators, χωρίς καλώδια.";
+  "Americell gives you real, physical US smartphones in US datacenters — control them live in your browser, automate repetitive flows, and manage a whole fleet from one dashboard. No emulators, no cables.";
 
 /** Topical keyword set surfaced in metadata. */
 export const KEYWORDS: string[] = [
-  "cloud τηλέφωνο",
-  "απομακρυσμένο τηλέφωνο",
-  "αληθινό τηλέφωνο ΗΠΑ",
-  "smartphone ΗΠΑ στο cloud",
-  "τηλεχειρισμός συσκευών",
-  "φάρμα κινητών συσκευών",
-  "δοκιμές σε αληθινές συσκευές",
-  "QA εφαρμογών κινητού",
-  "απομακρυσμένο Android",
-  "απομακρυσμένο iPhone",
-  "αυτοματισμός συσκευών",
-  "φιλοξενούμενα smartphone",
-  "οικιακές κινητές συσκευές",
+  "cloud phone",
+  "remote phone",
+  "real US phone",
+  "US smartphone in the cloud",
+  "remote device control",
+  "mobile device farm",
+  "real-device testing",
+  "mobile app QA",
+  "remote Android",
+  "remote iPhone",
+  "device automation",
+  "hosted smartphones",
+  "residential mobile devices",
   "Americell",
 ];
 
@@ -105,7 +105,7 @@ export function buildMetadata(overrides: MetadataOverrides = {}): Metadata {
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
     images: [OG_IMAGE_PATH],
-    locale: "el_GR",
+    locale: "en_US",
     ...(isObject(openGraph) ? openGraph : {}),
   };
 

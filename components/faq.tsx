@@ -14,16 +14,16 @@ export default function Faq() {
     <section id="faq" className="relative overflow-hidden">
       <div className="relative mx-auto w-full max-w-6xl px-6 py-24 sm:py-32">
         <Reveal className="mx-auto max-w-3xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-wide text-brand-2">
-            Συχνές ερωτήσεις
+          <p className="inline-flex items-center rounded-full border border-white/50 bg-white/60 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-brand-2 backdrop-blur-xl ring-1 ring-white/40">
+            FAQ
           </p>
-          <h2 className="mt-4 text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            <AuroraText>Απαντήσεις στις ερωτήσεις σου</AuroraText>
+          <h2 className="mt-6 text-5xl font-extrabold leading-[0.95] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+            Questions?{" "}
+            <AuroraText>Answered.</AuroraText>
           </h2>
-          <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-            Όλα όσα χρειάζεται να ξέρεις για τη λειτουργία αληθινών τηλεφώνων
-            ΗΠΑ με την Americell. Έχεις ακόμη απορίες; Επικοινώνησε μαζί μας και
-            θα σε βοηθήσουμε.
+          <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
+            Everything about running real US phones with Americell. Still
+            curious? Reach out — we&apos;re quick.
           </p>
         </Reveal>
 
@@ -42,7 +42,7 @@ export default function Faq() {
                 value={item.q}
                 className="border-white/40"
               >
-                <AccordionTrigger className="gap-6 py-6 text-lg font-medium tracking-tight text-foreground/90 transition-colors duration-300 hover:no-underline data-[panel-open]:text-brand-2">
+                <AccordionTrigger className="gap-6 py-6 text-lg font-semibold tracking-tight text-foreground/90 transition-colors duration-300 hover:no-underline data-[panel-open]:text-brand-2">
                   {item.q}
                 </AccordionTrigger>
                 <AccordionContent className="pr-14 pb-6 text-base leading-relaxed text-muted-foreground">

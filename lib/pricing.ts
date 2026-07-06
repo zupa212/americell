@@ -22,11 +22,11 @@ import { retailCentsFor, type PriceRounding } from "@/lib/money";
 
 export type BillingPeriod = "daily" | "weekly" | "monthly";
 
-/** The three rental durations, with Greek user-facing labels. `days` → CellGods `duration_days`. */
+/** The three rental durations, with English user-facing labels. `days` → CellGods `duration_days`. */
 export const DURATIONS = [
-  { period: "daily", days: 1, labelEl: "Ημέρα" },
-  { period: "weekly", days: 7, labelEl: "Εβδομάδα" },
-  { period: "monthly", days: 30, labelEl: "Μήνας" },
+  { period: "daily", days: 1, label: "Day" },
+  { period: "weekly", days: 7, label: "Week" },
+  { period: "monthly", days: 30, label: "Month" },
 ] as const;
 
 /**

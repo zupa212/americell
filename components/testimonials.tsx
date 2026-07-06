@@ -1,6 +1,7 @@
 import { Quote } from "lucide-react";
 import Reveal from "@/components/ui/reveal";
 import { ShineBorder } from "@/components/ui/shine-border";
+import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
 import { TESTIMONIALS } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -17,17 +18,34 @@ export default function Testimonials() {
       className="relative isolate overflow-hidden py-24 sm:py-32"
     >
       <div className="mx-auto w-full max-w-6xl px-6">
-        <Reveal className="max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-wide text-brand-2">
-            Πελάτες
-          </p>
-          <h2 className="mt-3 text-balance bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-clip-text text-4xl font-extrabold tracking-tight text-transparent sm:text-5xl lg:text-6xl">
-            Έμπιστο από ομάδες που δοκιμάζουν σε αληθινές συσκευές
+        <Reveal className="max-w-3xl">
+          {/* Flashy frosted-glass eyebrow with a live brand-gradient dot */}
+          <div
+            className={cn(
+              "inline-flex items-center gap-2.5 rounded-full py-1 pl-2.5 pr-3.5 text-sm",
+              "border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40",
+              "shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]",
+            )}
+          >
+            <span
+              aria-hidden="true"
+              className="h-2 w-2 rounded-full bg-gradient-to-br from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] motion-safe:animate-gradient shadow-[0_0_10px_rgba(43,107,255,0.7)]"
+            />
+            <AnimatedShinyText className="font-semibold uppercase tracking-[0.14em] text-brand">
+              Clients
+            </AnimatedShinyText>
+          </div>
+
+          <h2 className="mt-6 max-w-3xl text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.03em] text-foreground sm:text-5xl lg:text-6xl">
+            Trusted by teams on{" "}
+            <span className="bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] bg-clip-text text-transparent motion-safe:animate-gradient">
+              real US devices
+            </span>
+            .
           </h2>
-          <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-            Υπεύθυνοι QA, πρακτορεία και ομάδες ανάπτυξης χρησιμοποιούν το
-            Americell για να ελέγχουν γνήσιο υλικό ΗΠΑ από οπουδήποτε — χωρίς
-            αποστολές, χωρίς καλώδια.
+          <p className="mt-5 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
+            QA leads, agencies, and growth teams operate genuine US hardware from
+            anywhere — no shipping, no cables.
           </p>
         </Reveal>
 

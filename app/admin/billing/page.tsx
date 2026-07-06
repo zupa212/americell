@@ -76,11 +76,11 @@ export default async function AdminBillingPage({
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              Χρέωση &amp; Πίστωση
+              Billing &amp; Credit
             </h1>
             <p className="mt-1.5 text-sm text-muted-foreground">
-              Το προπληρωμένο υπόλοιπο reseller που τροφοδοτεί κάθε ενεργοποίηση,
-              το ιστορικό κινήσεων και οι ρυθμίσεις προσθήκης πίστωσης.
+              The prepaid reseller balance that funds every activation, the
+              transaction history, and your top-up settings.
             </p>
           </div>
           {balance != null && <TopupDialog />}
@@ -91,11 +91,10 @@ export default async function AdminBillingPage({
         <Reveal delay={0.05}>
           <Alert className="mt-8 border-white/50 bg-white/60 backdrop-blur-md">
             <TriangleAlert className="h-4 w-4" aria-hidden="true" />
-            <AlertTitle>Το CellGods δεν έχει ρυθμιστεί ακόμη.</AlertTitle>
+            <AlertTitle>CellGods isn&apos;t configured yet.</AlertTitle>
             <AlertDescription>
-              Πρόσθεσε <code>CELLGODS_API_KEY</code> (δες το{" "}
-              <code>.env.example</code>) για να δεις το υπόλοιπο και το ιστορικό
-              πίστωσης.
+              Add <code>CELLGODS_API_KEY</code> (see{" "}
+              <code>.env.example</code>) to see the balance and credit history.
             </AlertDescription>
           </Alert>
         </Reveal>
@@ -106,10 +105,10 @@ export default async function AdminBillingPage({
             className="mt-8 border-white/50 bg-white/60 backdrop-blur-md"
           >
             <TriangleAlert className="h-4 w-4" aria-hidden="true" />
-            <AlertTitle>Δεν ήταν δυνατή η φόρτωση του υπολοίπου.</AlertTitle>
+            <AlertTitle>Couldn&apos;t load the balance.</AlertTitle>
             <AlertDescription>
-              Υπήρξε πρόβλημα επικοινωνίας με το CellGods. Ανανέωσε τη σελίδα και
-              δοκίμασε ξανά.
+              There was a problem reaching CellGods. Refresh the page and try
+              again.
             </AlertDescription>
           </Alert>
         </Reveal>
@@ -140,7 +139,7 @@ export default async function AdminBillingPage({
                 <div>
                   <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                     <Wallet className="h-4 w-4 text-brand" aria-hidden="true" />
-                    Διαθέσιμη πίστωση
+                    Available credit
                   </div>
                   <div className="mt-2 text-4xl font-bold tracking-tight text-foreground tabular-nums sm:text-5xl">
                     {fmtMoney(balance.credit_balance_cents, currency)}
@@ -149,7 +148,7 @@ export default async function AdminBillingPage({
                     {low && (
                       <Badge variant="destructive">
                         <TriangleAlert aria-hidden="true" />
-                        Χαμηλό υπόλοιπο
+                        Low balance
                       </Badge>
                     )}
                     <Badge
@@ -157,12 +156,12 @@ export default async function AdminBillingPage({
                         balance.auto_topup.enabled ? "secondary" : "outline"
                       }
                     >
-                      Αυτόματη προσθήκη:{" "}
-                      {balance.auto_topup.enabled ? "ενεργή" : "ανενεργή"}
+                      Auto top-up:{" "}
+                      {balance.auto_topup.enabled ? "on" : "off"}
                     </Badge>
                     {balance.auto_topup.enabled && (
                       <span className="text-xs text-muted-foreground">
-                        στο{" "}
+                        at{" "}
                         {fmtMoney(
                           balance.auto_topup.threshold_cents,
                           currency,
@@ -183,11 +182,11 @@ export default async function AdminBillingPage({
               <TabsList>
                 <TabsTrigger value="ledger">
                   <ReceiptText aria-hidden="true" />
-                  Ιστορικό
+                  History
                 </TabsTrigger>
                 <TabsTrigger value="settings">
                   <Settings2 aria-hidden="true" />
-                  Ρυθμίσεις
+                  Settings
                 </TabsTrigger>
               </TabsList>
 
@@ -207,11 +206,11 @@ export default async function AdminBillingPage({
                   <div className="flex flex-col gap-3">
                     <div>
                       <h2 className="text-base font-semibold text-foreground">
-                        Προσθήκη πίστωσης
+                        Add credit
                       </h2>
                       <p className="text-sm text-muted-foreground">
-                        Χρέωσε την κάρτα σου μέσω του Stripe Checkout του CellGods
-                        για να αυξήσεις το υπόλοιπο.
+                        Charge your card through CellGods&apos; Stripe Checkout
+                        to top up your balance.
                       </p>
                     </div>
                     <div>

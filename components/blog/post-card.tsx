@@ -3,9 +3,9 @@ import { ArrowRight, CalendarDays, Clock } from "lucide-react";
 import { cn } from "@/lib/cn";
 import type { BlogPost } from "@/lib/blog";
 
-/** Long Greek date from an ISO `YYYY-MM-DD` string (timezone-stable). */
-function formatGreekDate(iso: string): string {
-  return new Date(`${iso}T00:00:00`).toLocaleDateString("el-GR", {
+/** Long US English date from an ISO `YYYY-MM-DD` string (timezone-stable). */
+function formatDate(iso: string): string {
+  return new Date(`${iso}T00:00:00`).toLocaleDateString("en-US", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -32,11 +32,11 @@ export default function PostCard({ post }: { post: BlogPost }) {
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
           <CalendarDays aria-hidden="true" className="h-3.5 w-3.5 text-brand" />
-          <time dateTime={post.date}>{formatGreekDate(post.date)}</time>
+          <time dateTime={post.date}>{formatDate(post.date)}</time>
         </span>
         <span className="inline-flex items-center gap-1.5">
           <Clock aria-hidden="true" className="h-3.5 w-3.5 text-brand" />
-          {post.readingMinutes} λεπτά
+          {post.readingMinutes} min
         </span>
       </div>
 
@@ -49,7 +49,7 @@ export default function PostCard({ post }: { post: BlogPost }) {
       </p>
 
       <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-brand">
-        Διάβασε το άρθρο
+        Read more
         <ArrowRight
           aria-hidden="true"
           className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"

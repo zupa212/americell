@@ -8,7 +8,7 @@ import { requireAdminPage } from "@/lib/admin";
 // Keep the owner cockpit out of search indexes as a defence-in-depth measure;
 // the real gate is `requireAdminPage()` below.
 export const metadata: Metadata = {
-  title: "Διαχείριση — Americell",
+  title: "Admin — Americell",
   robots: { index: false, follow: false },
 };
 

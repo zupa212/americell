@@ -74,10 +74,10 @@ export default function LoginPage() {
           />
           <CardHeader>
             <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
-              Καλώς όρισες ξανά
+              Welcome back
             </CardTitle>
             <CardDescription className="text-muted-foreground">
-              Συνδέσου στον λογαριασμό σου Americell.
+              Log in to your Americell account.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -94,7 +94,7 @@ export default function LoginPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="password">Κωδικός</Label>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   name="password"
@@ -121,17 +121,17 @@ export default function LoginPage() {
                 disabled={pending}
                 className="h-11 w-full rounded-full transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-16px_rgba(43,107,255,0.5)]"
               >
-                {pending ? "Σύνδεση…" : "Σύνδεση"}
+                {pending ? "Logging in…" : "Log in"}
               </Button>
             </form>
 
             <p className="mt-4 text-center text-sm text-muted-foreground">
-              Δεν έχεις λογαριασμό;{" "}
+              No account?{" "}
               <Link
                 href="/signup"
                 className="font-medium text-brand transition-colors duration-300 hover:text-brand-2"
               >
-                Δημιούργησε έναν
+                Create one
               </Link>
             </p>
           </CardContent>

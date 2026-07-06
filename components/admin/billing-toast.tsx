@@ -22,9 +22,9 @@ export default function BillingToast({
     fired.current = true;
 
     if (status === "success") {
-      toast.success("Η πίστωση προστέθηκε — το υπόλοιπο ενημερώθηκε.");
+      toast.success("Credit added — your balance is updated.");
     } else {
-      toast.info("Η προσθήκη πίστωσης ακυρώθηκε.");
+      toast.info("Top-up cancelled.");
     }
 
     const url = new URL(window.location.href);

@@ -10,16 +10,16 @@ import { CellgodsError } from "@/lib/cellgods";
  * outright and stays self-contained.
  */
 
-// Greek status map for CellGods failures (RESELLER_PLAN §6.3).
+// English status map for CellGods failures (RESELLER_PLAN §6.3).
 const CELLGODS_MESSAGES: Record<number, string> = {
-  400: "Μη έγκυρο αίτημα",
-  401: "Λείπει το κλειδί API",
-  402: "Ανεπαρκές υπόλοιπο — πρόσθεσε πίστωση",
-  403: "Μη έγκυρο κλειδί API",
-  404: "Δεν βρέθηκε",
-  409: "Η συσκευή δεν είναι πλέον διαθέσιμη",
-  429: "Πολλά αιτήματα",
-  500: "Σφάλμα διακομιστή",
+  400: "Invalid request",
+  401: "Missing API key",
+  402: "Insufficient balance — add credit",
+  403: "Invalid API key",
+  404: "Not found",
+  409: "Device is no longer available",
+  429: "Too many requests",
+  500: "Server error",
 };
 
 /**
@@ -31,15 +31,15 @@ const CELLGODS_MESSAGES: Record<number, string> = {
 export function adminDenied(status: 401 | 403): Response {
   if (status === 401) {
     return Response.json(
-      { error: "Μη εξουσιοδοτημένη πρόσβαση." },
+      { error: "Unauthorized." },
       { status: 401 },
     );
   }
-  return Response.json({ error: "Δεν βρέθηκε." }, { status: 404 });
+  return Response.json({ error: "Not found." }, { status: 404 });
 }
 
 /**
- * Map a thrown CellGods error to a Greek JSON Response carrying the upstream
+ * Map a thrown CellGods error to an English JSON Response carrying the upstream
  * status. A `status === 0` (network/timeout/unconfigured) becomes a 503 so we
  * never emit a nonsensical HTTP 0.
  */
@@ -47,8 +47,8 @@ export function cellgodsErrorResponse(err: unknown): Response {
   if (err instanceof CellgodsError) {
     const status = err.status && err.status >= 400 ? err.status : 503;
     const message =
-      CELLGODS_MESSAGES[err.status] ?? "Προσωρινά μη διαθέσιμο — δοκίμασε ξανά.";
+      CELLGODS_MESSAGES[err.status] ?? "Temporarily unavailable — try again.";
     return Response.json({ error: message }, { status });
   }
-  return Response.json({ error: "Σφάλμα διακομιστή." }, { status: 500 });
+  return Response.json({ error: "Server error." }, { status: 500 });
 }

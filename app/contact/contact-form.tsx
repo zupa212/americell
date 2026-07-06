@@ -30,7 +30,7 @@ export function ContactForm() {
   // has been accepted.
   useEffect(() => {
     if (state.ok) {
-      toast.success("Το μήνυμά σου στάλθηκε! Θα σου απαντήσουμε σύντομα.");
+      toast.success("Your message has been sent! We’ll get back to you soon.");
       formRef.current?.reset();
     } else if (state.error) {
       toast.error(state.error);
@@ -41,17 +41,16 @@ export function ContactForm() {
     <Card className="mt-8">
       <CardHeader>
         <CardTitle className="text-lg font-semibold">
-          Στείλε μας μήνυμα
+          Send us a message
         </CardTitle>
         <CardDescription>
-          Συμπλήρωσε τη φόρμα και θα επικοινωνήσουμε μαζί σου στο email που θα
-          δώσεις.
+          Fill out the form and we’ll reach out to you at the email you provide.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form ref={formRef} action={action} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="name">Όνομα</Label>
+            <Label htmlFor="name">Name</Label>
             <Input
               id="name"
               name="name"
@@ -59,7 +58,7 @@ export function ContactForm() {
               required
               minLength={2}
               autoComplete="name"
-              placeholder="Το όνομά σου"
+              placeholder="Your name"
             />
           </div>
 
@@ -76,14 +75,14 @@ export function ContactForm() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="message">Μήνυμα</Label>
+            <Label htmlFor="message">Message</Label>
             <Textarea
               id="message"
               name="message"
               required
               minLength={10}
               rows={5}
-              placeholder="Πώς μπορούμε να βοηθήσουμε;"
+              placeholder="How can we help?"
             />
           </div>
 
@@ -99,7 +98,7 @@ export function ContactForm() {
             disabled={pending}
             className="w-full rounded-full"
           >
-            {pending ? "Αποστολή…" : "Αποστολή μηνύματος"}
+            {pending ? "Sending…" : "Send message"}
           </Button>
         </form>
       </CardContent>

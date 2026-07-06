@@ -74,10 +74,10 @@ export default function SignupPage() {
           />
           <CardHeader>
             <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
-              Δημιούργησε τον λογαριασμό σου
+              Create your account
             </CardTitle>
             <CardDescription className="text-muted-foreground">
-              Ξεκίνα να ελέγχεις αληθινές συσκευές ΗΠΑ μέσα σε λίγα λεπτά.
+              Start controlling real US devices in minutes.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -94,7 +94,7 @@ export default function SignupPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="password">Κωδικός</Label>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   name="password"
@@ -105,7 +105,7 @@ export default function SignupPage() {
                   className={glassInput}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Τουλάχιστον 8 χαρακτήρες.
+                  At least 8 characters.
                 </p>
               </div>
 
@@ -124,17 +124,17 @@ export default function SignupPage() {
                 disabled={pending}
                 className="h-11 w-full rounded-full transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-16px_rgba(43,107,255,0.5)]"
               >
-                {pending ? "Δημιουργία…" : "Δημιουργία λογαριασμού"}
+                {pending ? "Creating…" : "Create account"}
               </Button>
             </form>
 
             <p className="mt-4 text-center text-sm text-muted-foreground">
-              Έχεις ήδη λογαριασμό;{" "}
+              Already have an account?{" "}
               <Link
                 href="/login"
                 className="font-medium text-brand transition-colors duration-300 hover:text-brand-2"
               >
-                Σύνδεση
+                Log in
               </Link>
             </p>
           </CardContent>

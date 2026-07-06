@@ -7,7 +7,7 @@ import * as z from "zod";
  * `useActionState`, so it must be serializable and stable across renders.
  *
  * - `ok`   : `true` once a valid message has been accepted, `false` otherwise.
- * - `error`: a Greek, user-facing validation/error message, or `null`.
+ * - `error`: an English, user-facing validation/error message, or `null`.
  */
 export type ContactState = {
   ok: boolean;
@@ -21,13 +21,13 @@ const ContactSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(2, "Δώσε το όνομά σου (τουλάχιστον 2 χαρακτήρες)."),
-  email: z.email("Δώσε ένα έγκυρο email."),
+    .min(2, "Enter your name (at least 2 characters)."),
+  email: z.email("Enter a valid email address."),
   message: z
     .string()
     .trim()
-    .min(10, "Το μήνυμα πρέπει να έχει τουλάχιστον 10 χαρακτήρες.")
-    .max(5000, "Το μήνυμα είναι πολύ μεγάλο (μέχρι 5000 χαρακτήρες)."),
+    .min(10, "Your message must be at least 10 characters.")
+    .max(5000, "Your message is too long (up to 5000 characters)."),
 });
 
 /**
@@ -49,7 +49,7 @@ export async function sendContactMessage(
     const first = parsed.error.issues[0]?.message;
     return {
       ok: false,
-      error: first ?? "Έλεγξε τα στοιχεία που συμπλήρωσες και δοκίμασε ξανά.",
+      error: first ?? "Check the details you entered and try again.",
     };
   }
 

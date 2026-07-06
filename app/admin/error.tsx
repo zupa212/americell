@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
  * Admin error boundary (§6.2). Fires when a server admin page throws — most
  * often a `CellgodsError` (missing/invalid API key, upstream 5xx) surfacing
  * from a `lib/cellgods` read. Renders inside the AdminNav chrome (the layout
- * gate already ran), so it only replaces the page body. Greek copy + glass, no
+ * gate already ran), so it only replaces the page body. English copy + glass, no
  * secret details leaked — just the opaque `digest` for support.
  */
 export default function AdminError({
@@ -34,16 +34,16 @@ export default function AdminError({
         </span>
 
         <h1 className="mt-4 text-xl font-bold tracking-tight text-foreground">
-          Κάτι πήγε στραβά στη διαχείριση.
+          Something went wrong in admin.
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          Δεν καταφέραμε να φορτώσουμε αυτή τη σελίδα. Δοκίμασε ξανά — αν το
-          πρόβλημα επιμείνει, έλεγξε το κλειδί API του CellGods ή τη σύνδεση.
+          We couldn&apos;t load this page. Try again — if the problem persists,
+          check the CellGods API key or the connection.
         </p>
 
         {error.digest ? (
           <p className="mt-3 font-mono text-xs text-muted-foreground/70">
-            Κωδικός: {error.digest}
+            Code: {error.digest}
           </p>
         ) : null}
 
@@ -53,7 +53,7 @@ export default function AdminError({
           className="mt-6 gap-1.5 bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white shadow-sm shadow-brand/25 transition-all duration-300 hover:-translate-y-0.5 hover:opacity-95"
         >
           <RefreshCw className="h-4 w-4" aria-hidden="true" />
-          Δοκίμασε ξανά
+          Try again
         </Button>
       </div>
     </div>

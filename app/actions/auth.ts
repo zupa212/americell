@@ -6,6 +6,7 @@ import { AuthError } from "next-auth";
 import { signIn, signOut } from "@/auth";
 import { isDbConfigured } from "@/lib/db";
 import { createUser, getUserByEmail } from "@/lib/users";
+import { logEvent } from "@/lib/logs";
 
 export type AuthState = { error: string | null };
 
@@ -23,21 +24,28 @@ export async function signup(
     password: formData.get("password"),
   });
   if (!parsed.success) {
-    return { error: "Δώσε ένα έγκυρο email και έναν κωδικό τουλάχιστον 8 χαρακτήρων." };
+    return { error: "Enter a valid email and a password of at least 8 characters." };
   }
   if (!isDbConfigured) {
-    return { error: "Η εγγραφή δεν είναι διαθέσιμη μέχρι να ρυθμιστεί η βάση δεδομένων." };
+    return { error: "Sign-up isn't available until the database is configured." };
   }
 
   const { email, password } = parsed.data;
 
   const existing = await getUserByEmail(email);
   if (existing) {
-    return { error: "Υπάρχει ήδη λογαριασμός με αυτό το email." };
+    return { error: "An account with this email already exists." };
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
   await createUser(email, passwordHash);
+
+  // Best-effort audit log (never throws, never blocks). No password recorded.
+  await logEvent({
+    actorType: "customer",
+    actorEmail: email,
+    action: "customer.signup",
+  });
 
   // signIn redirects on success (throws NEXT_REDIRECT, which must propagate).
   await signIn("credentials", { email, password, redirectTo: "/dashboard" });
@@ -49,7 +57,7 @@ export async function login(
   formData: FormData,
 ): Promise<AuthState> {
   if (!isDbConfigured) {
-    return { error: "Η σύνδεση δεν είναι διαθέσιμη μέχρι να ρυθμιστεί η βάση δεδομένων." };
+    return { error: "Log-in isn't available until the database is configured." };
   }
 
   const email = String(formData.get("email") ?? "");
@@ -61,8 +69,16 @@ export async function login(
   } catch (error) {
     // AuthError = bad credentials; anything else (e.g. NEXT_REDIRECT) must rethrow.
     if (error instanceof AuthError) {
-      return { error: "Λάθος email ή κωδικός." };
+      return { error: "Incorrect email or password." };
     }
+    // Reaching here means signIn succeeded and is throwing its redirect, so this
+    // is a successful login. Best-effort audit log (never throws, no password),
+    // then rethrow so the NEXT_REDIRECT propagates unchanged.
+    await logEvent({
+      actorType: "customer",
+      actorEmail: email,
+      action: "customer.login",
+    });
     throw error;
   }
 }

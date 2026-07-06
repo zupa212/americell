@@ -25,22 +25,26 @@ export default function HowItWorks() {
       className="relative overflow-hidden"
     >
       <div className="relative mx-auto w-full max-w-6xl px-6 py-24 sm:py-32">
-        <Reveal className="max-w-2xl" as="div">
+        <Reveal className="max-w-3xl" as="div">
           <header>
-            <p className="text-sm font-semibold uppercase tracking-wide text-brand">
-              Πώς λειτουργεί
+            <p className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-brand">
+              <span
+                aria-hidden="true"
+                className="h-1.5 w-1.5 rounded-full bg-gradient-to-br from-brand via-brand-2 to-brand-soft"
+              />
+              How it works
             </p>
             <h2
               id="how-heading"
-              className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl"
+              className="mt-4 text-balance text-4xl font-bold tracking-tighter text-foreground sm:text-5xl lg:text-6xl"
             >
-              Από αληθινό τηλέφωνο ΗΠΑ σε{" "}
-              <AuroraText>τηλεχειρισμό</AuroraText> σε τρία βήματα
+              Real US phone to{" "}
+              <AuroraText>live control</AuroraText>
+              <span className="text-muted-foreground"> in three steps.</span>
             </h2>
-            <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-              Χωρίς καλώδια, χωρίς τοπικό εξοπλισμό, χωρίς αναμονές logistics.
-              Ξεκίνα μια αυθεντική συσκευή και άρχισε να τη χειρίζεσαι από τον
-              browser σου.
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">
+              No cables. No local hardware. No shipping. Spin up a genuine
+              device and start driving it straight from your browser.
             </p>
           </header>
         </Reveal>
@@ -65,19 +69,27 @@ export default function HowItWorks() {
                 )}
               >
                 <ShineBorder
-                  shineColor={["#2b6bff", "#7aa2ff", "#c7d7ff"]}
+                  shineColor={["#2b6bff", "#7c3aed", "#22d3ee"]}
                   borderWidth={1}
                   duration={14}
                 />
-                <CardHeader className="relative gap-4 px-0">
-                  <Badge
-                    aria-hidden="true"
-                    className="h-14 w-14 rounded-full bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-xl font-bold text-white shadow-lg shadow-brand/25 ring-1 ring-white/40"
-                  >
-                    {step.n}
-                  </Badge>
-                  <CardTitle className="text-lg font-bold tracking-tight text-foreground">
-                    <span className="sr-only">{`Βήμα ${step.n}: `}</span>
+                <CardHeader className="relative gap-5 px-0">
+                  <div className="flex items-center gap-4">
+                    <Badge
+                      aria-hidden="true"
+                      className="h-14 w-14 rounded-2xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-2xl font-bold text-white shadow-lg shadow-brand/25 ring-1 ring-white/40"
+                    >
+                      {step.n}
+                    </Badge>
+                    <span
+                      aria-hidden="true"
+                      className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/70"
+                    >
+                      Step {step.n}
+                    </span>
+                  </div>
+                  <CardTitle className="text-xl font-bold tracking-tight text-foreground">
+                    <span className="sr-only">{`Step ${step.n}: `}</span>
                     {step.title}
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed text-muted-foreground">

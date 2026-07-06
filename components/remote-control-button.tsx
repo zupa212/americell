@@ -6,7 +6,7 @@ import { Radio } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * "Άνοιξε τηλεχειρισμό" — navigates to the INTERNAL, Americell-branded control
+ * "Open remote control" — navigates to the INTERNAL, Americell-branded control
  * page (`/dashboard/control/[id]`) that embeds the live device stream inside our
  * own chrome. We deliberately do NOT open the raw upstream stream URL in a new
  * tab, so the customer never sees the underlying provider's domain/branding
@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 export default function RemoteControlButton({
   rentalId,
   className,
-  label = "Άνοιξε τηλεχειρισμό",
+  label = "Open remote control",
 }: {
   rentalId: string;
   className?: string;

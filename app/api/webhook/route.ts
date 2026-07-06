@@ -9,8 +9,10 @@ import {
   markActivationFailedTransient,
   markActivationPendingCredit,
   markRefunded,
+  getRentalById,
 } from "@/lib/rentals";
 import { activateRental } from "@/lib/activation";
+import { logEvent } from "@/lib/logs";
 
 /**
  * AMERICELL Stripe webhook — exactly-once rental activation (RESELLER_PLAN §5.5C, §7.2).
@@ -96,6 +98,32 @@ export async function POST(req: Request) {
       if (owned) {
         try {
           await activateRental(owned);
+
+          // Audit (best-effort, never blocks the happy path): record the
+          // successful activation. Re-read the row for the actual wholesale
+          // `chargedCents` persisted by finalizeActivation (the `owned` snapshot
+          // predates it). The whole block is guarded so an audit read/write can
+          // never bubble into the outer catch and misflag a completed activation.
+          try {
+            const finalized = await getRentalById(owned.id);
+            const chargedCents = finalized?.chargedCents ?? null;
+            const marginCents =
+              chargedCents === null ? null : owned.retailCents - chargedCents;
+            await logEvent({
+              actorType: "system",
+              action: "rental.activated",
+              targetType: "rental",
+              targetId: owned.id,
+              metadata: {
+                model: owned.model,
+                chargedCents,
+                retailCents: owned.retailCents,
+                marginCents,
+              },
+            });
+          } catch {
+            // Audit is best-effort; swallow anything so the activation stands.
+          }
         } catch (err) {
           if (err instanceof CellgodsError) {
             const { status } = err;
@@ -117,6 +145,14 @@ export async function POST(req: Request) {
               console.error(
                 `[ALERT] insufficient CellGods credit — rental queued session=${session.id}: ${err.message}`,
               );
+              // Audit (best-effort): queued awaiting reseller credit top-up.
+              await logEvent({
+                actorType: "system",
+                action: "rental.pending_credit",
+                targetType: "rental",
+                targetId: owned.id,
+                metadata: { model: owned.model },
+              });
             } else {
               // Terminal (409/400/…): can never succeed. Refund on AMERICELL
               // Stripe ONLY (never CellGods /deactivate — no refund + phone lost)
@@ -126,6 +162,14 @@ export async function POST(req: Request) {
               console.error(
                 `[ALERT] terminal activation failure — refunded session=${session.id} status=${status}: ${err.message}`,
               );
+              // Audit (best-effort): terminal failure, refunded on AMERICELL Stripe.
+              await logEvent({
+                actorType: "system",
+                action: "rental.refunded",
+                targetType: "rental",
+                targetId: owned.id,
+                metadata: { model: owned.model, status },
+              });
             }
           } else {
             // Non-CellGods throw: `activate()` SUCCEEDED but persistence/encryption

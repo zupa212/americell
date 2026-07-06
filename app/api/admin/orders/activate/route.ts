@@ -6,6 +6,7 @@ import {
   activate,
   isCellgodsConfigured,
 } from "@/lib/cellgods";
+import { logEvent } from "@/lib/logs";
 
 /**
  * POST /api/admin/orders/activate — owner-only activation proxy (RESELLER_PLAN §6.3).
@@ -13,7 +14,7 @@ import {
  * Re-checks `requireAdmin()` itself, Zod-validates the body, then spends reseller
  * credit via `cellgods.activate`. The success payload contains `pin` +
  * `stream_url`, so every response is `Cache-Control: no-store`. On a
- * `CellgodsError` the wire status is translated to the Greek §6.3 map.
+ * `CellgodsError` the wire status is translated to the English §6.3 map.
  *
  * NOTE: this is the admin/manual activation path. The customer money-path
  * activation happens exactly-once at webhook time (§7.2) — never here.
@@ -21,16 +22,16 @@ import {
 
 const NO_STORE = { "Cache-Control": "no-store" } as const;
 
-/** Greek copy for a `CellgodsError.status` (RESELLER_PLAN §6.3); status 0 (network) → generic. */
-const CELLGODS_STATUS_EL: Record<number, string> = {
-  400: "Μη έγκυρο αίτημα",
-  401: "Λείπει το κλειδί API",
-  402: "Ανεπαρκές υπόλοιπο — πρόσθεσε πίστωση",
-  403: "Μη έγκυρο κλειδί API",
-  404: "Δεν βρέθηκε",
-  409: "Η συσκευή δεν είναι πλέον διαθέσιμη",
-  429: "Πολλά αιτήματα",
-  500: "Σφάλμα διακομιστή",
+/** English copy for a `CellgodsError.status` (RESELLER_PLAN §6.3); status 0 (network) → generic. */
+const CELLGODS_STATUS_EN: Record<number, string> = {
+  400: "Invalid request",
+  401: "Missing API key",
+  402: "Insufficient balance — add credit",
+  403: "Invalid API key",
+  404: "Not found",
+  409: "Device is no longer available",
+  429: "Too many requests",
+  500: "Server error",
 };
 
 const ActivateBody = z.object({
@@ -47,8 +48,8 @@ export async function POST(req: Request) {
       {
         error:
           gate.status === 401
-            ? "Παρακαλώ συνδέσου."
-            : "Δεν έχεις πρόσβαση.",
+            ? "Please sign in."
+            : "You don't have access.",
       },
       { status: gate.status, headers: NO_STORE },
     );
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
 
   if (!isCellgodsConfigured) {
     return Response.json(
-      { error: "Λείπει το κλειδί API" },
+      { error: "Missing API key" },
       { status: 503, headers: NO_STORE },
     );
   }
@@ -66,7 +67,7 @@ export async function POST(req: Request) {
     raw = await req.json();
   } catch {
     return Response.json(
-      { error: "Μη έγκυρο αίτημα" },
+      { error: "Invalid request" },
       { status: 400, headers: NO_STORE },
     );
   }
@@ -74,25 +75,39 @@ export async function POST(req: Request) {
   const parsed = ActivateBody.safeParse(raw);
   if (!parsed.success) {
     return Response.json(
-      { error: "Μη έγκυρο αίτημα" },
+      { error: "Invalid request" },
       { status: 400, headers: NO_STORE },
     );
   }
 
   try {
     const result = await activate(parsed.data);
+    // Best-effort audit trail (never logs pin/stream_url); never blocks/breaks.
+    await logEvent({
+      actorType: "admin",
+      actorEmail: gate.session?.user?.email,
+      action: "admin.activate",
+      targetType: "order",
+      targetId: result.order_id,
+      metadata: {
+        phone_id: parsed.data.phone_id,
+        customer_email: parsed.data.customer_email,
+        duration_days: parsed.data.duration_days,
+        charged_cents: result.charged_cents,
+      },
+    });
     // Contains pin + stream_url — admin-only, never cached.
     return Response.json(result, { headers: NO_STORE });
   } catch (e) {
     if (e instanceof CellgodsError) {
       const status = e.status || 500;
       return Response.json(
-        { error: CELLGODS_STATUS_EL[status] ?? "Σφάλμα διακομιστή" },
+        { error: CELLGODS_STATUS_EN[status] ?? "Server error" },
         { status, headers: NO_STORE },
       );
     }
     return Response.json(
-      { error: "Σφάλμα διακομιστή" },
+      { error: "Server error" },
       { status: 500, headers: NO_STORE },
     );
   }

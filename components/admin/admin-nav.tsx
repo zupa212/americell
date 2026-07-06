@@ -7,7 +7,10 @@ import {
   LayoutDashboard,
   LogOut,
   ReceiptText,
+  ScrollText,
   ShieldCheck,
+  Smartphone,
+  Users,
   Wallet,
   type LucideIcon,
 } from "lucide-react";
@@ -20,12 +23,15 @@ import { cn } from "@/lib/utils";
 
 type NavLink = { href: string; label: string; icon: LucideIcon };
 
-// Greek labels per §6.2/§6.4. Order = build order of the admin sections.
+// Labels per §6.2/§6.4. Order = build order of the admin sections.
 const LINKS: readonly NavLink[] = [
-  { href: "/admin", label: "Επισκόπηση", icon: LayoutDashboard },
-  { href: "/admin/inventory", label: "Απόθεμα", icon: Boxes },
-  { href: "/admin/orders", label: "Παραγγελίες", icon: ReceiptText },
-  { href: "/admin/billing", label: "Χρεώσεις", icon: Wallet },
+  { href: "/admin", label: "Overview", icon: LayoutDashboard },
+  { href: "/admin/inventory", label: "Inventory", icon: Boxes },
+  { href: "/admin/orders", label: "Orders", icon: ReceiptText },
+  { href: "/admin/rentals", label: "Rentals", icon: Smartphone },
+  { href: "/admin/customers", label: "Customers", icon: Users },
+  { href: "/admin/billing", label: "Billing", icon: Wallet },
+  { href: "/admin/logs", label: "Logs", icon: ScrollText },
 ];
 
 /** Overview (`/admin`) matches exactly; sections match their prefix. */
@@ -37,7 +43,7 @@ function isActive(pathname: string, href: string): boolean {
 /**
  * AdminNav — sticky frosted-glass chrome for the owner cockpit (§6.4).
  *
- * AuroraText wordmark + "Owner" badge, the four Greek section links with an
+ * AuroraText wordmark + "Owner" badge, the section links with an
  * active-state pill, and a sign-out button. Sign-out submits the `logout`
  * server action through a real <form>, so it works without JS. Client
  * component only for `usePathname` (active link) — the email string is passed
@@ -72,7 +78,7 @@ export default function AdminNav({ email }: { email: string }) {
         </Link>
 
         <nav
-          aria-label="Διαχείριση"
+          aria-label="Admin"
           className="order-last w-full overflow-x-auto lg:order-none lg:mx-auto lg:w-auto"
         >
           <ul className="flex items-center gap-1">
@@ -110,12 +116,12 @@ export default function AdminNav({ email }: { email: string }) {
             <Button
               variant="outline"
               size="lg"
-              aria-label="Αποσύνδεση"
+              aria-label="Sign out"
               className="gap-1.5 border-white/50 bg-white/60 backdrop-blur-md hover:bg-white/70"
               render={<button type="submit" />}
             >
               <LogOut className="h-4 w-4" aria-hidden="true" />
-              <span className="hidden sm:inline">Αποσύνδεση</span>
+              <span className="hidden sm:inline">Sign out</span>
             </Button>
           </form>
         </div>

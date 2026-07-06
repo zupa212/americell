@@ -30,31 +30,31 @@ export type AdminOrderRow = {
   model: string | null;
   customer_email: string;
   status: string;
-  /** Preformatted on the server (el-GR / Europe/Athens); "—" when absent. */
+  /** Preformatted on the server (en-US / America/New_York); "—" when absent. */
   expiresLabel: string;
 };
 
 /** CellGods statuses that entitle a live order (§5.4: `pooled` ≈ active). */
 const ACTIVE_STATUSES = new Set(["active", "pooled"]);
 
-/** CellGods order status → Badge variant + Greek label. */
+/** CellGods order status → Badge variant + label. */
 function statusBadge(status: string): {
   variant: "default" | "secondary" | "destructive" | "outline";
   label: string;
 } {
   switch (status) {
     case "active":
-      return { variant: "default", label: "ενεργή" };
+      return { variant: "default", label: "active" };
     case "pooled":
-      return { variant: "secondary", label: "σε pool" };
+      return { variant: "secondary", label: "pooled" };
     case "expired":
-      return { variant: "outline", label: "έληξε" };
+      return { variant: "outline", label: "expired" };
     case "deactivated":
     case "cancelled":
     case "canceled":
-      return { variant: "outline", label: "απενεργοποιημένη" };
+      return { variant: "outline", label: "deactivated" };
     case "pending":
-      return { variant: "secondary", label: "εκκρεμεί" };
+      return { variant: "secondary", label: "pending" };
     default:
       return { variant: "secondary", label: status };
   }
@@ -71,7 +71,7 @@ export default function OrdersTable({ orders }: { orders: AdminOrderRow[] }) {
           <Inbox className="h-5 w-5" />
         </span>
         <p className="text-sm text-muted-foreground">
-          Δεν υπάρχουν παραγγελίες αυτή τη στιγμή.
+          No orders right now.
         </p>
       </div>
     );
@@ -81,12 +81,12 @@ export default function OrdersTable({ orders }: { orders: AdminOrderRow[] }) {
     <Table>
       <TableHeader>
         <TableRow className="border-white/40 hover:bg-transparent">
-          <TableHead>Παραγγελία</TableHead>
-          <TableHead>Συσκευή</TableHead>
-          <TableHead>Πελάτης</TableHead>
-          <TableHead>Κατάσταση</TableHead>
-          <TableHead>Λήγει</TableHead>
-          <TableHead className="text-right">Ενέργειες</TableHead>
+          <TableHead>Order</TableHead>
+          <TableHead>Device</TableHead>
+          <TableHead>Customer</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Expires</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

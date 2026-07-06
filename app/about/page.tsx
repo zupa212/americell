@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "Σχετικά με το Americell",
+  title: "About Americell",
   description:
-    "Το Americell σού δίνει πρόσβαση σε αληθινά smartphone ΗΠΑ που ελέγχεις από τον browser σου. Μάθε τι είναι, για ποιους φτιάχτηκε, τις αξίες μας και την αποστολή μας.",
+    "Americell gives you access to real US smartphones you control from your browser. Learn what it is, who it’s for, our values, and our mission.",
   alternates: { canonical: "/about" },
 });
 
@@ -15,98 +15,91 @@ export default function AboutPage() {
     <PageShell>
       <div className="mx-auto w-full max-w-3xl px-6 py-16 sm:py-24">
         <h1 className="text-3xl font-bold sm:text-4xl">
-          Σχετικά με το{" "}
+          About{" "}
           <span className="bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-clip-text text-transparent">
             Americell
           </span>
         </h1>
         <p className="mt-4 leading-relaxed text-muted-foreground">
-          Το Americell είναι μια πλατφόρμα που σου δίνει πρόσβαση σε αληθινά,
-          φυσικά smartphone τοποθετημένα σε datacenter στις ΗΠΑ — και σου
-          επιτρέπει να τα χειρίζεσαι ζωντανά, απευθείας από τον browser σου,
-          από οπουδήποτε στον κόσμο.
+          Americell is a platform that gives you access to real, physical
+          smartphones placed in US datacenters — and lets you operate them live,
+          straight from your browser, from anywhere in the world.
         </p>
 
-        <h2 className="mt-10 text-xl font-semibold">Τι είναι το Americell</h2>
+        <h2 className="mt-10 text-xl font-semibold">What Americell is</h2>
         <p className="mt-4 leading-relaxed text-muted-foreground">
-          Δεν πρόκειται για emulator ούτε για εικονική συσκευή. Πίσω από κάθε
-          σύνδεση υπάρχει μια πραγματική συσκευή, με πραγματικό λειτουργικό,
-          πραγματικό δίκτυο και πραγματική συμπεριφορά. Εσύ βλέπεις την οθόνη
-          της σε πραγματικό χρόνο και τη χειρίζεσαι σαν να την κρατούσες στα
-          χέρια σου.
+          It’s not an emulator or a virtual device. Behind every connection is a
+          real device, with a real operating system, a real network, and real
+          behavior. You see its screen in real time and operate it as if you
+          were holding it in your hands.
         </p>
         <ul className="mt-4 list-disc space-y-2 pl-5 text-muted-foreground">
           <li>
-            Αληθινά τηλέφωνα ΗΠΑ — φυσικές συσκευές που τρέχουν σε υποδομή στις
-            Ηνωμένες Πολιτείες.
+            Real US phones — physical devices running on infrastructure in the
+            United States.
           </li>
           <li>
-            Τηλεχειρισμός από τον browser — χωρίς εγκαταστάσεις, χωρίς καλώδια,
-            χωρίς εξειδικευμένο εξοπλισμό.
+            Remote control from the browser — no installs, no cables, no
+            specialized equipment.
           </li>
           <li>
-            Ζωντανή αλληλεπίδραση και δυνατότητα αυτοματοποίησης
-            επαναλαμβανόμενων ροών σε έναν ολόκληρο στόλο συσκευών.
+            Live interaction, with the option to automate repetitive workflows
+            across an entire fleet of devices.
           </li>
         </ul>
 
-        <h2 className="mt-10 text-xl font-semibold">Για ποιους φτιάχτηκε</h2>
+        <h2 className="mt-10 text-xl font-semibold">Who it’s for</h2>
         <p className="mt-4 leading-relaxed text-muted-foreground">
-          Το Americell απευθύνεται σε ομάδες και επαγγελματίες που χρειάζονται
-          πρόσβαση σε αληθινές συσκευές ΗΠΑ, χωρίς να συντηρούν δικό τους
-          hardware.
+          Americell is built for teams and professionals who need access to real
+          US devices without maintaining their own hardware.
         </p>
         <ul className="mt-4 list-disc space-y-2 pl-5 text-muted-foreground">
           <li>
-            Πρακτορεία που διαχειρίζονται λογαριασμούς και ροές εργασίας για
-            πελάτες τους.
+            Agencies managing accounts and workflows on behalf of their clients.
           </li>
           <li>
-            Δοκιμαστές εφαρμογών (QA) που θέλουν να επιβεβαιώσουν τη
-            συμπεριφορά σε πραγματικές συσκευές και συνθήκες δικτύου.
+            QA testers who want to confirm behavior on real devices and network
+            conditions.
           </li>
           <li>
-            Ομάδες ανάπτυξης που χτίζουν, ελέγχουν και αυτοματοποιούν
-            εφαρμογές κινητού σε αληθινό περιβάλλον.
+            Development teams building, testing, and automating mobile apps in a
+            real environment.
           </li>
         </ul>
 
-        <h2 className="mt-10 text-xl font-semibold">Οι αξίες μας</h2>
+        <h2 className="mt-10 text-xl font-semibold">Our values</h2>
         <ul className="mt-4 list-disc space-y-2 pl-5 text-muted-foreground">
           <li>
-            <span className="font-medium text-foreground">
-              Αληθινό hardware.
-            </span>{" "}
-            Δουλεύεις πάντα με πραγματικές συσκευές — όχι με προσομοιώσεις που
-            κρύβουν αποκλίσεις.
+            <span className="font-medium text-foreground">Real hardware.</span>{" "}
+            You always work with real devices — not simulations that hide
+            discrepancies.
           </li>
           <li>
-            <span className="font-medium text-foreground">Διαφάνεια.</span>{" "}
-            Ξέρεις τι ελέγχεις, πού βρίσκεται η συσκευή και πώς λειτουργεί η
-            υπηρεσία. Χωρίς κρυφές χρεώσεις ή θολά όρια.
+            <span className="font-medium text-foreground">Transparency.</span>{" "}
+            You know what you’re controlling, where the device is, and how the
+            service works. No hidden fees or fuzzy limits.
           </li>
           <li>
-            <span className="font-medium text-foreground">Νόμιμη χρήση.</span>{" "}
-            Στηρίζουμε αποκλειστικά τη νόμιμη χρήση των συσκευών. Δεν
-            διευκολύνουμε απάτη, παράκαμψη κανόνων ή καταστρατήγηση των όρων
-            τρίτων υπηρεσιών — η συμμόρφωση με τους όρους κάθε πλατφόρμας
-            παραμένει ευθύνη του χρήστη.
+            <span className="font-medium text-foreground">Legitimate use.</span>{" "}
+            We support legitimate use of the devices only. We do not facilitate
+            fraud, rule circumvention, or evasion of third-party terms —
+            compliance with each platform’s terms remains the user’s
+            responsibility.
           </li>
         </ul>
 
-        <h2 className="mt-10 text-xl font-semibold">Η αποστολή μας</h2>
+        <h2 className="mt-10 text-xl font-semibold">Our mission</h2>
         <p className="mt-4 leading-relaxed text-muted-foreground">
-          Θέλουμε η πρόσβαση σε αληθινές κινητές συσκευές να είναι τόσο απλή
-          όσο το άνοιγμα μιας καρτέλας στον browser — με διαφάνεια, αξιοπιστία
-          και σεβασμό στους κανόνες. Χτίζουμε την υποδομή ώστε ομάδες κάθε
-          μεγέθους να δοκιμάζουν, να αναπτύσσουν και να αυτοματοποιούν πάνω σε
-          πραγματικό hardware, χωρίς συμβιβασμούς και χωρίς περιττή
-          πολυπλοκότητα.
+          We want access to real mobile devices to be as simple as opening a tab
+          in your browser — with transparency, reliability, and respect for the
+          rules. We’re building the infrastructure so that teams of every size
+          can test, develop, and automate on real hardware, without compromises
+          and without needless complexity.
         </p>
 
         <div className="mt-12 flex flex-col items-start gap-4 border-t pt-10">
           <p className="leading-relaxed text-muted-foreground">
-            Έτοιμος να δοκιμάσεις μια αληθινή συσκευή ΗΠΑ;
+            Ready to try a real US device?
           </p>
           <Button
             size="lg"
@@ -114,7 +107,7 @@ export default function AboutPage() {
             render={<Link href="/signup" />}
             nativeButton={false}
           >
-            Ξεκίνα τώρα
+            Get started
           </Button>
         </div>
       </div>

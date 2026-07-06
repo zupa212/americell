@@ -27,7 +27,7 @@ export async function generateMetadata({
   const post = getPostBySlug(slug);
 
   if (!post) {
-    return buildMetadata({ title: "Άρθρο", robots: { index: false, follow: false } });
+    return buildMetadata({ title: "Article", robots: { index: false, follow: false } });
   }
 
   const canonical = `${SITE_URL}/blog/${post.slug}`;
@@ -99,14 +99,14 @@ export default async function BlogPostPage({ params }: PageProps) {
       <div className="mx-auto w-full max-w-3xl px-6 py-12 sm:py-16">
         {/* Breadcrumb */}
         <Reveal>
-          <nav aria-label="Διαδρομή πλοήγησης" className="mb-8">
+          <nav aria-label="Breadcrumb" className="mb-8">
             <ol className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
               <li>
                 <Link
                   href="/"
                   className="rounded-sm transition-colors hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
                 >
-                  Αρχική
+                  Home
                 </Link>
               </li>
               <ChevronRight
@@ -143,7 +143,7 @@ export default async function BlogPostPage({ params }: PageProps) {
               href="/blog"
               className="inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/60 px-5 py-2.5 text-sm font-medium text-foreground backdrop-blur-xl ring-1 ring-white/40 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
             >
-              ← Όλα τα άρθρα
+              ← All articles
             </Link>
           </div>
         </Reveal>

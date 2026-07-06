@@ -4,6 +4,7 @@ import { isDbConfigured } from "@/lib/db";
 import { getBalance, getInventory, isCellgodsConfigured } from "@/lib/cellgods";
 import { DURATIONS, toPublicRetailPhone, wholesaleFor } from "@/lib/pricing";
 import { attachSession, createPendingRental } from "@/lib/rentals";
+import { logEvent } from "@/lib/logs";
 
 /**
  * Customer purchase — reseller flow B (RESELLER_PLAN §5.5).
@@ -123,6 +124,17 @@ export async function POST(req: Request) {
     retailCents,
   });
 
+  // Audit: pending rental snapshot created (best-effort, never blocks checkout).
+  await logEvent({
+    actorType: "customer",
+    actorEmail: email,
+    actorId: userId,
+    action: "checkout.started",
+    targetType: "rental",
+    targetId: rental.id,
+    metadata: { phoneId: item.phone_id, period, retailCents },
+  });
+
   // 6. One-time RETAIL Stripe Checkout (inline price_data in cents). No
   //    `recurring`, no `subscription_data` — this is `mode:"payment"`.
   const origin =
@@ -141,7 +153,7 @@ export async function POST(req: Request) {
         price_data: {
           currency: "usd",
           product_data: {
-            name: `Americell — ${item.model} (${duration.labelEl})`,
+            name: `Americell — ${item.model} (${duration.label})`,
           },
           unit_amount: retailCents,
         },

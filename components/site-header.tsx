@@ -37,8 +37,8 @@ import { Separator } from "@/components/ui/separator";
  * top edge (a `pt-3/pt-4` gap keeps it floating over the global aurora). It stays
  * pinned while scrolling and tightens its shadow/opacity once the page moves.
  * Brand mark + AuroraText wordmark on the left; shadcn NavigationMenu in the
- * center (md+); language DropdownMenu + Σύνδεση + Ξεκίνα τώρα on the right; a
- * hamburger-triggered Sheet on mobile.
+ * center (md+); language DropdownMenu + Log in + Get started (animated gradient)
+ * on the right; a hamburger-triggered Sheet on mobile.
  */
 export default function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -68,22 +68,22 @@ export default function SiteHeader() {
           <a
             href="/"
             className="group flex items-center gap-2.5 rounded-full outline-none transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            aria-label={`${SITE.name} — Αρχική`}
+            aria-label={`${SITE.name} — Home`}
           >
             <span
               aria-hidden="true"
-              className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-base font-bold text-white shadow-sm shadow-brand/20 ring-1 ring-white/40 transition-transform duration-300 group-hover:scale-105"
+              className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] text-base font-bold text-white shadow-sm shadow-brand/20 ring-1 ring-white/40 transition-transform duration-300 group-hover:scale-105 group-hover:animate-gradient"
             >
               <span className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/25 to-white/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               <span className="relative">A</span>
             </span>
-            <span className="text-lg font-bold tracking-tight">
+            <span className="text-lg font-bold tracking-tighter">
               <AuroraText>{SITE.name}</AuroraText>
             </span>
           </a>
 
           {/* Center nav (md+) */}
-          <NavigationMenu className="hidden md:flex" aria-label="Πλοήγηση">
+          <NavigationMenu className="hidden md:flex" aria-label="Navigation">
             <NavigationMenuList className="gap-0.5">
               {NAV_LINKS.map((link) => (
                 <NavigationMenuItem key={link.href}>
@@ -111,12 +111,12 @@ export default function SiteHeader() {
                     variant="ghost"
                     size="sm"
                     className="hidden rounded-full text-muted-foreground transition-all duration-300 hover:bg-white/70 hover:text-foreground lg:inline-flex"
-                    aria-label="Επιλογή γλώσσας, τρέχουσα Ελληνικά"
+                    aria-label="Select language, current English"
                   />
                 }
               >
                 <Globe className="h-4 w-4" aria-hidden="true" />
-                <span>Ελληνικά</span>
+                <span>English</span>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
@@ -128,25 +128,25 @@ export default function SiteHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Log in (outline) */}
+            {/* Log in (ghost) */}
             <Button
               variant="ghost"
               size="sm"
-              className="hidden rounded-full text-muted-foreground transition-all duration-300 hover:bg-white/70 hover:text-foreground sm:inline-flex"
+              className="hidden rounded-full font-medium text-muted-foreground transition-all duration-300 hover:bg-white/70 hover:text-foreground sm:inline-flex"
               render={<a href="/login" />}
               nativeButton={false}
             >
-              Σύνδεση
+              Log in
             </Button>
 
-            {/* Get started (primary) */}
+            {/* Get started (primary, animated gradient) */}
             <Button
               size="sm"
-              className="rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white shadow-sm shadow-brand/25 ring-1 ring-white/30 transition-all duration-300 hover:-translate-y-0.5 hover:opacity-95 hover:shadow-[0_16px_40px_-16px_rgba(43,107,255,0.55)]"
+              className="rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] font-semibold text-white shadow-sm shadow-brand/25 ring-1 ring-white/30 transition-all duration-300 animate-gradient hover:-translate-y-0.5 hover:opacity-95 hover:shadow-[0_16px_40px_-16px_rgba(43,107,255,0.55)]"
               render={<a href="/signup" />}
               nativeButton={false}
             >
-              Ξεκίνα τώρα
+              Get started
             </Button>
 
             {/* Mobile menu (Sheet) */}
@@ -157,7 +157,7 @@ export default function SiteHeader() {
                     variant="ghost"
                     size="icon-sm"
                     className="rounded-full text-foreground transition-all duration-300 hover:bg-white/70 md:hidden"
-                    aria-label="Άνοιγμα μενού"
+                    aria-label="Open menu"
                   />
                 }
               >
@@ -175,15 +175,15 @@ export default function SiteHeader() {
                     >
                       A
                     </span>
-                    <span className="text-lg font-bold tracking-tight">
+                    <span className="text-lg font-bold tracking-tighter">
                       <AuroraText>{SITE.name}</AuroraText>
                     </span>
                   </SheetTitle>
-                  <SheetDescription>Πλοήγηση για κινητά</SheetDescription>
+                  <SheetDescription>Mobile navigation</SheetDescription>
                 </SheetHeader>
 
                 <nav
-                  aria-label="Πλοήγηση για κινητά"
+                  aria-label="Mobile navigation"
                   className="flex flex-col gap-1 px-4"
                 >
                   {NAV_LINKS.map((link) => (
@@ -207,21 +207,21 @@ export default function SiteHeader() {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="h-11 w-full rounded-full border-white/50 bg-white/60 backdrop-blur-md transition-all duration-300 hover:bg-white/70"
+                    className="h-11 w-full rounded-full border-white/50 bg-white/60 font-medium backdrop-blur-md transition-all duration-300 hover:bg-white/70"
                     render={<a href="/login" onClick={() => setMenuOpen(false)} />}
                     nativeButton={false}
                   >
-                    Σύνδεση
+                    Log in
                   </Button>
                   <Button
                     size="lg"
-                    className="h-11 w-full rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white shadow-sm shadow-brand/25 ring-1 ring-white/30 transition-all duration-300 hover:opacity-95 hover:shadow-[0_16px_40px_-16px_rgba(43,107,255,0.55)]"
+                    className="h-11 w-full rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] font-semibold text-white shadow-sm shadow-brand/25 ring-1 ring-white/30 transition-all duration-300 animate-gradient hover:opacity-95 hover:shadow-[0_16px_40px_-16px_rgba(43,107,255,0.55)]"
                     render={
                       <a href="/signup" onClick={() => setMenuOpen(false)} />
                     }
                     nativeButton={false}
                   >
-                    Ξεκίνα τώρα
+                    Get started
                   </Button>
                 </div>
               </SheetContent>
@@ -233,4 +233,4 @@ export default function SiteHeader() {
   );
 }
 
-const LANGUAGES = ["Ελληνικά"] as const;
+const LANGUAGES = ["English"] as const;

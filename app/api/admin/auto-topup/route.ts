@@ -3,6 +3,7 @@ import * as z from "zod";
 import { requireAdmin } from "@/lib/admin";
 import { adminDenied, cellgodsErrorResponse } from "@/lib/admin-billing";
 import { setAutoTopup } from "@/lib/cellgods";
+import { logEvent } from "@/lib/logs";
 
 /**
  * POST /api/admin/auto-topup — configure automatic reseller top-up
@@ -26,16 +27,27 @@ export async function POST(req: Request) {
   try {
     raw = await req.json();
   } catch {
-    return Response.json({ error: "Μη έγκυρο αίτημα" }, { status: 400 });
+    return Response.json({ error: "Invalid request" }, { status: 400 });
   }
 
   const parsed = BodySchema.safeParse(raw);
   if (!parsed.success) {
-    return Response.json({ error: "Μη έγκυρο αίτημα" }, { status: 400 });
+    return Response.json({ error: "Invalid request" }, { status: 400 });
   }
 
   try {
     const result = await setAutoTopup(parsed.data);
+    await logEvent({
+      actorType: "admin",
+      actorEmail: gate.session?.user?.email,
+      action: "admin.auto_topup",
+      targetType: "balance",
+      metadata: {
+        enabled: parsed.data.enabled,
+        threshold_cents: parsed.data.threshold_cents,
+        amount_cents: parsed.data.amount_cents,
+      },
+    });
     return Response.json(result, {
       headers: { "Cache-Control": "no-store" },
     });

@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "Η σελίδα δεν βρέθηκε",
+  title: "Page not found",
   description:
-    "Η σελίδα που ψάχνεις δεν υπάρχει ή έχει μετακινηθεί. Επίστρεψε στην αρχική της Americell.",
+    "The page you’re looking for doesn’t exist or has moved. Head back to the Americell home page.",
   robots: { index: false, follow: false },
 });
 
@@ -19,11 +19,11 @@ export default function NotFound() {
             404
           </p>
           <h1 className="mt-6 text-3xl font-bold sm:text-4xl">
-            Η σελίδα δεν βρέθηκε.
+            Page not found.
           </h1>
           <p className="mt-4 leading-relaxed text-muted-foreground">
-            Η σελίδα που ψάχνεις μπορεί να έχει μετακινηθεί, διαγραφεί ή να μην
-            υπήρξε ποτέ.
+            The page you’re looking for may have moved, been deleted, or never
+            existed.
           </p>
           <div className="mt-10">
             <Button
@@ -32,7 +32,7 @@ export default function NotFound() {
               render={<Link href="/" />}
               nativeButton={false}
             >
-              Επιστροφή στην αρχική
+              Back to home
             </Button>
           </div>
         </div>

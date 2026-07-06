@@ -22,14 +22,14 @@ import { cn } from "@/lib/utils";
  */
 
 const REASON_LABELS: Record<string, string> = {
-  topup: "Προσθήκη πίστωσης",
-  top_up: "Προσθήκη πίστωσης",
-  auto_topup: "Αυτόματη προσθήκη",
-  activation: "Ενεργοποίηση",
-  activate: "Ενεργοποίηση",
-  refund: "Επιστροφή",
-  adjustment: "Διόρθωση",
-  deactivation: "Απενεργοποίηση",
+  topup: "Top-up",
+  top_up: "Top-up",
+  auto_topup: "Auto top-up",
+  activation: "Activation",
+  activate: "Activation",
+  refund: "Refund",
+  adjustment: "Adjustment",
+  deactivation: "Deactivation",
 };
 
 function reasonLabel(reason: string): string {
@@ -39,9 +39,9 @@ function reasonLabel(reason: string): string {
 // Format with an EXPLICIT locale + timezone so the server and client render the
 // exact same string — deterministic output means no SSR↔CSR hydration mismatch
 // (and no need for a mount-gated effect).
-const DATE_FMT = new Intl.DateTimeFormat("el-GR", {
+const DATE_FMT = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
-  timeZone: "Europe/Athens",
+  timeZone: "America/New_York",
 });
 
 function formatLedgerDate(iso: string): string {
@@ -59,7 +59,7 @@ export default function LedgerTable({
   if (entries.length === 0) {
     return (
       <p className="px-1 py-12 text-center text-sm text-muted-foreground">
-        Δεν υπάρχουν κινήσεις ακόμα.
+        No transactions yet.
       </p>
     );
   }
@@ -68,10 +68,10 @@ export default function LedgerTable({
     <Table>
       <TableHeader>
         <TableRow className="hover:bg-transparent">
-          <TableHead>Ημερομηνία</TableHead>
-          <TableHead>Αιτία</TableHead>
-          <TableHead className="text-right">Μεταβολή</TableHead>
-          <TableHead className="text-right">Υπόλοιπο</TableHead>
+          <TableHead>Date</TableHead>
+          <TableHead>Reason</TableHead>
+          <TableHead className="text-right">Change</TableHead>
+          <TableHead className="text-right">Balance</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

@@ -69,32 +69,31 @@ export default async function AdminInventoryPage() {
     <main className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
       <Reveal className="flex flex-col gap-2">
         <p className="text-sm font-medium text-muted-foreground">
-          Πίνακας διαχείρισης
+          Admin dashboard
         </p>
         <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
-          <AuroraText>Απόθεμα</AuroraText>
+          <AuroraText>Inventory</AuroraText>
         </h1>
         <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Ζωντανό απόθεμα CellGods με χονδρική τιμή και εκτιμώμενη λιανική.
-          Ενεργοποίησε μια διαθέσιμη συσκευή για έναν πελάτη.
+          Live CellGods inventory with wholesale price and estimated retail.
+          Activate an available device for a customer.
         </p>
       </Reveal>
 
       <Reveal delay={0.08} className="mt-10">
         {state === "unconfigured" ? (
           <Alert>
-            <AlertTitle>Λειτουργία demo</AlertTitle>
+            <AlertTitle>Demo mode</AlertTitle>
             <AlertDescription>
-              Το CellGods API δεν έχει ρυθμιστεί ακόμα, οπότε δεν υπάρχει ζωντανό
-              απόθεμα να εμφανιστεί.
+              The CellGods API isn&apos;t configured yet, so there&apos;s no live
+              inventory to show.
             </AlertDescription>
           </Alert>
         ) : state === "error" ? (
           <Alert variant="destructive">
-            <AlertTitle>Σφάλμα φόρτωσης</AlertTitle>
+            <AlertTitle>Failed to load</AlertTitle>
             <AlertDescription>
-              Δεν ήταν δυνατή η φόρτωση του αποθέματος. Ανανέωσε τη σελίδα και
-              δοκίμασε ξανά.
+              Couldn&apos;t load inventory. Refresh the page and try again.
             </AlertDescription>
           </Alert>
         ) : (

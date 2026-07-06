@@ -7,7 +7,7 @@ import { buildMetadata } from "@/lib/seo";
 export const metadata = buildMetadata({
   title: "Blog",
   description:
-    "Οδηγοί & άρθρα για τηλεχειρισμό πραγματικών τηλεφώνων ΗΠΑ (iPhone & Android) από τον browser — app testing, QA, διαχείριση λογαριασμών, growth teams & πρακτορεία.",
+    "Guides & articles on remote-controlling real US phones (iPhone & Android) from your browser — app testing, QA, account management, growth teams & agencies.",
   alternates: { canonical: "/blog" },
 });
 
@@ -22,16 +22,16 @@ export default function BlogIndexPage() {
             Blog
           </p>
           <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-            Οδηγοί &amp; άρθρα για{" "}
+            Guides &amp; articles on{" "}
             <span className="bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-clip-text text-transparent">
-              τηλεχειρισμό πραγματικών τηλεφώνων ΗΠΑ
+              remote-controlling real US phones
             </span>
           </h1>
           <p className="mt-4 leading-relaxed text-muted-foreground">
-            Πρακτικοί οδηγοί για τον τηλεχειρισμό αληθινών iPhone και Android των
-            ΗΠΑ μέσα από τον browser — δοκιμές &amp; QA εφαρμογών, τοπικοποιημένος
-            έλεγχος, διαχείριση των δικών σου λογαριασμών και ροών, growth teams
-            και πρακτορεία.
+            Practical guides for remote-controlling real US iPhones and Android
+            devices from your browser — app testing &amp; QA, localized
+            verification, managing your own accounts and flows, growth teams and
+            agencies.
           </p>
         </Reveal>
 

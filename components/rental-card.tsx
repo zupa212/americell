@@ -75,21 +75,21 @@ const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
 /** CellGods statuses that entitle a live rental (§5.4: `pooled` ≈ active). */
 const ACTIVE_STATUSES = new Set(["active", "pooled"]);
 
-/** Greek label for a billing period. */
+/** Label for a billing period. */
 function periodLabel(period: string): string {
   switch (period) {
     case "daily":
-      return "Ημέρα";
+      return "Day";
     case "weekly":
-      return "Εβδομάδα";
+      return "Week";
     case "monthly":
-      return "Μήνας";
+      return "Month";
     default:
       return period;
   }
 }
 
-/** Status → Badge variant + Greek label. */
+/** Status → Badge variant + label. */
 function statusBadge(status: string): {
   variant: "default" | "secondary" | "destructive" | "outline";
   label: string;
@@ -97,37 +97,37 @@ function statusBadge(status: string): {
   switch (status) {
     case "active":
     case "pooled":
-      return { variant: "default", label: "ενεργή" };
+      return { variant: "default", label: "active" };
     case "pending_payment":
-      return { variant: "secondary", label: "εκκρεμεί πληρωμή" };
+      return { variant: "secondary", label: "payment pending" };
     case "paid":
-      return { variant: "secondary", label: "επεξεργασία" };
+      return { variant: "secondary", label: "processing" };
     case "activating":
-      return { variant: "secondary", label: "ενεργοποίηση…" };
+      return { variant: "secondary", label: "activating…" };
     case "activation_pending_credit":
-      return { variant: "destructive", label: "σε αναμονή" };
+      return { variant: "destructive", label: "on hold" };
     case "refunded":
-      return { variant: "outline", label: "επιστροφή χρημάτων" };
+      return { variant: "outline", label: "refunded" };
     case "expired":
-      return { variant: "outline", label: "έληξε" };
+      return { variant: "outline", label: "expired" };
     case "deactivated":
-      return { variant: "outline", label: "ακυρωμένη" };
+      return { variant: "outline", label: "canceled" };
     default:
       return { variant: "secondary", label: status };
   }
 }
 
-/** Human Greek countdown for a positive duration in ms. */
+/** Human countdown for a positive duration in ms. */
 function formatRemaining(ms: number): string {
-  if (ms <= 0) return "Έληξε";
+  if (ms <= 0) return "Expired";
   const totalSeconds = Math.floor(ms / 1000);
   const days = Math.floor(totalSeconds / 86400);
   const hours = Math.floor((totalSeconds % 86400) / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
-  if (days >= 1) return `${days}η ${hours}ω ${minutes}λ`;
-  if (hours >= 1) return `${hours}ω ${minutes}λ ${seconds}δ`;
-  return `${minutes}λ ${seconds}δ`;
+  if (days >= 1) return `${days}d ${hours}h ${minutes}m`;
+  if (hours >= 1) return `${hours}h ${minutes}m ${seconds}s`;
+  return `${minutes}m ${seconds}s`;
 }
 
 export default function RentalCard({ rental }: { rental: RentalCardData }) {
@@ -195,14 +195,14 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
       if (res.ok && data.pin) {
         setPin(data.pin);
       } else if (res.status === 403) {
-        toast.error("Δεν έχεις πρόσβαση σε αυτή τη συσκευή.");
+        toast.error("You don't have access to this device.");
       } else if (res.status === 410) {
-        toast.error("Η ενοικίαση έχει λήξει.");
+        toast.error("This rental has expired.");
       } else {
-        toast.error(data.error ?? "Δεν ήταν δυνατή η ανάκτηση του PIN.");
+        toast.error(data.error ?? "Couldn't retrieve the PIN.");
       }
     } catch {
-      toast.error("Σφάλμα δικτύου. Δοκίμασε ξανά.");
+      toast.error("Network error. Please try again.");
     } finally {
       setPinLoading(false);
     }
@@ -213,10 +213,10 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
     try {
       await navigator.clipboard.writeText(pin);
       setCopied(true);
-      toast.success("Το PIN αντιγράφηκε.");
+      toast.success("PIN copied.");
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      toast.error("Δεν ήταν δυνατή η αντιγραφή.");
+      toast.error("Couldn't copy.");
     }
   }
 
@@ -241,14 +241,14 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
         return;
       }
       if (res.status === 401) {
-        toast.error("Η σύνδεσή σου έληξε — μπες ξανά.");
+        toast.error("Your session expired — sign in again.");
       } else if (res.status === 409) {
-        toast.error("Η συσκευή μόλις δεσμεύτηκε από άλλον.");
+        toast.error("This device was just taken by someone else.");
       } else {
-        toast.error(data.error ?? "Δεν ήταν δυνατή η ανανέωση.");
+        toast.error(data.error ?? "Couldn't renew.");
       }
     } catch {
-      toast.error("Σφάλμα δικτύου. Δοκίμασε ξανά.");
+      toast.error("Network error. Please try again.");
     } finally {
       setRenewLoading(false);
     }
@@ -262,18 +262,18 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (res.ok) {
-        toast.success("Η ενοικίαση ακυρώθηκε.");
+        toast.success("Rental canceled.");
         setCancelOpen(false);
         router.refresh();
         return;
       }
       if (res.status === 403) {
-        toast.error("Δεν έχεις πρόσβαση σε αυτή τη συσκευή.");
+        toast.error("You don't have access to this device.");
       } else {
-        toast.error(data.error ?? "Δεν ήταν δυνατή η ακύρωση.");
+        toast.error(data.error ?? "Couldn't cancel.");
       }
     } catch {
-      toast.error("Σφάλμα δικτύου. Δοκίμασε ξανά.");
+      toast.error("Network error. Please try again.");
     } finally {
       setCancelLoading(false);
     }
@@ -322,7 +322,7 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
             {/* Live expiry countdown */}
             <div className="flex items-center gap-2 rounded-2xl border border-white/50 bg-white/50 px-3 py-2 text-sm backdrop-blur-md">
               <Clock className="h-4 w-4 text-brand" aria-hidden="true" />
-              <span className="text-muted-foreground">Λήγει σε</span>
+              <span className="text-muted-foreground">Expires in</span>
               <span className="ml-auto font-semibold tabular-nums text-foreground">
                 {countdown}
               </span>
@@ -346,9 +346,9 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
                   <TriangleAlert className="h-3.5 w-3.5" aria-hidden="true" />
                 )}
                 {tokenFresh ? (
-                  <span>Ζωντανός σύνδεσμος — άνοιξε απευθείας.</span>
+                  <span>Live link — open directly.</span>
                 ) : (
-                  <span>Βάλε το PIN για να ανοίξει η συσκευή.</span>
+                  <span>Enter the PIN to open the device.</span>
                 )}
               </div>
             ) : null}
@@ -368,12 +368,12 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
                   {copied ? (
                     <>
                       <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                      Αντιγράφηκε
+                      Copied
                     </>
                   ) : (
                     <>
                       <Copy className="h-3.5 w-3.5" aria-hidden="true" />
-                      Αντιγραφή
+                      Copy
                     </>
                   )}
                 </span>
@@ -391,17 +391,17 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
                 ) : (
                   <KeyRound className="h-4 w-4" aria-hidden="true" />
                 )}
-                {pinLoading ? "Ανάκτηση…" : "Εμφάνιση PIN"}
+                {pinLoading ? "Loading…" : "Reveal PIN"}
               </Button>
             )}
           </>
         ) : rental.status === "refunded" ? (
           <p className="rounded-2xl border border-white/50 bg-white/50 px-3 py-2 text-sm text-muted-foreground backdrop-blur-md">
-            Επιστροφή χρημάτων — δοκίμασε ξανά.
+            Refunded — try again.
           </p>
         ) : rental.status === "activation_pending_credit" ? (
           <p className="rounded-2xl border border-amber-300/60 bg-amber-50/60 px-3 py-2 text-sm text-amber-700 backdrop-blur-md">
-            Η ενεργοποίηση καθυστερεί — θα ολοκληρωθεί σύντομα.
+            Activation is delayed — it&rsquo;ll finish soon.
           </p>
         ) : (
           <p className="rounded-2xl border border-white/50 bg-white/50 px-3 py-2 text-sm text-muted-foreground backdrop-blur-md">
@@ -427,7 +427,7 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
                 ) : (
                   <RefreshCw className="h-4 w-4" aria-hidden="true" />
                 )}
-                Ανανέωση
+                Renew
               </Button>
               <Button
                 type="button"
@@ -436,7 +436,7 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
                 className="h-10 flex-1 gap-2 rounded-full text-destructive hover:bg-destructive/10"
               >
                 <XCircle className="h-4 w-4" aria-hidden="true" />
-                Ακύρωση
+                Cancel
               </Button>
             </div>
           </>
@@ -460,7 +460,7 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
               ) : (
                 <RefreshCw className="h-4 w-4" aria-hidden="true" />
               )}
-              {renewLoading ? "Σύνδεση…" : "Ενοικίασε ξανά"}
+              {renewLoading ? "Connecting…" : "Rent again"}
             </span>
           </Button>
         )}
@@ -470,15 +470,15 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
       <AlertDialog open={cancelOpen} onOpenChange={setCancelOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Ακύρωση ενοικίασης;</AlertDialogTitle>
+            <AlertDialogTitle>Cancel this rental?</AlertDialogTitle>
             <AlertDialogDescription>
-              Η {rental.model} θα απενεργοποιηθεί άμεσα. Δεν γίνεται επιστροφή
-              χρημάτων για τον χρόνο που απομένει.
+              The {rental.model} will be deactivated immediately. No refund is
+              issued for the remaining time.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={cancelLoading}>
-              Όχι, κράτησέ τη
+              No, keep it
             </AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
@@ -490,7 +490,7 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
               ) : (
                 <XCircle className="h-4 w-4" aria-hidden="true" />
               )}
-              {cancelLoading ? "Ακύρωση…" : "Ναι, ακύρωσε"}
+              {cancelLoading ? "Canceling…" : "Yes, cancel"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

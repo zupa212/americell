@@ -20,10 +20,10 @@ type Stat = {
 };
 
 const STATS: readonly Stat[] = [
-  { value: 3, suffix: "+", label: "τοποθεσίες στις ΗΠΑ" },
-  { value: 100, suffix: "%", label: "αληθινό hardware" },
-  { prefix: "<", value: 10, suffix: "s", label: "χρόνος σύνδεσης" },
-  { value: 24, suffix: "/7", label: "πρόσβαση από browser" },
+  { value: 3, suffix: "+", label: "US locations" },
+  { value: 100, suffix: "%", label: "real hardware" },
+  { prefix: "<", value: 10, suffix: "s", label: "to connect" },
+  { value: 24, suffix: "/7", label: "browser access" },
 ];
 
 // Shared frosted-glass recipe used across the site.
@@ -34,7 +34,7 @@ const glassHover =
   "transition-all duration-300 hover:bg-white/70 hover:-translate-y-1 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)]";
 
 const gradientText =
-  "bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-clip-text text-transparent";
+  "bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient";
 
 // Run before paint on the client, but fall back to a plain effect on the
 // server so React doesn't warn during prerender.
@@ -112,18 +112,18 @@ export default function Stats() {
       <div className="relative mx-auto w-full max-w-6xl px-6 py-24 sm:py-32">
         <Reveal className="mx-auto max-w-2xl text-center" as="div">
           <header>
-            <p className="text-sm font-semibold uppercase tracking-wide text-brand">
-              Με μια ματιά
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">
+              At a glance
             </p>
             <h2
               id="stats-heading"
-              className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl"
+              className="mt-4 text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl"
             >
-              Η <AuroraText>Americell</AuroraText> σε αριθμούς
+              <AuroraText>Americell</AuroraText>, by the numbers
             </h2>
-            <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-              Χωρίς υπερβολές. Αληθινές συσκευές ΗΠΑ, iPhone και Android, έτοιμες
-              να τις χειριστείς μέσα από τον browser σου.
+            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+              No hype. Real US devices — iPhone and Android — ready to drive
+              live from your browser.
             </p>
           </header>
         </Reveal>
@@ -155,7 +155,7 @@ export default function Stats() {
                   <div className="relative">
                     <div
                       className={cn(
-                        "text-4xl font-bold leading-none tracking-tight sm:text-5xl",
+                        "text-5xl font-bold leading-none tracking-tight sm:text-6xl",
                         gradientText
                       )}
                     >
@@ -166,7 +166,7 @@ export default function Stats() {
                         active={inView}
                       />
                     </div>
-                    <p className="mt-3 text-sm text-muted-foreground">
+                    <p className="mt-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                       {stat.label}
                     </p>
                     {/* Accessible, non-animated full value for screen readers. */}
@@ -189,8 +189,9 @@ export default function Stats() {
             className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-brand to-brand-2"
           />
           <p className="text-xs font-medium tracking-wide text-muted-foreground">
-            Μετρήσιμα, όχι μαρκετίστικα — έτσι δουλεύει η{" "}
-            <span className={cn("font-semibold", gradientText)}>Americell</span>.
+            Measured, not marketed — that&apos;s how{" "}
+            <span className={cn("font-semibold", gradientText)}>Americell</span>{" "}
+            works.
           </p>
         </Reveal>
       </div>

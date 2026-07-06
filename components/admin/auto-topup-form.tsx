@@ -63,13 +63,13 @@ export default function AutoTopupForm({ autoTopup }: { autoTopup: AutoTopup }) {
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (res.ok) {
-        toast.success("Οι ρυθμίσεις αποθηκεύτηκαν.");
+        toast.success("Settings saved.");
         router.refresh();
       } else {
-        toast.error(data.error ?? "Δεν ήταν δυνατή η αποθήκευση.");
+        toast.error(data.error ?? "Couldn't save.");
       }
     } catch {
-      toast.error("Σφάλμα δικτύου. Δοκίμασε ξανά.");
+      toast.error("Network error. Try again.");
     } finally {
       setSaving(false);
     }
@@ -80,11 +80,11 @@ export default function AutoTopupForm({ autoTopup }: { autoTopup: AutoTopup }) {
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
           <Label htmlFor="auto-topup-switch" className="text-base">
-            Αυτόματη προσθήκη πίστωσης
+            Automatic credit top-up
           </Label>
           <p className="text-sm text-muted-foreground">
-            Όταν το υπόλοιπο πέσει κάτω από το όριο, το CellGods χρεώνει αυτόματα
-            την αποθηκευμένη κάρτα.
+            When the balance falls below the threshold, CellGods automatically
+            charges the card on file.
           </p>
         </div>
         <Switch
@@ -97,14 +97,14 @@ export default function AutoTopupForm({ autoTopup }: { autoTopup: AutoTopup }) {
 
       {!hasCard && (
         <p className="rounded-lg border border-amber-300/60 bg-amber-50/70 px-3 py-2 text-xs text-amber-800">
-          Δεν υπάρχει αποθηκευμένη κάρτα. Πρόσθεσε πίστωση μία φορά ώστε να
-          καταχωρηθεί κάρτα και να ενεργοποιηθεί η αυτόματη προσθήκη.
+          No card on file. Add credit once so a card is stored and auto top-up
+          can be enabled.
         </p>
       )}
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="auto-threshold">Όριο ενεργοποίησης (USD)</Label>
+          <Label htmlFor="auto-threshold">Trigger threshold (USD)</Label>
           <Input
             id="auto-threshold"
             type="number"
@@ -117,7 +117,7 @@ export default function AutoTopupForm({ autoTopup }: { autoTopup: AutoTopup }) {
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="auto-amount">Ποσό προσθήκης (USD)</Label>
+          <Label htmlFor="auto-amount">Top-up amount (USD)</Label>
           <Input
             id="auto-amount"
             type="number"
@@ -133,14 +133,14 @@ export default function AutoTopupForm({ autoTopup }: { autoTopup: AutoTopup }) {
 
       {invalid && (
         <p className="text-xs text-rose-600">
-          Όρισε έγκυρο όριο και ποσό προσθήκης (ελάχιστο{" "}
+          Set a valid threshold and top-up amount (minimum{" "}
           {fmtMoney(MIN_AMOUNT_CENTS)}).
         </p>
       )}
 
       <div>
         <Button onClick={save} disabled={saving || invalid || !hasCard}>
-          {saving ? "Αποθήκευση…" : "Αποθήκευση ρυθμίσεων"}
+          {saving ? "Saving…" : "Save settings"}
         </Button>
       </div>
     </div>

@@ -38,40 +38,40 @@ type Benefit = {
 const BENEFITS: readonly Benefit[] = [
   {
     num: "01",
-    title: "Αληθινό hardware από τις ΗΠΑ",
-    body: "Χειρίζεσαι πραγματικά iPhone και Android που βρίσκονται φυσικά στις Ηνωμένες Πολιτείες — όχι emulators, όχι εικονικές μηχανές. Ιδανικό για δοκιμές εφαρμογών, QA και έρευνα αγοράς σε αυθεντικές συνθήκες.",
+    title: "Real US hardware.",
+    body: "Operate real iPhones and Androids physically located in the United States — no emulators, no virtual machines. Built for app testing, QA, and market research under authentic conditions.",
     Icon: Smartphone,
     shine: ["#2b6bff", "#7aa2ff", "#c7d7ff"],
     beam: { from: "#2b6bff", to: "#7c3aed" },
   },
   {
     num: "02",
-    title: "Ζωντανός τηλεχειρισμός μέσα από τον browser",
-    body: "Δες την οθόνη σε πραγματικό χρόνο και άγγιξε, πληκτρολόγησε και πλοηγήσου σαν να κρατάς τη συσκευή στο χέρι σου. Καμία εγκατάσταση — μόνο ο browser σου και χαμηλή καθυστέρηση.",
+    title: "Live control, in your browser.",
+    body: "Watch the screen in real time and tap, type, and swipe as if the device were in your hand. Nothing to install — just your browser and low latency.",
     Icon: MonitorSmartphone,
     shine: ["#7c3aed", "#9E7AFF", "#d9c7ff"],
     beam: { from: "#7c3aed", to: "#2b6bff" },
   },
   {
     num: "03",
-    title: "Καθαρές οικιακές IP των ΗΠΑ",
-    body: "Κάθε συσκευή συνδέεται μέσω αυθεντικής οικιακής σύνδεσης ΗΠΑ, ώστε να βλέπεις περιεχόμενο, τιμές και εμπειρίες όπως ένας τοπικός χρήστης — για νόμιμες δοκιμές localization, growth και ελέγχου διαφημίσεων.",
+    title: "Clean US residential IPs.",
+    body: "Every device runs on a genuine US home connection, so you see content, pricing, and experiences like a local — for legitimate localization, growth, and ad-review testing.",
     Icon: Globe2,
     shine: ["#2b6bff", "#5aa2ff", "#c7d7ff"],
     beam: { from: "#5aa2ff", to: "#7c3aed" },
   },
   {
     num: "04",
-    title: "Ασφάλεια, PIN και απομόνωση",
-    body: "Κάθε μίσθωση είναι αποκλειστικά δική σου: προστασία με PIN, κρυπτογραφημένη σύνδεση και καθαρή συσκευή ανάμεσα στους χρήστες. Εσύ ελέγχεις την πρόσβαση — εμείς κρατάμε τα δεδομένα ασφαλή.",
+    title: "Secure, PIN-locked, isolated.",
+    body: "Every rental is yours alone: PIN protection, an encrypted connection, and a clean device between sessions. You control access — we keep the data safe.",
     Icon: ShieldCheck,
     shine: ["#7c3aed", "#2b6bff", "#c7d7ff"],
     beam: { from: "#2b6bff", to: "#5aa2ff" },
   },
   {
     num: "05",
-    title: "Έτοιμο σε δευτερόλεπτα",
-    body: "Διάλεξε συσκευή, ενεργοποίησε τη μίσθωση και ξεκίνα τον τηλεχειρισμό σχεδόν ακαριαία. Χωρίς αποστολές, χωρίς αναμονές logistics — απλώς πάτα play.",
+    title: "Ready in seconds.",
+    body: "Pick a device, start the rental, and take control almost instantly. No shipping, no logistics waits — just press play.",
     Icon: Rocket,
     shine: ["#2b6bff", "#7c3aed", "#5aa2ff"],
     beam: { from: "#7c3aed", to: "#2b6bff" },
@@ -89,19 +89,18 @@ export default function BenefitsStack() {
         {/* Section header */}
         <Reveal className="mx-auto max-w-2xl text-center">
           <p className="text-sm font-semibold uppercase tracking-wide text-brand">
-            Γιατί Americell
+            Why Americell
           </p>
           <h2
             id="why-heading"
             className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl"
           >
-            Πέντε λόγοι να εμπιστευτείς την{" "}
+            Five reasons to trust{" "}
             <AuroraText colors={BRAND_AURORA}>Americell</AuroraText>
           </h2>
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-            Αληθινές συσκευές ΗΠΑ, ζωντανός τηλεχειρισμός και καθαρές οικιακές IP
-            — φτιαγμένα για ομάδες που δοκιμάζουν, ελέγχουν και μεγαλώνουν με
-            διαφάνεια.
+            Real US devices, live remote control, and clean residential IPs —
+            built for teams that test, verify, and grow in the open.
           </p>
         </Reveal>
 
@@ -152,7 +151,7 @@ export default function BenefitsStack() {
                       <Icon className="h-6 w-6" aria-hidden="true" />
                     </span>
                     <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                      Πλεονέκτημα {num}
+                      Benefit {num}
                     </span>
                   </div>
 

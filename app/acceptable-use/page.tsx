@@ -4,9 +4,9 @@ import { Separator } from "@/components/ui/separator";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "Πολιτική Αποδεκτής Χρήσης",
+  title: "Acceptable Use Policy",
   description:
-    "Πολιτική Αποδεκτής Χρήσης της Americell: επιτρεπόμενες και απαγορευμένες χρήσεις των αληθινών συσκευών ΗΠΑ, ευθύνη του χρήστη για συμμόρφωση και συνέπειες παράβασης.",
+    "Americell Acceptable Use Policy: permitted and prohibited uses of our real US devices, your responsibility for compliance, and the consequences of violations.",
   alternates: { canonical: "/acceptable-use" },
 });
 
@@ -15,176 +15,169 @@ export default function AcceptableUsePage() {
     <PageShell>
       <article className="mx-auto w-full max-w-3xl px-6 py-16 sm:py-24">
         <Alert className="mb-8">
-          <AlertTitle>Πρότυπο κείμενο</AlertTitle>
+          <AlertTitle>Template copy</AlertTitle>
           <AlertDescription>
-            Το παρόν αποτελεί πρότυπο κείμενο — να ελεγχθεί από νομικό σύμβουλο
-            πριν τεθεί σε ισχύ.
+            This is template copy — to be reviewed by legal counsel before it
+            goes live.
           </AlertDescription>
         </Alert>
 
         <h1 className="text-3xl font-bold sm:text-4xl">
-          Πολιτική Αποδεκτής Χρήσης
+          Acceptable Use Policy
         </h1>
         <p className="mt-4 leading-relaxed text-muted-foreground">
-          Η παρούσα Πολιτική Αποδεκτής Χρήσης («Πολιτική») καθορίζει τους
-          κανόνες για τη χρήση της υπηρεσίας Americell, η οποία παρέχει
-          πρόσβαση σε αληθινές, φυσικές συσκευές smartphone που βρίσκονται σε
-          datacenter στις Ηνωμένες Πολιτείες. Στόχος μας είναι μια νόμιμη,
-          διαφανής και υπεύθυνη χρήση των συσκευών. Χρησιμοποιώντας την
-          υπηρεσία, αποδέχεστε τους όρους της παρούσας Πολιτικής.
+          This Acceptable Use Policy (the “Policy”) sets the rules for using the
+          Americell service, which provides access to real, physical smartphones
+          located in datacenters in the United States. Our goal is legitimate,
+          transparent, and responsible use of the devices. By using the service,
+          you accept the terms of this Policy.
         </p>
 
-        <h2 className="mt-10 text-xl font-semibold">Πεδίο εφαρμογής</h2>
+        <h2 className="mt-10 text-xl font-semibold">Scope</h2>
         <p className="mt-4 leading-relaxed text-muted-foreground">
-          Η Πολιτική ισχύει για κάθε χρήστη, λογαριασμό και συσκευή που
-          αποκτάται μέσω της Americell, καθώς και για κάθε ενέργεια που
-          εκτελείται μέσω της πλατφόρμας μας — είτε χειροκίνητα μέσω του
-          browser είτε μέσω αυτοματοποιημένων ροών. Λειτουργεί συμπληρωματικά
-          με τους Όρους Χρήσης και την Πολιτική Απορρήτου.
+          This Policy applies to every user, account, and device obtained
+          through Americell, as well as to every action performed through our
+          platform — whether manually from the browser or through automated
+          workflows. It operates alongside our Terms of Service and Privacy
+          Policy.
         </p>
 
-        <h2 className="mt-10 text-xl font-semibold">Επιτρεπόμενες χρήσεις</h2>
+        <h2 className="mt-10 text-xl font-semibold">Permitted uses</h2>
         <p className="mt-4 leading-relaxed text-muted-foreground">
-          Οι συσκευές της Americell προορίζονται για νόμιμες, θεμιτές χρήσεις.
-          Ενδεικτικά και όχι περιοριστικά, επιτρέπονται:
+          Americell devices are intended for lawful, legitimate uses. By way of
+          example and without limitation, the following are permitted:
         </p>
         <ul className="mt-4 list-disc space-y-2 pl-5 text-muted-foreground">
           <li>
-            <strong className="text-foreground">Δοκιμές &amp; QA:</strong>{" "}
-            έλεγχος εφαρμογών και ιστοσελίδων σε αληθινές συσκευές ΗΠΑ,
-            διασφάλιση συμβατότητας, εντοπισμός σφαλμάτων και δοκιμές
-            απόδοσης.
+            <strong className="text-foreground">Testing &amp; QA:</strong>{" "}
+            testing apps and websites on real US devices, verifying
+            compatibility, finding bugs, and running performance tests.
           </li>
           <li>
-            <strong className="text-foreground">Τοπικοποίηση:</strong>{" "}
-            επαλήθευση περιεχομένου, τιμών, μεταφράσεων και εμπειρίας χρήστη
-            όπως εμφανίζονται σε τοποθεσία και δίκτυο των ΗΠΑ.
+            <strong className="text-foreground">Localization:</strong>{" "}
+            verifying content, pricing, translations, and user experience as
+            they appear on a US location and network.
           </li>
           <li>
             <strong className="text-foreground">
-              Διαχείριση δικών σας λογαριασμών &amp; ροών:
+              Managing your own accounts &amp; workflows:
             </strong>{" "}
-            πρόσβαση και διαχείριση λογαριασμών που σας ανήκουν νόμιμα ή για
-            τους οποίους έχετε ρητή εξουσιοδότηση, καθώς και επαναλαμβανόμενων
-            εργασιών που σχετίζονται με αυτούς.
+            accessing and managing accounts that you legally own or for which
+            you have explicit authorization, along with recurring tasks related
+            to them.
           </li>
           <li>
-            <strong className="text-foreground">Ανάπτυξη:</strong>{" "}
-            δημιουργία, δοκιμή και συντήρηση λογισμικού, αυτοματισμών και
-            ενσωματώσεων που βασίζονται σε πραγματικές συσκευές.
+            <strong className="text-foreground">Development:</strong> building,
+            testing, and maintaining software, automations, and integrations
+            that rely on real devices.
           </li>
           <li>
-            Κάθε άλλη νόμιμη επιχειρηματική ή προσωπική χρήση που σέβεται την
-            παρούσα Πολιτική, τον ισχύοντα νόμο και τους όρους των τρίτων
-            μερών.
+            Any other lawful business or personal use that respects this Policy,
+            applicable law, and third-party terms.
           </li>
         </ul>
 
-        <h2 className="mt-10 text-xl font-semibold">Απαγορευμένες χρήσεις</h2>
+        <h2 className="mt-10 text-xl font-semibold">Prohibited uses</h2>
         <p className="mt-4 leading-relaxed text-muted-foreground">
-          Δεν επιτρέπεται να χρησιμοποιείτε την Americell για οποιαδήποτε
-          παράνομη, δόλια ή καταχρηστική ενέργεια. Ενδεικτικά, απαγορεύονται
-          ρητά:
+          You may not use Americell for any unlawful, fraudulent, or abusive
+          activity. By way of example, the following are expressly prohibited:
         </p>
         <ul className="mt-4 list-disc space-y-2 pl-5 text-muted-foreground">
           <li>
-            <strong className="text-foreground">Απάτη:</strong> κάθε μορφή
-            εξαπάτησης, οικονομικής απάτης, κλοπής ταυτότητας, παραποίησης
-            πληρωμών ή δόλιας απόκτησης αγαθών, υπηρεσιών ή προνομίων.
+            <strong className="text-foreground">Fraud:</strong> any form of
+            deception, financial fraud, identity theft, payment tampering, or
+            fraudulent acquisition of goods, services, or benefits.
           </li>
           <li>
-            <strong className="text-foreground">Spam &amp; κατάχρηση:</strong>{" "}
-            μαζική αποστολή ανεπιθύμητων μηνυμάτων, ανεπιθύμητη προώθηση,
-            phishing ή διάδοση κακόβουλου περιεχομένου.
-          </li>
-          <li>
-            <strong className="text-foreground">
-              Δημιουργία ψεύτικων λογαριασμών:
-            </strong>{" "}
-            μαζική ή αυτοματοποιημένη δημιουργία πλαστών, ψεύτικων ή
-            παραπλανητικών λογαριασμών, καθώς και τεχνητή αύξηση εγγραφών,
-            αλληλεπιδράσεων, ψήφων ή αξιολογήσεων.
+            <strong className="text-foreground">Spam &amp; abuse:</strong> bulk
+            sending of unsolicited messages, unwanted promotion, phishing, or
+            distribution of malicious content.
           </li>
           <li>
             <strong className="text-foreground">
-              Παραβίαση όρων τρίτων:
+              Creating fake accounts:
             </strong>{" "}
-            παράβαση των όρων χρήσης, των πολιτικών ή των τεχνικών μέτρων
-            προστασίας εφαρμογών, υπηρεσιών και πλατφορμών τρίτων, καθώς και
-            παράκαμψη ελέγχων ασφαλείας ή περιορισμών τους.
+            mass or automated creation of fake, bogus, or misleading accounts,
+            as well as artificially inflating sign-ups, engagement, votes, or
+            reviews.
           </li>
           <li>
-            <strong className="text-foreground">Παράνομες ενέργειες:</strong>{" "}
-            οποιαδήποτε δραστηριότητα που παραβιάζει την ισχύουσα νομοθεσία,
-            συμπεριλαμβανομένων της παραβίασης δικαιωμάτων πνευματικής
-            ιδιοκτησίας, της μη εξουσιοδοτημένης πρόσβασης σε συστήματα και
-            της διακίνησης παράνομου περιεχομένου.
+            <strong className="text-foreground">
+              Violating third-party terms:
+            </strong>{" "}
+            breaching the terms of service, policies, or technical protection
+            measures of third-party apps, services, and platforms, as well as
+            circumventing their security controls or restrictions.
           </li>
           <li>
-            Πρόσβαση σε λογαριασμούς ή δεδομένα τρίτων χωρίς ρητή
-            εξουσιοδότηση, καθώς και παρακολούθηση ή παρενόχληση προσώπων.
+            <strong className="text-foreground">Unlawful activity:</strong> any
+            activity that violates applicable law, including infringement of
+            intellectual property rights, unauthorized access to systems, and
+            trafficking in illegal content.
           </li>
           <li>
-            Ενέργειες που βλάπτουν, υπερφορτώνουν ή αποσταθεροποιούν την
-            υποδομή της Americell ή δικτύων τρίτων.
+            Accessing third-party accounts or data without explicit
+            authorization, as well as surveilling or harassing individuals.
+          </li>
+          <li>
+            Actions that harm, overload, or destabilize the infrastructure of
+            Americell or of third-party networks.
           </li>
         </ul>
 
         <Separator className="my-10" />
 
-        <h2 className="text-xl font-semibold">Ευθύνη του χρήστη</h2>
+        <h2 className="text-xl font-semibold">User responsibility</h2>
         <p className="mt-4 leading-relaxed text-muted-foreground">
-          Είστε αποκλειστικά υπεύθυνοι για όλες τις ενέργειες που εκτελούνται
-          μέσω του λογαριασμού και των συσκευών σας. Οφείλετε να διασφαλίζετε
-          ότι κάθε χρήση συμμορφώνεται με την ισχύουσα νομοθεσία (ΗΠΑ, Ελλάδας
-          και κάθε άλλης σχετικής δικαιοδοσίας), με τους όρους των τρίτων
-          μερών των οποίων τις υπηρεσίες χρησιμοποιείτε, καθώς και με την
-          παρούσα Πολιτική. Πρέπει να διαθέτετε κάθε αναγκαία εξουσιοδότηση,
-          άδεια ή δικαίωμα για τους λογαριασμούς, τα δεδομένα και το
-          περιεχόμενο που διαχειρίζεστε. Η Americell δεν φέρει ευθύνη για την
-          κατάχρηση της υπηρεσίας από τους χρήστες.
+          You are solely responsible for all actions performed through your
+          account and devices. You must ensure that every use complies with
+          applicable law (of the US and any other relevant jurisdiction), with
+          the terms of the third parties whose services you use, and with this
+          Policy. You must hold every necessary authorization, license, or right
+          for the accounts, data, and content you manage. Americell is not
+          liable for users’ misuse of the service.
         </p>
 
-        <h2 className="mt-10 text-xl font-semibold">Συνέπειες παράβασης</h2>
+        <h2 className="mt-10 text-xl font-semibold">
+          Consequences of violations
+        </h2>
         <p className="mt-4 leading-relaxed text-muted-foreground">
-          Σε περίπτωση παράβασης της παρούσας Πολιτικής, η Americell διατηρεί
-          το δικαίωμα, κατά την κρίση της και ανάλογα με τη σοβαρότητα της
-          παράβασης, να προβεί σε μία ή περισσότερες από τις ακόλουθες
-          ενέργειες:
+          In the event of a violation of this Policy, Americell reserves the
+          right, at its discretion and depending on the severity of the
+          violation, to take one or more of the following actions:
         </p>
         <ul className="mt-4 list-disc space-y-2 pl-5 text-muted-foreground">
-          <li>Προειδοποίηση και αίτημα άμεσης διόρθωσης της συμπεριφοράς.</li>
+          <li>A warning and a request to correct the behavior immediately.</li>
           <li>
-            Προσωρινή αναστολή ή περιορισμό της πρόσβασης σε συσκευές ή
-            λειτουργίες.
+            Temporary suspension or restriction of access to devices or
+            features.
           </li>
           <li>
-            Οριστική διακοπή του λογαριασμού χωρίς επιστροφή χρημάτων για την
-            περίοδο που απομένει.
+            Permanent termination of the account without a refund for the
+            remaining period.
           </li>
           <li>
-            Γνωστοποίηση στις αρμόδιες αρχές και συνεργασία μαζί τους όπου
-            απαιτείται από τον νόμο.
+            Notifying and cooperating with the competent authorities where
+            required by law.
           </li>
           <li>
-            Διεκδίκηση αποζημίωσης για ζημίες που προκλήθηκαν στην Americell ή
-            σε τρίτους.
+            Pursuing compensation for damages caused to Americell or to third
+            parties.
           </li>
         </ul>
 
-        <h2 className="mt-10 text-xl font-semibold">Αναφορά κατάχρησης</h2>
+        <h2 className="mt-10 text-xl font-semibold">Reporting abuse</h2>
         <p className="mt-4 leading-relaxed text-muted-foreground">
-          Αν εντοπίσετε χρήση της Americell που παραβιάζει την παρούσα
-          Πολιτική, επικοινωνήστε μαζί μας ώστε να ερευνήσουμε και να λάβουμε
-          τα κατάλληλα μέτρα. Ενθαρρύνουμε την υπεύθυνη αναφορά περιστατικών.
+          If you become aware of any use of Americell that violates this Policy,
+          contact us so we can investigate and take appropriate action. We
+          encourage responsible reporting of incidents.
         </p>
 
-        <h2 className="mt-10 text-xl font-semibold">Τροποποιήσεις</h2>
+        <h2 className="mt-10 text-xl font-semibold">Changes</h2>
         <p className="mt-4 leading-relaxed text-muted-foreground">
-          Ενδέχεται να επικαιροποιήσουμε την παρούσα Πολιτική ώστε να
-          αντικατοπτρίζει αλλαγές στην υπηρεσία, στη νομοθεσία ή στις
-          πρακτικές μας. Η συνεχιζόμενη χρήση της Americell μετά από τυχόν
-          τροποποιήσεις συνιστά αποδοχή της αναθεωρημένης Πολιτικής.
+          We may update this Policy to reflect changes to the service, the law,
+          or our practices. Continued use of Americell after any changes
+          constitutes acceptance of the revised Policy.
         </p>
       </article>
     </PageShell>

@@ -17,11 +17,11 @@ import { cn } from "@/lib/utils";
  * (always via `fmtMoney`), an em dash for missing data, or richer markup.
  */
 export type StatCardProps = {
-  /** Short muted caption, e.g. "Υπόλοιπο πίστωσης". */
+  /** Short muted caption, e.g. "Credit balance". */
   label: string;
   /** The headline figure — pass money pre-formatted with `fmtMoney`. */
   value: ReactNode;
-  /** Optional secondary line under the value (e.g. "εκτίμηση"). */
+  /** Optional secondary line under the value (e.g. "estimate"). */
   sub?: ReactNode;
   /** Optional leading glyph (a lucide icon) shown in a glass chip. */
   icon?: ReactNode;

@@ -58,23 +58,23 @@ export default function TopupDialog() {
         window.location.assign(data.checkout_url);
         return;
       }
-      toast.error(data.error ?? "Δεν ήταν δυνατή η προσθήκη πίστωσης.");
+      toast.error(data.error ?? "Couldn't add credit.");
       setLoading(false);
     } catch {
-      toast.error("Σφάλμα δικτύου. Δοκίμασε ξανά.");
+      toast.error("Network error. Try again.");
       setLoading(false);
     }
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button />}>Προσθήκη πίστωσης</DialogTrigger>
+      <DialogTrigger render={<Button />}>Add credit</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Προσθήκη πίστωσης</DialogTitle>
+          <DialogTitle>Add credit</DialogTitle>
           <DialogDescription>
-            Θα μεταφερθείς στο ασφαλές Stripe Checkout του CellGods για τη χρέωση.
-            Ελάχιστο ποσό {fmtMoney(MIN_CENTS)}.
+            You&apos;ll be taken to CellGods&apos; secure Stripe Checkout for the
+            charge. Minimum {fmtMoney(MIN_CENTS)}.
           </DialogDescription>
         </DialogHeader>
 
@@ -94,7 +94,7 @@ export default function TopupDialog() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="topup-amount">Ποσό (USD)</Label>
+            <Label htmlFor="topup-amount">Amount (USD)</Label>
             <div className="relative">
               <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-sm text-muted-foreground">
                 $
@@ -112,7 +112,7 @@ export default function TopupDialog() {
             </div>
             {!valid && dollars.trim() !== "" && (
               <p className="text-xs text-rose-600">
-                Το ελάχιστο ποσό είναι {fmtMoney(MIN_CENTS)}.
+                The minimum amount is {fmtMoney(MIN_CENTS)}.
               </p>
             )}
           </div>
@@ -121,8 +121,8 @@ export default function TopupDialog() {
         <DialogFooter>
           <Button onClick={submit} disabled={!valid || loading}>
             {loading
-              ? "Ανακατεύθυνση…"
-              : `Πληρωμή ${valid ? fmtMoney(amountCents) : ""}`.trim()}
+              ? "Redirecting…"
+              : `Pay ${valid ? fmtMoney(amountCents) : ""}`.trim()}
           </Button>
         </DialogFooter>
       </DialogContent>

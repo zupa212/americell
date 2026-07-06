@@ -50,14 +50,14 @@ export default function DeactivateButton({
       const data = (await res.json().catch(() => ({}))) as { error?: string };
 
       if (res.ok) {
-        toast.success("Η παραγγελία απενεργοποιήθηκε.");
+        toast.success("Order deactivated.");
         setOpen(false);
         router.refresh();
         return;
       }
-      toast.error(data.error ?? "Δεν ήταν δυνατή η απενεργοποίηση.");
+      toast.error(data.error ?? "Couldn't deactivate.");
     } catch {
-      toast.error("Σφάλμα δικτύου. Δοκίμασε ξανά.");
+      toast.error("Network error. Try again.");
     } finally {
       setLoading(false);
     }
@@ -73,16 +73,16 @@ export default function DeactivateButton({
         className="h-8 gap-1.5 rounded-full text-destructive hover:bg-destructive/10"
       >
         <PowerOff className="h-3.5 w-3.5" aria-hidden="true" />
-        Απενεργοποίηση
+        Deactivate
       </Button>
 
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Απενεργοποίηση παραγγελίας;</AlertDialogTitle>
+            <AlertDialogTitle>Deactivate order?</AlertDialogTitle>
             <AlertDialogDescription>
-              Η <span className="font-medium text-foreground">{label}</span> θα
-              απελευθερωθεί άμεσα στο CellGods.
+              <span className="font-medium text-foreground">{label}</span> will
+              be released on CellGods immediately.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -95,13 +95,13 @@ export default function DeactivateButton({
               aria-hidden="true"
             />
             <span>
-              <span className="font-semibold">Δεν γίνεται επιστροφή χρημάτων.</span>{" "}
-              Η πίστωση δεν επιστρέφεται — η ενέργεια είναι οριστική.
+              <span className="font-semibold">No refund is issued.</span>{" "}
+              Credit is not returned — this action is final.
             </span>
           </div>
 
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={loading}>Άκυρο</AlertDialogCancel>
+            <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               disabled={loading}
@@ -112,7 +112,7 @@ export default function DeactivateButton({
               ) : (
                 <PowerOff className="h-4 w-4" aria-hidden="true" />
               )}
-              {loading ? "Απενεργοποίηση…" : "Ναι, απενεργοποίησε"}
+              {loading ? "Deactivating…" : "Yes, deactivate"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

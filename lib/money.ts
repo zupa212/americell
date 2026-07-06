@@ -14,11 +14,11 @@
 export type PriceRounding = "whole" | "psychological" | "none";
 
 /**
- * Format integer cents as a localized currency string (el-GR, e.g. "80,00 $").
+ * Format integer cents as a localized currency string (en-US, e.g. "$80.00").
  * `currency` is an ISO-4217 code, case-insensitive (default "usd").
  */
 export function fmtMoney(cents: number, currency = "usd"): string {
-  return new Intl.NumberFormat("el-GR", {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: currency.toUpperCase(),
   }).format(cents / 100);

@@ -38,7 +38,7 @@ export type ActivatePhone = {
 type DurationOption = {
   period: BillingPeriod;
   days: number;
-  labelEl: string;
+  label: string;
 };
 
 /** Shape of a successful `/api/admin/orders/activate` response (mirrors ActivateResult). */
@@ -130,14 +130,14 @@ export default function ActivateDialog({
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(
-          (data as { error?: string }).error ?? "Σφάλμα διακομιστή",
+          (data as { error?: string }).error ?? "Server error",
         );
         return;
       }
       setResult(data as ActivateResult);
-      toast.success("Η ενεργοποίηση ολοκληρώθηκε.");
+      toast.success("Activation complete.");
     } catch {
-      setError("Σφάλμα δικτύου. Δοκίμασε ξανά.");
+      setError("Network error. Try again.");
     } finally {
       setPending(false);
     }
@@ -146,9 +146,9 @@ export default function ActivateDialog({
   async function copy(value: string, label: string) {
     try {
       await navigator.clipboard.writeText(value);
-      toast.success(`${label} αντιγράφηκε.`);
+      toast.success(`${label} copied.`);
     } catch {
-      toast.error("Δεν ήταν δυνατή η αντιγραφή.");
+      toast.error("Couldn't copy.");
     }
   }
 
@@ -162,20 +162,20 @@ export default function ActivateDialog({
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <CheckCircle2 className="size-5 text-emerald-500" aria-hidden />
-                Ενεργοποιήθηκε
+                Activated
               </DialogTitle>
               <DialogDescription>
-                {phone?.model} — παράδοσε τα παρακάτω στοιχεία στον πελάτη.
+                {phone?.model} — hand the details below to the customer.
               </DialogDescription>
             </DialogHeader>
 
             <div className="flex flex-col gap-3">
-              <ResultRow label="Αναγνωριστικό παραγγελίας">
+              <ResultRow label="Order ID">
                 <span className="font-mono text-xs break-all">
                   {result.order_id}
                 </span>
                 <CopyButton
-                  onClick={() => copy(result.order_id, "Το αναγνωριστικό")}
+                  onClick={() => copy(result.order_id, "Order ID")}
                 />
               </ResultRow>
 
@@ -184,33 +184,33 @@ export default function ActivateDialog({
                   <KeyRound className="size-4 text-brand" aria-hidden />
                   {result.pin}
                 </span>
-                <CopyButton onClick={() => copy(result.pin, "Το PIN")} />
+                <CopyButton onClick={() => copy(result.pin, "PIN")} />
               </ResultRow>
 
-              <ResultRow label="Σύνδεσμος ελέγχου">
+              <ResultRow label="Control link">
                 <a
                   href={result.stream_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-sm font-medium text-brand underline-offset-4 hover:underline"
                 >
-                  Άνοιγμα ροής
+                  Open stream
                   <ExternalLink className="size-3.5" aria-hidden />
                 </a>
                 <CopyButton
-                  onClick={() => copy(result.stream_url, "Ο σύνδεσμος")}
+                  onClick={() => copy(result.stream_url, "Link")}
                 />
               </ResultRow>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-xl border border-border/60 bg-muted/40 p-3">
-                  <p className="text-xs text-muted-foreground">Χρέωση</p>
+                  <p className="text-xs text-muted-foreground">Charged</p>
                   <p className="mt-0.5 text-sm font-semibold">
                     {fmtMoney(result.charged_cents, result.currency)}
                   </p>
                 </div>
                 <div className="rounded-xl border border-border/60 bg-muted/40 p-3">
-                  <p className="text-xs text-muted-foreground">Νέο υπόλοιπο</p>
+                  <p className="text-xs text-muted-foreground">New balance</p>
                   <p className="mt-0.5 text-sm font-semibold">
                     {fmtMoney(result.credit_balance_cents, result.currency)}
                   </p>
@@ -219,7 +219,7 @@ export default function ActivateDialog({
 
               <p className="inline-flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-3 py-2 text-xs font-medium text-amber-600 dark:text-amber-400">
                 <Clock className="size-3.5" aria-hidden />
-                Ο σύνδεσμος λήγει σε 4 ώρες — μετά, βάλε ξανά το PIN για νέο σύνδεσμο.
+                The link expires in 4 hours — after that, re-enter the PIN for a new link.
               </p>
 
               <Button
@@ -227,21 +227,21 @@ export default function ActivateDialog({
                 className="mt-1 w-full"
                 onClick={() => handleOpenChange(false)}
               >
-                Κλείσιμο
+                Close
               </Button>
             </div>
           </>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <DialogHeader>
-              <DialogTitle>Ενεργοποίηση συσκευής</DialogTitle>
+              <DialogTitle>Activate device</DialogTitle>
               <DialogDescription>
-                {phone?.model} — δημιούργησε μια ενοικίαση για έναν πελάτη.
+                {phone?.model} — create a rental for a customer.
               </DialogDescription>
             </DialogHeader>
 
             <div className="flex flex-col gap-2">
-              <Label htmlFor="activate-email">Email πελάτη</Label>
+              <Label htmlFor="activate-email">Customer email</Label>
               <Input
                 id="activate-email"
                 type="email"
@@ -255,7 +255,7 @@ export default function ActivateDialog({
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label>Περίοδος χρέωσης</Label>
+              <Label>Billing period</Label>
               <Tabs
                 value={period}
                 onValueChange={(v) => selectPeriod(v as BillingPeriod)}
@@ -268,7 +268,7 @@ export default function ActivateDialog({
                       className="flex-1"
                       disabled={pending}
                     >
-                      {d.labelEl}
+                      {d.label}
                     </TabsTrigger>
                   ))}
                 </TabsList>
@@ -276,7 +276,7 @@ export default function ActivateDialog({
             </div>
 
             <div className="flex flex-col gap-2">
-              <Label htmlFor="activate-days">Διάρκεια (ημέρες)</Label>
+              <Label htmlFor="activate-days">Duration (days)</Label>
               <Input
                 id="activate-days"
                 type="number"
@@ -305,16 +305,16 @@ export default function ActivateDialog({
                 onClick={() => handleOpenChange(false)}
                 disabled={pending}
               >
-                Άκυρο
+                Cancel
               </Button>
               <Button type="submit" disabled={!canSubmit}>
                 {pending ? (
                   <>
                     <Loader2 className="size-4 animate-spin" aria-hidden />
-                    Ενεργοποίηση…
+                    Activating…
                   </>
                 ) : (
-                  "Ενεργοποίηση"
+                  "Activate"
                 )}
               </Button>
             </div>
@@ -347,7 +347,7 @@ function CopyButton({ onClick }: { onClick: () => void }) {
       variant="ghost"
       size="icon-sm"
       onClick={onClick}
-      aria-label="Αντιγραφή"
+      aria-label="Copy"
       className={cn("shrink-0 text-muted-foreground hover:text-foreground")}
     >
       <Copy className="size-4" aria-hidden />

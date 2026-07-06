@@ -3,6 +3,7 @@ import { Smartphone, Globe, Zap, Users, type LucideProps } from "lucide-react";
 import { FEATURES } from "@/lib/site";
 import Reveal from "@/components/ui/reveal";
 import { MagicCard } from "@/components/ui/magic-card";
+import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
 import { cn } from "@/lib/utils";
 
 // Map the four feature keys to lucide icons. No external requests.
@@ -28,20 +29,37 @@ export default function Features() {
     >
       <div className="mx-auto w-full max-w-6xl px-6">
         {/* Section header */}
-        <Reveal className="max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-wide text-brand">
-            Γιατί Americell
-          </p>
+        <Reveal className="max-w-3xl">
+          {/* Flashy frosted-glass eyebrow with a live brand-gradient dot */}
+          <div
+            className={cn(
+              "inline-flex items-center gap-2.5 rounded-full py-1 pl-2.5 pr-3.5 text-sm",
+              "border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40",
+              "shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]"
+            )}
+          >
+            <span
+              aria-hidden="true"
+              className="h-2 w-2 rounded-full bg-gradient-to-br from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] motion-safe:animate-gradient shadow-[0_0_10px_rgba(43,107,255,0.7)]"
+            />
+            <AnimatedShinyText className="font-semibold uppercase tracking-[0.14em] text-brand">
+              Why Americell
+            </AnimatedShinyText>
+          </div>
+
           <h2
             id="features-heading"
-            className="mt-4 bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl lg:text-5xl"
+            className="mt-6 max-w-3xl text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.03em] text-foreground sm:text-5xl lg:text-6xl"
           >
-            Αληθινές συσκευές ΗΠΑ, πλήρως υπό τον έλεγχό σου.
+            Real US devices,{" "}
+            <span className="bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] bg-clip-text text-transparent motion-safe:animate-gradient">
+              fully in your control
+            </span>
+            .
           </h2>
-          <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-            Όλα όσα χρειάζεσαι για να δοκιμάζεις, να αυτοματοποιείς και να
-            χειρίζεσαι αληθινά τηλέφωνα ΗΠΑ από οπουδήποτε — φτιαγμένο για
-            πρακτορεία, δοκιμαστές εφαρμογών και ομάδες ανάπτυξης.
+          <p className="mt-5 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
+            Everything you need to test, automate, and operate real US phones
+            from anywhere — built for agencies, app testers, and growth teams.
           </p>
         </Reveal>
 
@@ -65,8 +83,8 @@ export default function Features() {
                   gradientOpacity={0.9}
                 >
                   <div className="flex h-full flex-col gap-4 p-6">
-                    {/* Icon in a frosted glass tile */}
-                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/50 bg-white/60 text-brand ring-1 ring-white/40 backdrop-blur-md">
+                    {/* Bold brand-gradient icon tile */}
+                    <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-white shadow-[0_8px_24px_-8px_rgba(43,107,255,0.6)] ring-1 ring-white/40">
                       <Icon className="h-5 w-5" aria-hidden="true" />
                     </span>
                     <h3 className="text-lg font-bold tracking-tight text-foreground">

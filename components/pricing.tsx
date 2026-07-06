@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
  * Renders the landing pricing section over LIVE CellGods inventory. It calls the
  * server-only `getRetailCatalog()`, which strips all wholesale cost and returns
  * only `PublicRetailPhone[]` (retail cents per period). On failure it fails
- * closed with a Greek demo / retry notice; on success it hands the client-safe
+ * closed with an English demo / retry notice; on success it hands the client-safe
  * catalog to the client `<PricingGrid/>` (duration toggle + checkout).
  *
  * NEVER imports wholesale or the margin %; only retail cents cross to the client.
@@ -88,23 +88,23 @@ export default async function Pricing() {
                 aria-hidden="true"
                 className="h-3 w-px bg-brand-2/30"
               />
-              Τιμές
+              Pricing
             </span>
           </div>
           <h2
             id="pricing-heading"
-            className="mt-4 text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl"
+            className="mt-5 text-balance text-5xl font-black leading-[0.95] tracking-tighter text-foreground sm:text-6xl lg:text-7xl"
           >
-            Μία αληθινή συσκευή,{" "}
-            <span className="bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-clip-text text-transparent">
-              μία σταθερή τιμή
+            One real phone.{" "}
+            <span className="animate-gradient bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] bg-clip-text text-transparent">
+              One flat price.
             </span>
           </h2>
-          <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-            Διάλεξε ένα αληθινό τηλέφωνο ΗΠΑ από το ζωντανό απόθεμα της{" "}
-            <span className="font-semibold text-brand-2">Americell</span>, έλεγξέ
-            το από τον browser σου και πλήρωσε μία φορά για όση διάρκεια
-            χρειάζεσαι. Χωρίς emulators, χωρίς κρυφές χρεώσεις — μόνο αληθινό
+          <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
+            Pick a real US phone from{" "}
+            <span className="font-semibold text-brand-2">Americell</span>&apos;s
+            live inventory, drive it straight from your browser, and pay once for
+            exactly the time you need. No emulators. No hidden fees. Just real
             hardware.
           </p>
         </Reveal>
@@ -120,28 +120,28 @@ export default async function Pricing() {
               {catalog.reason === "unconfigured" ? (
                 <>
                   <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-2">
-                    Λειτουργία demo
+                    Demo mode
                   </p>
                   <h3 className="mt-3 text-xl font-bold text-foreground">
-                    Το ζωντανό απόθεμα δεν είναι ακόμα συνδεδεμένο
+                    Live inventory isn&apos;t wired up yet
                   </h3>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                    Η σύνδεση με τον πάροχο συσκευών δεν έχει ρυθμιστεί σε αυτό το
-                    περιβάλλον, οπότε δεν μπορούμε να εμφανίσουμε ζωντανές τιμές. Οι
-                    πληρωμές και οι ενεργοποιήσεις είναι προσωρινά ανενεργές.
+                    The device provider isn&apos;t configured in this environment,
+                    so we can&apos;t show live pricing right now. Checkout and
+                    activations are paused for the moment.
                   </p>
                 </>
               ) : (
                 <>
                   <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-2">
-                    Προσωρινό πρόβλημα
+                    Temporary hiccup
                   </p>
                   <h3 className="mt-3 text-xl font-bold text-foreground">
-                    Δεν φορτώθηκε το απόθεμα
+                    Inventory didn&apos;t load
                   </h3>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                    Δεν ήταν δυνατή η φόρτωση των διαθέσιμων συσκευών αυτή τη στιγμή.
-                    Ανανέωσε τη σελίδα σε λίγο για να δεις ζωντανές τιμές.
+                    We couldn&apos;t load available devices just now. Refresh in a
+                    moment to see live pricing.
                   </p>
                 </>
               )}

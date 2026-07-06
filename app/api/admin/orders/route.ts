@@ -13,17 +13,17 @@ import { CellgodsError, getOrders } from "@/lib/cellgods";
 
 const NO_STORE = { "Cache-Control": "no-store" } as const;
 
-// Greek copy for CellGods failures (§6.3). Kept local so each admin route stays
+// English copy for CellGods failures (§6.3). Kept local so each admin route stays
 // self-contained; `0` (transport error) and anything unmapped fall back to 500.
-const GREEK_CELLGODS: Record<number, string> = {
-  400: "Μη έγκυρο αίτημα",
-  401: "Λείπει το κλειδί API",
-  402: "Ανεπαρκές υπόλοιπο — πρόσθεσε πίστωση",
-  403: "Μη έγκυρο κλειδί API",
-  404: "Δεν βρέθηκε",
-  409: "Η συσκευή δεν είναι πλέον διαθέσιμη",
-  429: "Πολλά αιτήματα",
-  500: "Σφάλμα διακομιστή",
+const CELLGODS_MESSAGES: Record<number, string> = {
+  400: "Invalid request",
+  401: "Missing API key",
+  402: "Insufficient balance — add credit",
+  403: "Invalid API key",
+  404: "Not found",
+  409: "Device is no longer available",
+  429: "Too many requests",
+  500: "Server error",
 };
 
 export async function GET() {
@@ -33,8 +33,8 @@ export async function GET() {
       {
         error:
           gate.status === 401
-            ? "Παρακαλώ συνδέσου για να συνεχίσεις."
-            : "Δεν έχεις πρόσβαση.",
+            ? "Please sign in to continue."
+            : "You don't have access.",
       },
       { status: gate.status, headers: NO_STORE },
     );
@@ -47,12 +47,12 @@ export async function GET() {
     if (err instanceof CellgodsError) {
       const status = err.status || 500;
       return Response.json(
-        { error: GREEK_CELLGODS[status] ?? GREEK_CELLGODS[500] },
+        { error: CELLGODS_MESSAGES[status] ?? CELLGODS_MESSAGES[500] },
         { status, headers: NO_STORE },
       );
     }
     return Response.json(
-      { error: GREEK_CELLGODS[500] },
+      { error: CELLGODS_MESSAGES[500] },
       { status: 500, headers: NO_STORE },
     );
   }

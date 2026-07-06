@@ -7,11 +7,11 @@ import { cn } from "@/lib/cn";
 import type { BlogPost } from "@/lib/blog";
 
 /**
- * Format an ISO `YYYY-MM-DD` date as a long Greek date. The `T00:00:00`
+ * Format an ISO `YYYY-MM-DD` date as a long US English date. The `T00:00:00`
  * anchor keeps the day stable regardless of the build machine's timezone.
  */
-function formatGreekDate(iso: string): string {
-  return new Date(`${iso}T00:00:00`).toLocaleDateString("el-GR", {
+function formatDate(iso: string): string {
+  return new Date(`${iso}T00:00:00`).toLocaleDateString("en-US", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -144,14 +144,14 @@ export default function Article({ post }: { post: BlogPost }) {
         <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <CalendarDays aria-hidden="true" className="h-4 w-4 text-brand" />
-            <time dateTime={post.date}>{formatGreekDate(post.date)}</time>
+            <time dateTime={post.date}>{formatDate(post.date)}</time>
           </span>
           <span aria-hidden="true" className="text-line">
             ·
           </span>
           <span className="inline-flex items-center gap-1.5">
             <Clock aria-hidden="true" className="h-4 w-4 text-brand" />
-            {post.readingMinutes} λεπτά ανάγνωσης
+            {post.readingMinutes} min read
           </span>
           <span aria-hidden="true" className="text-line">
             ·

@@ -23,14 +23,14 @@ export default function Error({
   return (
     <div className="flex min-h-[60vh] w-full flex-col items-center justify-center gap-6 bg-background px-6 text-center text-foreground">
       <div className="space-y-3">
-        <h1 className="text-3xl font-bold sm:text-4xl">Κάτι πήγε στραβά.</h1>
+        <h1 className="text-3xl font-bold sm:text-4xl">Something went wrong.</h1>
         <p className="leading-relaxed text-muted-foreground">
-          Παρουσιάστηκε ένα απρόσμενο σφάλμα. Δοκίμασε ξανά — αν το πρόβλημα
-          επιμείνει, επικοινώνησε μαζί μας.
+          An unexpected error occurred. Try again — if the problem persists,
+          get in touch with us.
         </p>
       </div>
       <Button size="lg" onClick={() => reset()}>
-        Δοκίμασε ξανά
+        Try again
       </Button>
     </div>
   );

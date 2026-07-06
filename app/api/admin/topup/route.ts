@@ -3,6 +3,7 @@ import * as z from "zod";
 import { requireAdmin } from "@/lib/admin";
 import { adminDenied, cellgodsErrorResponse } from "@/lib/admin-billing";
 import { topup } from "@/lib/cellgods";
+import { logEvent } from "@/lib/logs";
 
 /**
  * POST /api/admin/topup — start a CellGods hosted Stripe Checkout that funds the
@@ -27,12 +28,12 @@ export async function POST(req: Request) {
   try {
     raw = await req.json();
   } catch {
-    return Response.json({ error: "Μη έγκυρο αίτημα" }, { status: 400 });
+    return Response.json({ error: "Invalid request" }, { status: 400 });
   }
 
   const parsed = BodySchema.safeParse(raw);
   if (!parsed.success) {
-    return Response.json({ error: "Μη έγκυρο αίτημα" }, { status: 400 });
+    return Response.json({ error: "Invalid request" }, { status: 400 });
   }
 
   const origin =
@@ -45,6 +46,13 @@ export async function POST(req: Request) {
       amount_cents: parsed.data.amount_cents,
       success_url: `${origin}/admin/billing?topup=success`,
       cancel_url: `${origin}/admin/billing?topup=cancel`,
+    });
+    await logEvent({
+      actorType: "admin",
+      actorEmail: gate.session?.user?.email,
+      action: "admin.topup",
+      targetType: "balance",
+      metadata: { amount_cents: parsed.data.amount_cents },
     });
     return Response.json(
       { checkout_url: result.checkout_url },

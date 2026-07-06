@@ -36,7 +36,7 @@ export type InventoryRow = {
 type DurationOption = {
   period: BillingPeriod;
   days: number;
-  labelEl: string;
+  label: string;
 };
 
 type InventoryTableProps = {
@@ -50,11 +50,11 @@ const PLATFORM_LABEL: Record<Platform, string> = {
 };
 
 const STATUS_LABEL: Record<string, string> = {
-  available: "Διαθέσιμο",
-  rented: "Σε χρήση",
-  active: "Σε χρήση",
-  pooled: "Δεσμευμένο",
-  unavailable: "Μη διαθέσιμο",
+  available: "Available",
+  rented: "In use",
+  active: "In use",
+  pooled: "Reserved",
+  unavailable: "Unavailable",
 };
 
 function money(cents: number | null, currency: string): string {
@@ -65,9 +65,9 @@ function money(cents: number | null, currency: string): string {
  * InventoryTable — admin live inventory (RESELLER_PLAN §6.2).
  *
  * A wide, horizontally-scrollable shadcn Table over `InventoryRow[]`. Wholesale
- * `price_monthly` and the retail estimate ("εκτίμηση") are shown side by side;
- * each `available` phone gets an "Ενεργοποίηση" action that opens
- * {@link ActivateDialog} for that phone.
+ * `price_monthly` and the retail estimate are shown side by side; each
+ * `available` phone gets an "Activate" action that opens {@link ActivateDialog}
+ * for that phone.
  */
 export default function InventoryTable({
   rows,
@@ -79,11 +79,10 @@ export default function InventoryTable({
     return (
       <div className="px-6 py-16 text-center">
         <p className="text-sm font-medium text-foreground">
-          Κανένα απόθεμα αυτή τη στιγμή
+          No inventory right now
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Δεν βρέθηκαν συσκευές. Δοκίμασε ξανά σε λίγο — το απόθεμα αλλάζει
-          συνεχώς.
+          No devices found. Try again shortly — inventory changes constantly.
         </p>
       </div>
     );
@@ -95,12 +94,12 @@ export default function InventoryTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Μοντέλο</TableHead>
-              <TableHead>Τύπος</TableHead>
-              <TableHead>Κατάσταση</TableHead>
-              <TableHead className="text-right">Χονδρική / μήνα</TableHead>
-              <TableHead className="text-right">Λιανική (εκτ.)</TableHead>
-              <TableHead className="text-right">Ενέργεια</TableHead>
+              <TableHead>Model</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Wholesale / mo</TableHead>
+              <TableHead className="text-right">Retail (est.)</TableHead>
+              <TableHead className="text-right">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -159,7 +158,7 @@ export default function InventoryTable({
                       }
                     >
                       <Zap className="size-3.5" aria-hidden />
-                      Ενεργοποίηση
+                      Activate
                     </Button>
                   ) : (
                     <span className="text-xs text-muted-foreground">—</span>

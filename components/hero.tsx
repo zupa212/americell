@@ -23,7 +23,7 @@ import HeroPhoneParallax from "@/components/hero-phone-parallax";
 import { cn } from "@/lib/utils";
 
 /**
- * Hero — the marketing centerpiece (Server Component).
+ * Hero — the marketing centerpiece (Server Component). THE STAR.
  *
  * No client interactivity lives here: entrance motion is delegated to the
  * shared <Reveal> client wrapper, the floating app tiles bob via the CSS
@@ -33,16 +33,18 @@ import { cn } from "@/lib/utils";
  * Magic UI + shadcn (AuroraText, BorderBeam, ShineBorder, Particles,
  * AnimatedShinyText, ShimmerButton, Button).
  *
- * Apple-polish pass: crisper glass eyebrow carrying a small AMERICELL brand
- * mark (gradient chip + AuroraText wordmark) beside the AnimatedShinyText,
- * larger/cleaner balanced type with tighter tracking, more generous vertical
- * rhythm, and a soft brand-gradient glow behind the headline.
+ * Flashy · minimal · BOLD (US-English): a huge, few-words headline with an
+ * animated blue→violet→cyan gradient keyword, one short subline, a ShimmerButton
+ * "Get started" + a subtle "See pricing", and a noticeably BIGGER, more premium
+ * phone mockup sitting over the wild animated gradient. The device draws in its
+ * native 286×580 coordinate system, then scales up inside a correctly-sized
+ * outer box so the floating app tiles stay anchored around it.
  *
  * GLASSMORPHISM: the <section> is fully transparent so the persistent global
  * <SiteBackground/> (light wash + drifting aurora + dot grid, fixed behind
  * everything) shows through. Surfaces above it are frosted glass. Brand logos
  * (react-icons/si) + a lucide gear are decorative; all copy stays honest about
- * real-device management, automation, and testing. No network images.
+ * real-device control, automation, and testing. No network images.
  */
 
 type IconType = ComponentType<SVGProps<SVGSVGElement>>;
@@ -199,123 +201,278 @@ function FloatingTile({ tile }: { tile: FloatingTile }) {
   );
 }
 
+/**
+ * PhoneMockup — a pure-CSS, Apple-grade device (Server Component), scaled up.
+ *
+ * It draws in a native 286×580 coordinate system so every meticulously
+ * calibrated offset (side buttons, Dynamic Island, status bar, glass card…)
+ * stays exact — then a single `origin-top-left scale-[1.15]` transform makes the
+ * whole thing NOTICEABLY BIGGER. The outer box is pre-sized to the scaled
+ * footprint (329×667) so the floating app tiles keep their anchoring.
+ *
+ * The realism is layered, back-to-front:
+ *   • a soft contact shadow grounding the device
+ *   • a colored brand bloom for depth
+ *   • sculpted side buttons (action / volume / power) tucked under the rail
+ *   • a polished chamfer rim → brushed titanium rail (edge gradient + specular
+ *     sheen + inset bevels) → hairline black bezel → the screen
+ *   • a rich radial dark-blue wallpaper with brand glow + vignette
+ *   • an accurate Dynamic Island with a camera lens
+ *   • a crisp status bar (signal · 5G · Wi-Fi · battery)
+ *   • the frosted "Automation running…" glass card + CTA pill
+ *   • a glossy front-glass reflection sweeping the whole face
+ *
+ * The animated ShineBorder + dual BorderBeam still trace the metal edge.
+ */
 function PhoneMockup() {
+  // Brushed titanium rail — a cross-band gradient reads as a rounded metal
+  // edge catching light on both sides with a darker core.
+  const titanium =
+    "linear-gradient(140deg, #e6e8ec 0%, #b2b6bf 14%, #83878f 30%, #595c63 46%, #6d7079 55%, #9fa3ab 72%, #cdd0d6 88%, #edeff2 100%)";
+  // Inset bevels give the rail thickness and a lit top / shadowed bottom.
+  const railBevels =
+    "inset 0 1.5px 1px rgba(255,255,255,0.6), inset 0 -2px 3px rgba(0,0,0,0.5), inset 2px 0 3px rgba(255,255,255,0.22), inset -2px 0 3px rgba(0,0,0,0.35)";
+  // A polished 1.4px chamfer catching a hard highlight.
+  const chamfer =
+    "linear-gradient(150deg, rgba(255,255,255,0.95) 0%, rgba(215,218,224,0.6) 20%, rgba(120,124,133,0.5) 50%, rgba(70,73,80,0.6) 72%, rgba(205,208,214,0.75) 100%)";
+  // Rich, deep dark-blue wallpaper with a soft glow spilling from the top.
+  const wallpaper =
+    "radial-gradient(130% 90% at 50% -20%, #1c3d80 0%, #14306a 30%, #0b1e4c 58%, #060f30 100%)";
+
   return (
-    <div className="relative mx-auto h-[580px] w-[286px]">
-      {/* colored glow bloom behind the whole phone for depth */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -inset-10 -z-10 rounded-[4rem] bg-gradient-to-br from-brand/30 via-brand-2/25 to-brand-soft/30 blur-3xl"
-      />
-      {/* relative glass container — carries the animated BorderBeam,
-          the ShineBorder edge and a faint glass reflection */}
-      <div className="relative h-full w-full overflow-hidden rounded-[3rem] bg-foreground p-[10px] shadow-[0_30px_90px_-30px_rgba(43,107,255,0.45)] ring-1 ring-black/5">
-        {/* faint glass reflection sweeping across the frame */}
+    // Outer box pre-sized to the SCALED footprint (286×1.15, 580×1.15) so the
+    // absolutely-positioned floating tiles anchor around the bigger device.
+    <div className="relative mx-auto h-[667px] w-[329px]">
+      {/* native 286×580 canvas, scaled up from the top-left corner */}
+      <div className="relative h-[580px] w-[286px] origin-top-left scale-[1.15]">
+        {/* colored glow bloom behind the whole phone for depth */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-30 rounded-[3rem] bg-gradient-to-tr from-transparent via-white/10 to-white/25"
+          className="pointer-events-none absolute -inset-10 -z-20 rounded-[4rem] bg-gradient-to-br from-brand/40 via-brand-2/30 to-brand-soft/40 blur-3xl"
         />
-        {/* screen */}
-        <div className="relative h-full w-full overflow-hidden rounded-[2.4rem] bg-gradient-to-b from-[#081a44] via-[#12306e] to-[#1d4ed8]">
-          {/* dynamic island */}
-          <div className="absolute left-1/2 top-3 z-20 h-7 w-[92px] -translate-x-1/2 rounded-full bg-black" />
+        {/* soft contact shadow grounding the device */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-6 left-1/2 -z-10 h-16 w-[82%] -translate-x-1/2 rounded-[50%] bg-black/45 blur-2xl"
+        />
 
-          {/* wallpaper glow */}
-          <div className="pointer-events-none absolute -top-12 left-1/2 h-52 w-52 -translate-x-1/2 rounded-full bg-brand-soft/50 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-16 right-0 h-52 w-52 rounded-full bg-brand-2/40 blur-3xl" />
+        {/* sculpted side buttons — tucked half under the rail so only a
+            machined sliver shows (drawn before the body so the frame overlaps) */}
+        <span
+          aria-hidden="true"
+          className="absolute -left-[3px] top-[128px] z-0 h-[26px] w-[5px] rounded-l-[3px] shadow-[-1px_0_2px_rgba(0,0,0,0.35)]"
+          style={{ backgroundImage: "linear-gradient(90deg,#d4d7dd,#9297a0 55%,#5c6069)" }}
+        />
+        <span
+          aria-hidden="true"
+          className="absolute -left-[3px] top-[176px] z-0 h-[44px] w-[5px] rounded-l-[3px] shadow-[-1px_0_2px_rgba(0,0,0,0.35)]"
+          style={{ backgroundImage: "linear-gradient(90deg,#d4d7dd,#9297a0 55%,#5c6069)" }}
+        />
+        <span
+          aria-hidden="true"
+          className="absolute -left-[3px] top-[230px] z-0 h-[44px] w-[5px] rounded-l-[3px] shadow-[-1px_0_2px_rgba(0,0,0,0.35)]"
+          style={{ backgroundImage: "linear-gradient(90deg,#d4d7dd,#9297a0 55%,#5c6069)" }}
+        />
+        <span
+          aria-hidden="true"
+          className="absolute -right-[3px] top-[198px] z-0 h-[72px] w-[5px] rounded-r-[3px] shadow-[1px_0_2px_rgba(0,0,0,0.35)]"
+          style={{ backgroundImage: "linear-gradient(270deg,#d4d7dd,#9297a0 55%,#5c6069)" }}
+        />
 
-          {/* status row */}
-          <div className="absolute inset-x-0 top-4 z-10 flex items-center justify-between px-7 text-[11px] font-medium text-white/85">
-            <span>9:41</span>
-            <span className="flex items-center gap-1" aria-hidden="true">
-              <span className="tracking-tight">5G</span>
-              <span className="inline-block h-2.5 w-4 rounded-[3px] border border-white/70">
-                <span className="block h-full w-2/3 rounded-[1.5px] bg-white/85" />
-              </span>
-            </span>
-          </div>
+        {/* device body — polished chamfer rim wrapping the titanium rail */}
+        <div
+          className="relative z-10 h-full w-full rounded-[3.05rem] p-[1.4px] shadow-[0_40px_100px_-30px_rgba(43,107,255,0.55),0_18px_44px_-18px_rgba(0,0,0,0.6)]"
+          style={{ backgroundImage: chamfer }}
+        >
+          {/* brushed titanium rail — hosts the screen, sheen, ShineBorder + beams */}
+          <div
+            className="relative h-full w-full overflow-hidden rounded-[3rem] p-[9px]"
+            style={{ backgroundImage: titanium, boxShadow: railBevels }}
+          >
+            {/* specular sheen streaking across the metal */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 z-20 rounded-[3rem]"
+              style={{
+                backgroundImage:
+                  "linear-gradient(140deg, transparent 38%, rgba(255,255,255,0.4) 48%, transparent 58%)",
+              }}
+            />
 
-          {/* wordmark */}
-          <div className="absolute inset-x-0 top-28 flex flex-col items-center text-white">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/25 backdrop-blur-sm">
-              <BrandGlyph className="h-6 w-6" />
-            </div>
-            <p className="mt-4 text-2xl font-semibold tracking-tight">
-              {SITE.name}
-            </p>
-            <p className="mt-1 text-xs text-white/60">Αληθινή συσκευή ΗΠΑ · live</p>
-          </div>
+            {/* hairline black bezel between metal and glass */}
+            <div className="relative h-full w-full overflow-hidden rounded-[2.5rem] bg-black p-[2px] shadow-[inset_0_0_2px_1px_rgba(0,0,0,0.9)]">
+              {/* screen */}
+              <div
+                className="relative h-full w-full overflow-hidden rounded-[2.4rem]"
+                style={{ backgroundImage: wallpaper }}
+              >
+                {/* wallpaper brand glow */}
+                <div className="pointer-events-none absolute -top-12 left-1/2 h-52 w-52 -translate-x-1/2 rounded-full bg-brand-soft/50 blur-3xl" />
+                <div className="pointer-events-none absolute -bottom-16 right-0 h-52 w-52 rounded-full bg-brand-2/40 blur-3xl" />
+                {/* screen vignette for depth */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 rounded-[2.4rem] shadow-[inset_0_0_50px_16px_rgba(3,8,26,0.55)]"
+                />
+                {/* soft in-glass sheen (behind the UI, keeps copy crisp) */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 rounded-[2.4rem]"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(125deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.03) 22%, transparent 46%)",
+                  }}
+                />
 
-          {/* automation running glass card */}
-          <div className="absolute inset-x-5 bottom-24">
-            <div className="rounded-2xl border border-white/20 bg-white/10 p-4 ring-1 ring-white/20 backdrop-blur-md">
-              <div className="flex items-center gap-2">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-glow rounded-full bg-emerald-300" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                </span>
-                <p className="text-xs font-medium text-white">
-                  Αυτοματισμός σε εξέλιξη…
-                </p>
-              </div>
-              <div className="mt-3 flex items-center justify-between">
-                <div className="h-1.5 w-28 overflow-hidden rounded-full bg-white/20">
-                  <div className="h-full w-2/3 rounded-full bg-white/80" />
+                {/* dynamic island */}
+                <div className="absolute left-1/2 top-[11px] z-30 flex h-[30px] w-[98px] -translate-x-1/2 items-center justify-end rounded-full bg-black px-2.5 shadow-[inset_0_1px_1px_rgba(255,255,255,0.12),0_2px_6px_rgba(0,0,0,0.5)] ring-1 ring-black/70">
+                  {/* camera lens with a faint blue catch-light */}
+                  <span
+                    className="relative h-[11px] w-[11px] rounded-full ring-1 ring-white/10"
+                    style={{
+                      backgroundImage:
+                        "radial-gradient(circle at 32% 30%, #223a63 0%, #0a1224 55%, #000 100%)",
+                    }}
+                  >
+                    <span className="absolute left-[2px] top-[1.5px] h-[3px] w-[3px] rounded-full bg-sky-300/60 blur-[0.5px]" />
+                  </span>
                 </div>
-                <div className="flex items-center gap-2 text-[11px] text-white/80">
+
+                {/* status row */}
+                <div className="absolute inset-x-0 top-[14px] z-20 flex items-center justify-between px-6 text-white">
+                  <span className="text-[13px] font-semibold tracking-tight">
+                    9:41
+                  </span>
+                  <span className="flex items-center gap-1.5" aria-hidden="true">
+                    {/* signal bars */}
+                    <span className="flex items-end gap-[2px]">
+                      <span className="h-[5px] w-[3px] rounded-[1px] bg-white/90" />
+                      <span className="h-[7px] w-[3px] rounded-[1px] bg-white/90" />
+                      <span className="h-[9px] w-[3px] rounded-[1px] bg-white/90" />
+                      <span className="h-[11px] w-[3px] rounded-[1px] bg-white/40" />
+                    </span>
+                    <span className="text-[11px] font-semibold tracking-tight">
+                      5G
+                    </span>
+                    {/* wi-fi */}
+                    <svg
+                      viewBox="0 0 16 12"
+                      className="h-3 w-3.5 text-white/90"
+                      fill="currentColor"
+                    >
+                      <path d="M8 9.4a1.25 1.25 0 100 2.5 1.25 1.25 0 000-2.5zM8 5.1c1.75 0 3.35.68 4.55 1.9l1.32-1.42A8.4 8.4 0 008 3.1a8.4 8.4 0 00-5.87 2.48L3.45 7A6.55 6.55 0 018 5.1zM8 0C4.94 0 2.16 1.17.08 3.24l1.32 1.42A9.7 9.7 0 018 2.02c2.6 0 4.98.98 6.6 2.64l1.32-1.42A11.75 11.75 0 008 0z" />
+                    </svg>
+                    {/* battery */}
+                    <span className="relative flex h-[11px] w-[22px] items-center">
+                      <span className="absolute inset-0 rounded-[3px] border border-white/50" />
+                      <span className="absolute -right-[3px] top-1/2 h-[4px] w-[1.5px] -translate-y-1/2 rounded-r-[1px] bg-white/50" />
+                      <span className="absolute left-[1.5px] top-1/2 h-[6px] w-[13px] -translate-y-1/2 rounded-[1.5px] bg-white/90" />
+                    </span>
+                  </span>
+                </div>
+
+                {/* wordmark */}
+                <div className="absolute inset-x-0 top-28 flex flex-col items-center text-white">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)] ring-1 ring-white/25 backdrop-blur-sm">
+                    <BrandGlyph className="h-6 w-6" />
+                  </div>
+                  <p className="mt-4 text-2xl font-semibold tracking-tight">
+                    {SITE.name}
+                  </p>
+                  <p className="mt-1 text-xs text-white/60">
+                    Real US device · live
+                  </p>
+                </div>
+
+                {/* automation running glass card */}
+                <div className="absolute inset-x-5 bottom-24">
+                  <div className="rounded-2xl border border-white/15 bg-white/[0.08] p-4 shadow-[0_10px_34px_-10px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.14)] ring-1 ring-white/10 backdrop-blur-xl">
+                    <div className="flex items-center gap-2">
+                      <span className="relative flex h-2 w-2">
+                        <span className="absolute inline-flex h-full w-full animate-glow rounded-full bg-emerald-300" />
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                      </span>
+                      <p className="text-xs font-medium text-white">
+                        Automation running…
+                      </p>
+                    </div>
+                    <div className="mt-3 flex items-center justify-between">
+                      <div className="h-1.5 w-28 overflow-hidden rounded-full bg-white/20">
+                        <div className="h-full w-2/3 rounded-full bg-gradient-to-r from-emerald-300 to-emerald-400" />
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] text-white/80">
+                        <span
+                          aria-hidden="true"
+                          className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 ring-1 ring-white/30"
+                        >
+                          <Pause className="h-3 w-3 fill-white text-white" />
+                        </span>
+                        <span>Tap to pause</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* bottom "Get started" pill + send glyph */}
+                <div className="absolute inset-x-5 bottom-7 flex items-center gap-2">
+                  <span className="flex h-9 flex-1 items-center justify-center rounded-full bg-white text-xs font-semibold text-foreground shadow-[0_6px_16px_-6px_rgba(0,0,0,0.5)]">
+                    Get started
+                  </span>
                   <span
                     aria-hidden="true"
-                    className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 ring-1 ring-white/30"
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/25 backdrop-blur-sm"
                   >
-                    <Pause className="h-3 w-3 fill-white text-white" />
+                    <Send className="h-4 w-4 text-white" />
                   </span>
-                  <span>Πάτα για παύση</span>
                 </div>
+
+                {/* home indicator */}
+                <div
+                  aria-hidden="true"
+                  className="absolute bottom-1.5 left-1/2 h-1 w-[100px] -translate-x-1/2 rounded-full bg-white/40"
+                />
               </div>
             </div>
-          </div>
 
-          {/* bottom "Get started" pill + send glyph */}
-          <div className="absolute inset-x-5 bottom-7 flex items-center gap-2">
-            <span className="flex h-9 flex-1 items-center justify-center rounded-full bg-white text-xs font-semibold text-foreground">
-              Ξεκίνα τώρα
-            </span>
-            <span
+            {/* glossy front-glass reflection sweeping the whole face */}
+            <div
               aria-hidden="true"
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/25 backdrop-blur-sm"
-            >
-              <Send className="h-4 w-4 text-white" />
-            </span>
+              className="pointer-events-none absolute inset-0 z-40 rounded-[3rem]"
+              style={{
+                backgroundImage:
+                  "linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.05) 14%, transparent 34%, transparent 66%, rgba(255,255,255,0.04) 84%, rgba(255,255,255,0.14) 100%)",
+              }}
+            />
+
+            {/* shimmering glass edge tracing the frame */}
+            <ShineBorder
+              borderWidth={2}
+              duration={12}
+              shineColor={[
+                "var(--color-brand, #2b6bff)",
+                "var(--color-brand-2, #7c3aed)",
+                "var(--color-brand-soft, #60a5fa)",
+              ]}
+              className="rounded-[3rem]"
+            />
+
+            {/* animated border beam tracing the phone frame */}
+            <BorderBeam
+              size={150}
+              duration={7}
+              colorFrom="var(--color-brand, #2b6bff)"
+              colorTo="var(--color-brand-2, #7c3aed)"
+            />
+            <BorderBeam
+              size={150}
+              duration={7}
+              delay={3.5}
+              reverse
+              colorFrom="var(--color-brand-2, #7c3aed)"
+              colorTo="var(--color-brand, #2b6bff)"
+            />
           </div>
         </div>
-
-        {/* shimmering glass edge tracing the frame */}
-        <ShineBorder
-          borderWidth={2}
-          duration={12}
-          shineColor={[
-            "var(--color-brand, #2b6bff)",
-            "var(--color-brand-2, #7c3aed)",
-            "var(--color-brand-soft, #60a5fa)",
-          ]}
-          className="rounded-[3rem]"
-        />
-
-        {/* animated border beam tracing the phone frame */}
-        <BorderBeam
-          size={140}
-          duration={7}
-          colorFrom="var(--color-brand, #2b6bff)"
-          colorTo="var(--color-brand-2, #7c3aed)"
-        />
-        <BorderBeam
-          size={140}
-          duration={7}
-          delay={3.5}
-          reverse
-          colorFrom="var(--color-brand-2, #7c3aed)"
-          colorTo="var(--color-brand, #2b6bff)"
-        />
       </div>
     </div>
   );
@@ -362,7 +519,7 @@ export default function Hero() {
                 className="h-3.5 w-px bg-foreground/15"
               />
               <AnimatedShinyText className="inline-flex items-center justify-center text-brand">
-                Αληθινές συσκευές ΗΠΑ, πλήρως απομακρυσμένα
+                Real US devices, fully remote
               </AnimatedShinyText>
             </div>
           </div>
@@ -370,17 +527,22 @@ export default function Hero() {
 
         {/* headline — the ONLY h1 */}
         <Reveal delay={0.05}>
-          <h1 className="mx-auto mt-8 max-w-4xl text-balance text-center text-5xl font-semibold leading-[1.03] tracking-[-0.03em] text-foreground sm:text-7xl lg:text-[6.5rem]">
-            Μετατρέπουμε αληθινά τηλέφωνα ΗΠΑ σε μηχανισμό{" "}
-            <AuroraText>τηλεχειρισμού</AuroraText>.
+          <h1 className="mx-auto mt-8 max-w-5xl text-balance text-center text-5xl font-bold leading-[0.92] tracking-[-0.045em] text-foreground sm:text-7xl lg:text-[6.5rem]">
+            Real US phones.{" "}
+            <br className="hidden sm:block" />
+            In your{" "}
+            <span className="bg-gradient-to-r from-brand via-brand-2 to-[#22d3ee] bg-[length:200%_auto] bg-clip-text text-transparent motion-safe:animate-gradient">
+              browser
+            </span>
+            .
           </h1>
         </Reveal>
 
         {/* subhead */}
         <Reveal delay={0.1}>
           <p className="mx-auto mt-7 max-w-2xl text-pretty text-center text-lg leading-relaxed text-muted-foreground sm:text-xl">
-            Με το Americell μπορείς να διαχειριστείς, να αυτοματοποιήσεις και να
-            ελέγξεις ένα αληθινό τηλέφωνο ΗΠΑ από οπουδήποτε, ανά πάσα στιγμή.
+            Live iPhones and Androids in US datacenters. Tap, type, install, and
+            automate — from anywhere.
           </p>
         </Reveal>
 
@@ -392,7 +554,7 @@ export default function Hero() {
                 background="var(--foreground)"
                 className="h-12 px-7 text-sm font-medium shadow-soft transition-all duration-300 hover:-translate-y-0.5"
               >
-                Ξεκίνα τώρα
+                Get started
               </ShimmerButton>
             </Link>
             <Button
@@ -402,7 +564,7 @@ export default function Hero() {
               render={<a href="#pricing" />}
               nativeButton={false}
             >
-              Δες τις τιμές
+              See pricing
             </Button>
           </div>
         </Reveal>

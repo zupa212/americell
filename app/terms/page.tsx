@@ -7,9 +7,9 @@ import { buildMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Όροι Χρήσης",
+  title: "Terms of Service",
   description:
-    "Οι Όροι Χρήσης της Americell: λογαριασμοί, αποδεκτή χρήση, συνδρομές και χρεώσεις, πνευματική ιδιοκτησία, περιορισμός ευθύνης και τερματισμός.",
+    "Americell Terms of Service: accounts, acceptable use, subscriptions and billing, intellectual property, limitation of liability, and termination.",
   alternates: { canonical: "/terms" },
 });
 
@@ -21,7 +21,7 @@ export const metadata: Metadata = buildMetadata({
  * US devices, no fraud or rule circumvention, compliance with third-party terms.
  */
 export default function TermsPage() {
-  const lastUpdated = "1 Ιουλίου 2026";
+  const lastUpdated = "July 1, 2026";
 
   return (
     <PageShell>
@@ -29,217 +29,211 @@ export default function TermsPage() {
         <Alert className="mb-10">
           <Info className="h-4 w-4" />
           <AlertDescription>
-            Πρότυπο κείμενο — να ελεγχθεί από νομικό σύμβουλο.
+            Template copy — to be reviewed by legal counsel.
           </AlertDescription>
         </Alert>
 
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          Όροι Χρήσης
+          Terms of Service
         </h1>
         <p className="mt-4 text-sm text-muted-foreground">
-          Τελευταία ενημέρωση: {lastUpdated}
+          Last updated: {lastUpdated}
         </p>
 
         <p className="mt-4 leading-relaxed text-muted-foreground">
-          Καλώς όρισες στην {SITE.name}. Οι παρόντες Όροι Χρήσης («Όροι»)
-          διέπουν την πρόσβαση και τη χρήση της πλατφόρμας, του ιστότοπου και
-          των υπηρεσιών μας (συλλογικά, η «Υπηρεσία»). Χρησιμοποιώντας την
-          Υπηρεσία, αποδέχεσαι τους παρόντες Όρους. Αν δεν συμφωνείς με
-          οποιοδήποτε μέρος τους, παρακαλούμε μην χρησιμοποιείς την Υπηρεσία.
+          Welcome to {SITE.name}. These Terms of Service (the “Terms”) govern
+          your access to and use of our platform, website, and services
+          (collectively, the “Service”). By using the Service, you agree to
+          these Terms. If you do not agree with any part of them, please do not
+          use the Service.
         </p>
 
         <section>
-          <h2 className="mt-10 text-xl font-semibold">1. Εισαγωγή</h2>
+          <h2 className="mt-10 text-xl font-semibold">1. Introduction</h2>
           <p className="mt-4 leading-relaxed text-muted-foreground">
-            Η {SITE.name} παρέχει απομακρυσμένη πρόσβαση σε αληθινές, φυσικές
-            συσκευές smartphone που φιλοξενούνται σε datacenters των ΗΠΑ. Η
-            Υπηρεσία προορίζεται για νόμιμη χρήση: δοκιμές και QA εφαρμογών για
-            κινητά, τοπικοποιημένο testing στις ΗΠΑ, έλεγχο στα app stores και
-            διαχείριση των δικών σου λογαριασμών και ροών εργασίας.
+            {SITE.name} provides remote access to real, physical smartphones
+            hosted in US datacenters. The Service is intended for legitimate
+            use: mobile app testing and QA, US-localized testing, app store
+            review, and managing your own accounts and workflows.
           </p>
           <p className="mt-4 leading-relaxed text-muted-foreground">
-            Οι παρόντες Όροι αποτελούν δεσμευτική συμφωνία ανάμεσα σε εσένα (ή
-            τον οργανισμό που εκπροσωπείς) και την {SITE.name}. Για να
-            χρησιμοποιήσεις την Υπηρεσία πρέπει να είσαι τουλάχιστον 18 ετών και
-            να έχεις τη δικαιοπρακτική ικανότητα να συνάπτεις σύμβαση.
+            These Terms form a binding agreement between you (or the
+            organization you represent) and {SITE.name}. To use the Service you
+            must be at least 18 years old and have the legal capacity to enter
+            into a contract.
           </p>
         </section>
 
         <section>
           <h2 className="mt-10 text-xl font-semibold">
-            2. Λογαριασμοί &amp; πρόσβαση
+            2. Accounts &amp; access
           </h2>
           <p className="mt-4 leading-relaxed text-muted-foreground">
-            Για την πρόσβαση στην Υπηρεσία απαιτείται η δημιουργία λογαριασμού.
-            Είσαι υπεύθυνος/η για την ακρίβεια των στοιχείων που παρέχεις και για
-            τη διατήρησή τους ενημερωμένων.
+            Accessing the Service requires creating an account. You are
+            responsible for the accuracy of the information you provide and for
+            keeping it up to date.
           </p>
           <ul className="mt-4 list-disc space-y-2 pl-5 text-muted-foreground">
             <li>
-              Οφείλεις να διαφυλάσσεις την εμπιστευτικότητα των διαπιστευτηρίων
-              σου και είσαι υπεύθυνος/η για κάθε δραστηριότητα που πραγματοποιείται
-              μέσω του λογαριασμού σου.
+              You must safeguard the confidentiality of your credentials and are
+              responsible for all activity that takes place through your
+              account.
             </li>
             <li>
-              Ειδοποίησέ μας αμέσως αν υποπέσει στην αντίληψή σου μη
-              εξουσιοδοτημένη χρήση του λογαριασμού σου ή οποιαδήποτε παραβίαση
-              ασφαλείας.
+              Notify us immediately if you become aware of any unauthorized use
+              of your account or any breach of security.
             </li>
             <li>
-              Δεν επιτρέπεται να μοιράζεσαι την πρόσβασή σου με τρόπο που παρακάμπτει
-              τα όρια θέσεων ή τα όρια συσκευών του πλάνου σου.
+              You may not share your access in a way that circumvents the seat
+              or device limits of your plan.
             </li>
             <li>
-              Διατηρούμε το δικαίωμα να αναστείλουμε λογαριασμούς που εμφανίζουν
-              ύποπτη ή μη εξουσιοδοτημένη δραστηριότητα.
+              We reserve the right to suspend accounts that show suspicious or
+              unauthorized activity.
             </li>
           </ul>
         </section>
 
         <section>
-          <h2 className="mt-10 text-xl font-semibold">3. Αποδεκτή χρήση</h2>
+          <h2 className="mt-10 text-xl font-semibold">3. Acceptable use</h2>
           <p className="mt-4 leading-relaxed text-muted-foreground">
-            Δεσμεύεσαι να χρησιμοποιείς την Υπηρεσία μόνο για νόμιμους σκοπούς και
-            σύμφωνα με τους παρόντες Όρους. Απαγορεύεται ρητά η χρήση της Υπηρεσίας
-            για απάτη, για παράκαμψη κανόνων ή μέτρων ασφαλείας τρίτων, καθώς και
-            για οποιαδήποτε ενέργεια που παραβιάζει τους όρους των εφαρμογών ή των
-            πλατφορμών που χρησιμοποιείς στις συσκευές.
+            You agree to use the Service only for lawful purposes and in
+            accordance with these Terms. Using the Service for fraud, for
+            circumventing third-party rules or security measures, or for any
+            activity that violates the terms of the apps or platforms you use on
+            the devices is expressly prohibited.
           </p>
           <p className="mt-4 leading-relaxed text-muted-foreground">
-            Είσαι αποκλειστικά υπεύθυνος/η για τη συμμόρφωσή σου με τους όρους κάθε
-            τρίτης εφαρμογής ή πλατφόρμας. Οι πλήρεις κανόνες περιγράφονται στην{" "}
+            You are solely responsible for your compliance with the terms of any
+            third-party app or platform. The full rules are described in our{" "}
             <Link
               href="/acceptable-use"
               className="font-medium text-brand underline underline-offset-4 transition hover:opacity-80"
             >
-              Πολιτική Αποδεκτής Χρήσης
+              Acceptable Use Policy
             </Link>
-            , η οποία αποτελεί αναπόσπαστο μέρος των παρόντων Όρων.
+            , which forms an integral part of these Terms.
           </p>
         </section>
 
         <section>
           <h2 className="mt-10 text-xl font-semibold">
-            4. Συνδρομές &amp; χρεώσεις
+            4. Subscriptions &amp; billing
           </h2>
           <p className="mt-4 leading-relaxed text-muted-foreground">
-            Η Υπηρεσία προσφέρεται με συνδρομητικά πλάνα ανά συσκευή. Επιλέγοντας
-            ένα πλάνο, εξουσιοδοτείς την {SITE.name} να χρεώνει τον επιλεγμένο
-            τρόπο πληρωμής σου σε επαναλαμβανόμενη βάση, έως ότου ακυρώσεις.
+            The Service is offered on per-device subscription plans. By
+            selecting a plan, you authorize {SITE.name} to charge your chosen
+            payment method on a recurring basis until you cancel.
           </p>
           <ul className="mt-4 list-disc space-y-2 pl-5 text-muted-foreground">
             <li>
               <span className="font-medium text-foreground">
-                Μηνιαία χρέωση:
+                Monthly billing:
               </span>{" "}
-              η συνδρομή ανανεώνεται αυτόματα κάθε μήνα και χρεώνεται στην αρχή
-              κάθε περιόδου χρέωσης.
+              the subscription renews automatically each month and is charged at
+              the start of each billing period.
             </li>
             <li>
               <span className="font-medium text-foreground">
-                Ετήσια χρέωση:
+                Annual billing:
               </span>{" "}
-              η συνδρομή ανανεώνεται αυτόματα κάθε έτος, με μειωμένο κόστος σε
-              σύγκριση με την αντίστοιχη μηνιαία χρέωση.
+              the subscription renews automatically each year, at a reduced cost
+              compared to the equivalent monthly billing.
             </li>
             <li>
-              <span className="font-medium text-foreground">Ακύρωση:</span>{" "}
-              μπορείς να ακυρώσεις ανά πάσα στιγμή από το dashboard σου. Η
-              ακύρωση ισχύει στο τέλος της τρέχουσας περιόδου χρέωσης — διατηρείς
-              πρόσβαση μέχρι τότε.
+              <span className="font-medium text-foreground">Cancellation:</span>{" "}
+              you can cancel at any time from your dashboard. Cancellation takes
+              effect at the end of the current billing period — you keep access
+              until then.
             </li>
             <li>
-              Οι τιμές δεν περιλαμβάνουν φόρους, εκτός αν αναφέρεται διαφορετικά.
-              Οι πληρωμές είναι μη επιστρεπτέες, εκτός αν απαιτείται από τον νόμο
-              ή προβλέπεται ρητά.
+              Prices are exclusive of taxes unless stated otherwise. Payments
+              are non-refundable except where required by law or expressly
+              provided.
             </li>
             <li>
-              Ενδέχεται να τροποποιήσουμε τις τιμές μας· τυχόν αλλαγές θα ισχύουν
-              από την επόμενη περίοδο ανανέωσης, με προηγούμενη ειδοποίηση.
+              We may modify our prices; any changes will apply from the next
+              renewal period, with prior notice.
             </li>
           </ul>
         </section>
 
         <section>
           <h2 className="mt-10 text-xl font-semibold">
-            5. Πνευματική ιδιοκτησία
+            5. Intellectual property
           </h2>
           <p className="mt-4 leading-relaxed text-muted-foreground">
-            Η Υπηρεσία, το λογισμικό, ο σχεδιασμός, τα λογότυπα και όλο το
-            σχετικό περιεχόμενο αποτελούν ιδιοκτησία της {SITE.name} ή των
-            δικαιοπαρόχων της και προστατεύονται από τη νομοθεσία περί
-            πνευματικής ιδιοκτησίας και εμπορικών σημάτων.
+            The Service, software, design, logos, and all related content are
+            the property of {SITE.name} or its licensors and are protected by
+            copyright and trademark law.
           </p>
           <p className="mt-4 leading-relaxed text-muted-foreground">
-            Σου παραχωρείται μια περιορισμένη, μη αποκλειστική, μη μεταβιβάσιμη
-            άδεια χρήσης της Υπηρεσίας σύμφωνα με τους παρόντες Όρους. Διατηρείς
-            την κυριότητα του περιεχομένου και των δεδομένων που παρέχεις εσύ,
-            ενώ μας παραχωρείς την περιορισμένη άδεια που χρειάζεται για τη
-            λειτουργία της Υπηρεσίας. Δεν επιτρέπεται η αντιγραφή, τροποποίηση,
-            αντίστροφη μηχανική ή δημιουργία παράγωγων έργων χωρίς προηγούμενη
-            γραπτή συγκατάθεσή μας.
+            You are granted a limited, non-exclusive, non-transferable license
+            to use the Service in accordance with these Terms. You retain
+            ownership of the content and data you provide, while granting us the
+            limited license needed to operate the Service. You may not copy,
+            modify, reverse-engineer, or create derivative works without our
+            prior written consent.
           </p>
         </section>
 
         <section>
           <h2 className="mt-10 text-xl font-semibold">
-            6. Περιορισμός ευθύνης
+            6. Limitation of liability
           </h2>
           <p className="mt-4 leading-relaxed text-muted-foreground">
-            Η Υπηρεσία παρέχεται «ως έχει» και «ως διατίθεται», χωρίς εγγυήσεις
-            οποιουδήποτε είδους, ρητές ή σιωπηρές. Δεν εγγυόμαστε ότι η Υπηρεσία
-            θα είναι αδιάλειπτη, ασφαλής ή απαλλαγμένη από σφάλματα.
+            The Service is provided “as is” and “as available,” without
+            warranties of any kind, express or implied. We do not warrant that
+            the Service will be uninterrupted, secure, or error-free.
           </p>
           <p className="mt-4 leading-relaxed text-muted-foreground">
-            Στον μέγιστο βαθμό που επιτρέπει ο νόμος, η {SITE.name} δεν ευθύνεται
-            για έμμεσες, παρεπόμενες, ειδικές ή αποθετικές ζημίες, ούτε για
-            απώλεια κερδών, δεδομένων ή φήμης, που προκύπτουν από τη χρήση ή την
-            αδυναμία χρήσης της Υπηρεσίας. Η συνολική μας ευθύνη περιορίζεται στο
-            ποσό που κατέβαλες για την Υπηρεσία κατά τους δώδεκα μήνες που
-            προηγήθηκαν του γεγονότος που γεννά την ευθύνη.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="mt-10 text-xl font-semibold">7. Τερματισμός</h2>
-          <p className="mt-4 leading-relaxed text-muted-foreground">
-            Μπορείς να τερματίσεις τον λογαριασμό σου ανά πάσα στιγμή. Διατηρούμε
-            το δικαίωμα να αναστείλουμε ή να τερματίσουμε την πρόσβασή σου στην
-            Υπηρεσία, με ή χωρίς ειδοποίηση, εάν παραβιάσεις τους παρόντες Όρους ή
-            την Πολιτική Αποδεκτής Χρήσης, εάν εντοπίσουμε δόλια ή παράνομη
-            δραστηριότητα, ή εάν απαιτείται από τον νόμο.
-          </p>
-          <p className="mt-4 leading-relaxed text-muted-foreground">
-            Μετά τον τερματισμό, το δικαίωμα χρήσης της Υπηρεσίας παύει άμεσα.
-            Όροι που από τη φύση τους οφείλουν να παραμείνουν σε ισχύ — όπως η
-            πνευματική ιδιοκτησία, ο περιορισμός ευθύνης και οι εφαρμοστέες
-            νομικές διατάξεις — εξακολουθούν να ισχύουν και μετά τον τερματισμό.
+            To the maximum extent permitted by law, {SITE.name} shall not be
+            liable for any indirect, incidental, special, or consequential
+            damages, nor for loss of profits, data, or goodwill, arising from
+            your use of or inability to use the Service. Our total liability is
+            limited to the amount you paid for the Service during the twelve
+            months preceding the event giving rise to the liability.
           </p>
         </section>
 
         <section>
-          <h2 className="mt-10 text-xl font-semibold">8. Τροποποιήσεις</h2>
+          <h2 className="mt-10 text-xl font-semibold">7. Termination</h2>
           <p className="mt-4 leading-relaxed text-muted-foreground">
-            Ενδέχεται να επικαιροποιούμε τους παρόντες Όρους κατά διαστήματα. Σε
-            περίπτωση ουσιωδών αλλαγών, θα σε ειδοποιήσουμε με εύλογο τρόπο —
-            για παράδειγμα μέσω email ή με ανακοίνωση εντός της Υπηρεσίας — πριν
-            τεθούν σε ισχύ. Η συνέχιση της χρήσης της Υπηρεσίας μετά την
-            ενημέρωση συνιστά αποδοχή των αναθεωρημένων Όρων.
+            You may terminate your account at any time. We reserve the right to
+            suspend or terminate your access to the Service, with or without
+            notice, if you violate these Terms or the Acceptable Use Policy, if
+            we detect fraudulent or unlawful activity, or if required by law.
+          </p>
+          <p className="mt-4 leading-relaxed text-muted-foreground">
+            Upon termination, your right to use the Service ceases immediately.
+            Terms that by their nature should survive — such as intellectual
+            property, limitation of liability, and applicable legal provisions —
+            remain in effect after termination.
           </p>
         </section>
 
         <section>
-          <h2 className="mt-10 text-xl font-semibold">9. Επικοινωνία</h2>
+          <h2 className="mt-10 text-xl font-semibold">8. Changes</h2>
           <p className="mt-4 leading-relaxed text-muted-foreground">
-            Για οποιαδήποτε απορία σχετικά με τους παρόντες Όρους, μπορείς να
-            επικοινωνήσεις μαζί μας μέσω της{" "}
+            We may update these Terms from time to time. In the event of
+            material changes, we will notify you by reasonable means — for
+            example, by email or with an in-Service notice — before they take
+            effect. Continued use of the Service after the update constitutes
+            acceptance of the revised Terms.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="mt-10 text-xl font-semibold">9. Contact</h2>
+          <p className="mt-4 leading-relaxed text-muted-foreground">
+            For any questions about these Terms, you can reach us through our{" "}
             <Link
               href="/contact"
               className="font-medium text-brand underline underline-offset-4 transition hover:opacity-80"
             >
-              σελίδας επικοινωνίας
+              contact page
             </Link>
-            . Θα χαρούμε να σε βοηθήσουμε.
+            . We’re happy to help.
           </p>
         </section>
       </article>

@@ -88,7 +88,7 @@ export default async function DashboardPage() {
     }
   }
 
-  // Partition into Ενεργές (entitled) vs Ιστορικό (everything else).
+  // Partition into Active (entitled) vs History (everything else).
   const active: RentalCardData[] = [];
   const history: RentalCardData[] = [];
   for (const r of rows) {
@@ -132,11 +132,11 @@ export default async function DashboardPage() {
 
         <Reveal>
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            Οι ενοικιάσεις σου
+            Your rentals
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            Διαχειρίσου τα αληθινά τηλέφωνα ΗΠΑ που έχεις ενοικιάσει — PIN,
-            τηλεχειρισμός και χρόνος λήξης.
+            Manage the real US phones you&rsquo;ve rented — PIN, remote control,
+            and time remaining.
           </p>
         </Reveal>
 
@@ -144,11 +144,11 @@ export default async function DashboardPage() {
           <Reveal delay={0.05}>
             <Alert className={cn("mt-8 border-white/50 bg-white/60 backdrop-blur-md")}>
               <Database className="h-4 w-4" aria-hidden="true" />
-              <AlertTitle>Η βάση δεδομένων δεν έχει συνδεθεί ακόμη.</AlertTitle>
+              <AlertTitle>The database isn&rsquo;t connected yet.</AlertTitle>
               <AlertDescription>
-                Πρόσθεσε <code>DATABASE_URL</code> (δες το{" "}
-                <code>.env.example</code>) και τρέξε τα migrations για να δεις
-                εδώ τις ενοικιάσεις σου.
+                Add <code>DATABASE_URL</code> (see{" "}
+                <code>.env.example</code>) and run the migrations to see your
+                rentals here.
               </AlertDescription>
             </Alert>
           </Reveal>
@@ -181,11 +181,10 @@ export default async function DashboardPage() {
                   <Smartphone className="h-6 w-6" />
                 </span>
                 <CardTitle className="text-lg">
-                  Δεν έχεις ενοικιάσεις ακόμη.
+                  No rentals yet.
                 </CardTitle>
                 <CardDescription>
-                  Επίλεξε ένα αληθινό τηλέφωνο ΗΠΑ και ξεκίνα τον τηλεχειρισμό σε
-                  λίγα λεπτά.
+                  Pick a real US phone and start controlling it live in minutes.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -195,7 +194,7 @@ export default async function DashboardPage() {
                   render={<Link href="/#pricing" />}
                   nativeButton={false}
                 >
-                  Δες τις συσκευές
+                  Browse devices
                 </Button>
               </CardContent>
             </Card>
@@ -206,7 +205,7 @@ export default async function DashboardPage() {
               <section>
                 <Reveal>
                   <h2 className="text-lg font-semibold tracking-tight text-foreground">
-                    Ενεργές
+                    Active
                   </h2>
                 </Reveal>
                 <ul className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -223,7 +222,7 @@ export default async function DashboardPage() {
               <section>
                 <Reveal>
                   <h2 className="text-lg font-semibold tracking-tight text-foreground">
-                    Ιστορικό
+                    History
                   </h2>
                 </Reveal>
                 <ul className="mt-4 grid gap-4 sm:grid-cols-2">

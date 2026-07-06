@@ -5,7 +5,7 @@ import type { ReactElement } from "react";
 // can statically parse it — only this presentational element is shared.
 export const OG_WIDTH = 1200;
 export const OG_HEIGHT = 630;
-export const OG_ALT = "Americell — αληθινά τηλέφωνα ΗΠΑ, με έλεγχο από παντού";
+export const OG_ALT = "Americell — real US phones, controlled from anywhere";
 
 export function OgCard(): ReactElement {
   return (
@@ -56,7 +56,7 @@ export function OgCard(): ReactElement {
           maxWidth: "900px",
         }}
       >
-        Αληθινά τηλέφωνα ΗΠΑ, με έλεγχο από παντού
+        Real US phones, controlled from anywhere
       </div>
     </div>
   );

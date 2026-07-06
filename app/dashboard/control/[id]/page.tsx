@@ -9,7 +9,7 @@ import { AuroraText } from "@/components/ui/aurora-text";
 import StreamViewer from "@/components/stream-viewer";
 
 export const metadata: Metadata = {
-  title: "Τηλεχειρισμός · Americell",
+  title: "Remote control · Americell",
   robots: { index: false, follow: false },
 };
 
@@ -50,7 +50,7 @@ export default async function ControlPage({
             className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/60 hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-            Πίσω
+            Back
           </Link>
           <div className="flex items-center gap-2 text-sm font-semibold">
             <span
@@ -61,7 +61,7 @@ export default async function ControlPage({
             </span>
             <span className="tracking-tight">
               <AuroraText>Americell</AuroraText>
-              <span className="text-muted-foreground"> · Τηλεχειρισμός</span>
+              <span className="text-muted-foreground"> · Remote control</span>
             </span>
           </div>
           <span className="hidden text-sm text-muted-foreground sm:block">
@@ -85,17 +85,16 @@ export default async function ControlPage({
         ) : (
           <div className="mx-auto mt-10 max-w-md rounded-3xl border border-white/50 bg-white/60 p-8 text-center backdrop-blur-xl">
             <h1 className="text-lg font-bold text-foreground">
-              Η συσκευή δεν είναι ενεργή
+              This device isn&rsquo;t active
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Αυτή η ενοικίαση δεν είναι διαθέσιμη για τηλεχειρισμό αυτή τη
-              στιγμή.
+              This rental isn&rsquo;t available for remote control right now.
             </p>
             <Link
               href="/dashboard"
               className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft px-6 text-sm font-semibold text-white"
             >
-              Επιστροφή στις ενοικιάσεις
+              Back to rentals
             </Link>
           </div>
         )}

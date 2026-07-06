@@ -1,6 +1,7 @@
 import {
   index,
   integer,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -83,3 +84,30 @@ export type NewUser = typeof users.$inferInsert;
 export type Subscription = typeof subscriptions.$inferSelect;
 export type Rental = typeof rentals.$inferSelect;
 export type NewRental = typeof rentals.$inferInsert;
+
+// Append-only audit / activity log — every meaningful admin, customer, and
+// system event is written here (see lib/logs.ts) and surfaced in /admin/logs.
+export const activityLogs = pgTable(
+  "activity_logs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    actorType: text("actor_type").notNull(), // "admin" | "customer" | "system"
+    actorEmail: text("actor_email"),
+    actorId: uuid("actor_id"),
+    action: text("action").notNull(), // e.g. "admin.topup", "rental.activated"
+    targetType: text("target_type"), // "rental" | "order" | "phone" | ...
+    targetId: text("target_id"),
+    metadata: jsonb("metadata"), // arbitrary structured details
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    index("activity_logs_created_idx").on(t.createdAt),
+    index("activity_logs_action_idx").on(t.action),
+    index("activity_logs_actor_idx").on(t.actorEmail),
+  ],
+);
+
+export type ActivityLog = typeof activityLogs.$inferSelect;
+export type NewActivityLog = typeof activityLogs.$inferInsert;

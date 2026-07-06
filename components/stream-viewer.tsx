@@ -20,14 +20,14 @@ import { cn } from "@/lib/utils";
 const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
 
 function formatRemaining(ms: number): string {
-  if (ms <= 0) return "έληξε";
+  if (ms <= 0) return "expired";
   const total = Math.floor(ms / 1000);
   const d = Math.floor(total / 86400);
   const h = Math.floor((total % 86400) / 3600);
   const m = Math.floor((total % 3600) / 60);
-  if (d > 0) return `${d}μ ${h}ω`;
-  if (h > 0) return `${h}ω ${m}λ`;
-  return `${m}λ`;
+  if (d > 0) return `${d}d ${h}h`;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
 }
 
 /**
@@ -80,7 +80,7 @@ export default function StreamViewer({
     const el = frameRef.current;
     if (el?.requestFullscreen) {
       el.requestFullscreen().catch(() => {
-        toast.error("Δεν ήταν δυνατή η πλήρης οθόνη.");
+        toast.error("Couldn't enter fullscreen.");
       });
     }
   }
@@ -103,10 +103,10 @@ export default function StreamViewer({
       if (res.ok && data.pin) {
         setPin(data.pin);
       } else {
-        toast.error(data.error ?? "Δεν ήταν δυνατή η ανάκτηση του PIN.");
+        toast.error(data.error ?? "Couldn't retrieve the PIN.");
       }
     } catch {
-      toast.error("Σφάλμα δικτύου. Δοκίμασε ξανά.");
+      toast.error("Network error. Please try again.");
     } finally {
       setPinLoading(false);
     }
@@ -117,10 +117,10 @@ export default function StreamViewer({
     try {
       await navigator.clipboard.writeText(pin);
       setCopied(true);
-      toast.success("Το PIN αντιγράφηκε.");
+      toast.success("PIN copied.");
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      toast.error("Δεν ήταν δυνατή η αντιγραφή.");
+      toast.error("Couldn't copy.");
     }
   }
 
@@ -133,7 +133,7 @@ export default function StreamViewer({
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
           </span>
-          Ζωντανά · {platform === "iphone" ? "iPhone" : "Android"} {model}
+          Live · {platform === "iphone" ? "iPhone" : "Android"} {model}
         </span>
 
         <span
@@ -149,10 +149,10 @@ export default function StreamViewer({
           ) : (
             <TriangleAlert className="h-3.5 w-3.5" aria-hidden="true" />
           )}
-          {tokenFresh ? "Ζωντανός σύνδεσμος" : "Βάλε το PIN στη συσκευή"}
+          {tokenFresh ? "Live link" : "Enter the PIN on the device"}
         </span>
 
-        <span className="text-xs text-muted-foreground">Λήγει σε {countdown}</span>
+        <span className="text-xs text-muted-foreground">Expires in {countdown}</span>
 
         <div className="ml-auto flex items-center gap-1.5">
           {pin ? (
@@ -195,7 +195,7 @@ export default function StreamViewer({
             className="gap-1.5 rounded-full border-white/50 bg-white/60 backdrop-blur-md"
           >
             <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
-            <span className="hidden sm:inline">Ανανέωση</span>
+            <span className="hidden sm:inline">Reload</span>
           </Button>
           <Button
             type="button"
@@ -204,7 +204,7 @@ export default function StreamViewer({
             className="gap-1.5 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white"
           >
             <Maximize className="h-3.5 w-3.5" aria-hidden="true" />
-            <span className="hidden sm:inline">Πλήρης οθόνη</span>
+            <span className="hidden sm:inline">Fullscreen</span>
           </Button>
         </div>
       </div>
@@ -215,7 +215,7 @@ export default function StreamViewer({
           key={reloadKey}
           ref={frameRef}
           src={streamUrl}
-          title={`Americell — τηλεχειρισμός ${model}`}
+          title={`Americell — remote control ${model}`}
           className="h-[72vh] w-full border-0 bg-black"
           allow="autoplay; fullscreen; clipboard-read; clipboard-write; accelerometer; gyroscope"
           referrerPolicy="no-referrer"
@@ -224,14 +224,14 @@ export default function StreamViewer({
 
       {/* Fallback if the provider blocks embedding. */}
       <p className="text-center text-xs text-muted-foreground">
-        Δεν φορτώνει η ζωντανή προβολή;{" "}
+        Live view not loading?{" "}
         <a
           href={streamUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 font-medium text-brand hover:text-brand-2"
         >
-          Άνοιξε σε νέα καρτέλα
+          Open in a new tab
           <ExternalLink className="h-3 w-3" aria-hidden="true" />
         </a>
       </p>

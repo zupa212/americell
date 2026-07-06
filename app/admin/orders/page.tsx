@@ -36,10 +36,10 @@ const glassCard =
 
 // Deterministic server-side expiry formatting (fixed locale + timezone) so the
 // preformatted label can't drift between server render and client hydration.
-const expiryFmt = new Intl.DateTimeFormat("el-GR", {
+const expiryFmt = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
   timeStyle: "short",
-  timeZone: "Europe/Athens",
+  timeZone: "America/New_York",
 });
 
 function fmtExpiry(iso: string | null): string {
@@ -87,11 +87,11 @@ export default async function AdminOrdersPage() {
     <div className="flex flex-col gap-6">
       <Reveal>
         <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-          <AuroraText>Παραγγελίες</AuroraText>
+          <AuroraText>Orders</AuroraText>
         </h1>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          Ενεργές ενοικιάσεις στο CellGods. Η απενεργοποίηση απελευθερώνει τη
-          συσκευή — χωρίς επιστροφή χρημάτων.
+          Active rentals on CellGods. Deactivating releases the device — with no
+          refund.
         </p>
       </Reveal>
 
@@ -103,16 +103,16 @@ export default async function AdminOrdersPage() {
             <Database className="h-4 w-4" aria-hidden="true" />
             <AlertTitle>
               {configured
-                ? "Δεν ήταν δυνατή η φόρτωση των παραγγελιών."
-                : "Το CellGods δεν έχει ρυθμιστεί ακόμη."}
+                ? "Couldn't load orders."
+                : "CellGods isn't configured yet."}
             </AlertTitle>
             <AlertDescription>
               {configured ? (
-                <>Δοκίμασε ξανά σε λίγο ή έλεγξε το κλειδί API.</>
+                <>Try again shortly or check the API key.</>
               ) : (
                 <>
-                  Πρόσθεσε <code>CELLGODS_API_KEY</code> στο περιβάλλον για να
-                  εμφανιστούν εδώ οι παραγγελίες.
+                  Add <code>CELLGODS_API_KEY</code> to the environment to show
+                  orders here.
                 </>
               )}
             </AlertDescription>

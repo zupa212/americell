@@ -3,16 +3,16 @@
 export const SITE = {
   name: "Americell",
   domain: "americell.example",
-  tagline: "Μετατρέπουμε αληθινά τηλέφωνα ΗΠΑ σε μηχανισμό τηλεχειρισμού.",
+  tagline: "Real US phones. Controlled from your browser.",
   subtagline:
-    "Με το Americell μπορείς να διαχειρίζεσαι, να αυτοματοποιείς και να ελέγχεις ένα αληθινό smartphone ΗΠΑ από οπουδήποτε, ανά πάσα στιγμή.",
+    "Live iPhones and Androids in US datacenters. Tap, type, install, and automate — from anywhere, any time.",
 };
 
 export const NAV_LINKS: { label: string; href: string }[] = [
-  { label: "Αρχική", href: "/" },
-  { label: "Πώς λειτουργεί", href: "/#how" },
-  { label: "Τιμές", href: "/#pricing" },
-  { label: "Πελάτες", href: "/#clients" },
+  { label: "Home", href: "/" },
+  { label: "How it works", href: "/#how" },
+  { label: "Pricing", href: "/#pricing" },
+  { label: "Clients", href: "/#clients" },
   { label: "Blog", href: "/blog" },
 ];
 
@@ -35,23 +35,23 @@ export type Feature = { title: string; body: string; icon: string };
 
 export const FEATURES: Feature[] = [
   {
-    title: "Αληθινό hardware, όχι emulators",
-    body: "Γνήσια iPhone και συσκευές Android σε καθαρή οικιακή συνδεσιμότητα ΗΠΑ — ακριβώς αυτό που βλέπουν οι χρήστες σου και τα app stores.",
+    title: "Real hardware. No emulators.",
+    body: "Genuine iPhones and Androids on clean US residential connectivity — exactly what your users and the app stores see.",
     icon: "device",
   },
   {
-    title: "Έλεγχος από οπουδήποτε",
-    body: "Μια πλήρης ζωντανή οθόνη στον browser σου. Πάτα, πληκτρολόγησε, κάνε swipe και εγκατέστησε — από οποιοδήποτε laptop, οποιαδήποτε ζώνη ώρας, οποιοδήποτε μέλος της ομάδας.",
+    title: "Control from anywhere",
+    body: "A full live screen in your browser. Tap, type, swipe, and install — from any laptop, any time zone, any teammate.",
     icon: "globe",
   },
   {
-    title: "Αυτοματοποίησε τη ρουτίνα",
-    body: "Δημιούργησε σενάρια για επαναλαμβανόμενες ροές και προγραμμάτισέ τα. Τρέξε ροές εργασίας σε αληθινές συσκευές για testing, QA και ανάπτυξη σε μεγάλη κλίμακα.",
+    title: "Automate the routine",
+    body: "Script repeatable flows and schedule them. Run workflows on real devices for testing, QA, and scale.",
     icon: "bolt",
   },
   {
-    title: "Φτιαγμένο για ομάδες",
-    body: "Κοινόχρηστες δεξαμενές συσκευών, πρόσβαση ανά θέση και ιστορικό ελέγχου. Διαχειρίσου πολλές συσκευές από ένα καθαρό dashboard.",
+    title: "Built for teams",
+    body: "Shared device pools, per-seat access, and full audit history — all from one clean dashboard.",
     icon: "users",
   },
 ];
@@ -59,37 +59,37 @@ export const FEATURES: Feature[] = [
 export type Step = { n: number; title: string; body: string };
 
 export const STEPS: Step[] = [
-  { n: 1, title: "Διάλεξε συσκευή", body: "Επίλεξε ένα αληθινό τηλέφωνο ΗΠΑ και τοποθεσία από τον στόλο μας — Pixel, Galaxy ή iPhone." },
-  { n: 2, title: "Συνδέσου άμεσα", body: "Η συσκευή σου εκκινεί σε ένα datacenter των ΗΠΑ και μεταδίδεται στον browser σου μέσα σε δευτερόλεπτα." },
-  { n: 3, title: "Έλεγξε & αυτοματοποίησε", body: "Χειρίσου την ζωντανά ή γράψε ροές που τρέχουν προγραμματισμένα — χωρίς καλώδια, χωρίς τοπικό hardware." },
+  { n: 1, title: "Pick a device", body: "Choose a real US phone and location from our fleet — Pixel, Galaxy, or iPhone." },
+  { n: 2, title: "Connect instantly", body: "Your device boots in a US datacenter and streams to your browser in seconds." },
+  { n: 3, title: "Control & automate", body: "Drive it live or script flows that run on schedule — no cables, no local hardware." },
 ];
 
 export type Faq = { q: string; a: string };
 
 export const FAQS: Faq[] = [
   {
-    q: "Είναι αληθινά τηλέφωνα ή emulators;",
-    a: "Αληθινά, φυσικά smartphones που φιλοξενούνται σε datacenters των ΗΠΑ με καθαρή οικιακή συνδεσιμότητα. Χωρίς emulators ή εικονικά images λειτουργικού.",
+    q: "Real phones or emulators?",
+    a: "Real, physical smartphones hosted in US datacenters on clean residential connectivity. No emulators, no virtual OS images.",
   },
   {
-    q: "Για τι μπορώ να χρησιμοποιήσω το Americell;",
-    a: "Νόμιμη εργασία σε αληθινές συσκευές: testing και QA εφαρμογών για κινητά, τοπικό testing στις ΗΠΑ, έλεγχο στο store και διαχείριση των δικών σου λογαριασμών και ροών εργασίας για πρακτορεία και ομάδες ανάπτυξης.",
+    q: "What can I use Americell for?",
+    a: "Legitimate work on real devices: mobile app testing and QA, US localization testing, store review, and managing your own accounts and workflows for agencies and growth teams.",
   },
   {
-    q: "Πού βρίσκονται οι συσκευές;",
-    a: "Σε διάφορες περιοχές των ΗΠΑ — αυτή τη στιγμή Ashburn (VA), Dallas (TX) και San Jose (CA), με περισσότερες να έρχονται.",
+    q: "Where are the devices?",
+    a: "Across the US — currently Ashburn (VA), Dallas (TX), and San Jose (CA), with more coming.",
   },
   {
-    q: "Μπορώ να αυτοματοποιήσω ενέργειες;",
-    a: "Ναι. Μπορείς να χειριστείς μια συσκευή ζωντανά στον browser ή να γράψεις επαναλαμβανόμενες ροές και να τις προγραμματίσεις να τρέχουν στην αληθινή συσκευή.",
+    q: "Can I automate actions?",
+    a: "Yes. Drive a device live in the browser, or script repeatable flows and schedule them to run on the real device.",
   },
   {
-    q: "Πώς λειτουργεί η χρέωση;",
-    a: "Απλές συνδρομές ανά συσκευή, μηνιαία ή ετήσια (η ετήσια εξοικονομεί ~20%). Ακύρωσε ανά πάσα στιγμή από το dashboard σου.",
+    q: "How does billing work?",
+    a: "Simple per-device plans, monthly or annual (annual saves ~20%). Cancel anytime from your dashboard.",
   },
   {
-    q: "Επιτρέπεται αυτό βάσει των κανόνων των εφαρμογών και των πλατφορμών;",
-    a: "Το Americell προορίζεται για νόμιμη χρήση. Είσαι υπεύθυνος να τηρείς τους όρους οποιασδήποτε εφαρμογής ή πλατφόρμας χρησιμοποιείς σε μια συσκευή — δες την πολιτική Αποδεκτής χρήσης μας.",
+    q: "Is this allowed by app and platform rules?",
+    a: "Americell is built for legitimate use. You're responsible for following the terms of any app or platform you use on a device — see our Acceptable Use policy.",
   },
 ];
 
@@ -97,19 +97,19 @@ export type Testimonial = { quote: string; name: string; role: string };
 
 export const TESTIMONIALS: Testimonial[] = [
   {
-    quote: "Αντικαταστήσαμε μια ντουλάπα με τηλέφωνα δοκιμών με το Americell. Αληθινές συσκευές ΗΠΑ, αληθινές εκδόσεις λειτουργικού, μηδέν καλώδια.",
+    quote: "We replaced a closet of test phones with Americell. Real US devices, real OS versions, zero cables.",
     name: "Maya R.",
-    role: "Επικεφαλής QA, fintech για κινητά",
+    role: "Head of QA, mobile fintech",
   },
   {
-    quote: "Το πρακτορείο μας διαχειρίζεται πλέον δεκάδες αληθινές συσκευές από ένα dashboard. Ο ζωντανός έλεγχος είναι πραγματικά άμεσος.",
+    quote: "Our agency now runs dozens of real devices from one dashboard. Live control feels truly instant.",
     name: "Devin K.",
-    role: "Ιδρυτής, πρακτορείο ανάπτυξης",
+    role: "Founder, growth agency",
   },
   {
-    quote: "Ο έλεγχος στο store και το testing τοπικοποίησης σε πραγματικό hardware ΗΠΑ σταμάτησε επιτέλους να είναι εφιάλτης logistics.",
+    quote: "Store review and localization testing on real US hardware finally stopped being a logistics nightmare.",
     name: "Priya S.",
-    role: "Υπεύθυνη κυκλοφορίας",
+    role: "Release manager",
   },
 ];
 
