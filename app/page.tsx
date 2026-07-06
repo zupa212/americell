@@ -1,7 +1,9 @@
 import SiteHeader from "@/components/site-header";
 import Hero from "@/components/hero";
 import LogosStrip from "@/components/logos-strip";
+import Stats from "@/components/stats";
 import Features from "@/components/features";
+import BenefitsStack from "@/components/benefits-stack";
 import HowItWorks from "@/components/how-it-works";
 import Pricing from "@/components/pricing";
 import Testimonials from "@/components/testimonials";
@@ -16,7 +18,9 @@ export default function Page() {
       <main className="flex-1">
         <Hero />
         <LogosStrip />
+        <Stats />
         <Features />
+        <BenefitsStack />
         <HowItWorks />
         <Pricing />
         <Testimonials />

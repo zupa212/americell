@@ -9,12 +9,11 @@
 //
 // The graph is derived from the same content sources the UI uses:
 //   - lib/seo   → canonical SITE_URL / SITE_NAME / OG image path
-//   - lib/devices → the device catalog (one Product per device)
 //   - lib/site  → FAQ content (FAQPage)
-// Keeping a single source of truth means the rich results can never drift
-// from what's rendered on the page.
+// Inventory is now dynamic (CellGods), so the offering is described as a single
+// generic Service (not per-device Products) — avoids per-request API calls in
+// the global layout while keeping rich results.
 
-import { DEVICES } from "@/lib/devices";
 import { OG_IMAGE_PATH, SITE_NAME, SITE_URL } from "@/lib/seo";
 import { FAQS, SITE } from "@/lib/site";
 
@@ -62,30 +61,31 @@ function webSiteNode(): JsonLdNode {
     name: SITE_NAME,
     description: SITE.subtagline,
     publisher: { "@id": ORGANIZATION_ID },
-    inLanguage: "en-US",
+    inLanguage: "el-GR",
   };
 }
 
-function productNodes(): JsonLdNode[] {
-  return DEVICES.map((device) => ({
-    "@type": "Product",
-    "@id": `${SITE_URL}/#product-${device.id}`,
-    name: device.name,
-    description: `${device.name} με ${device.os} — ${device.specs}. Φιλοξενείται σε ${device.location} και ελέγχεται ζωντανά από τον browser σου.`,
-    brand: {
-      "@type": "Brand",
-      name: device.brand,
+function serviceNode(): JsonLdNode {
+  return {
+    "@type": "Service",
+    "@id": `${SITE_URL}/#service`,
+    name: "Ενοικίαση & τηλεχειρισμός πραγματικών τηλεφώνων ΗΠΑ",
+    serviceType: "Remote US phone rental (cloud phones)",
+    description: SITE.subtagline,
+    provider: { "@id": ORGANIZATION_ID },
+    areaServed: { "@type": "Country", name: "United States" },
+    audience: {
+      "@type": "Audience",
+      audienceType: "Πρακτορεία, δοκιμαστές εφαρμογών, ομάδες ανάπτυξης",
     },
-    category: "Συνδρομή φιλοξενούμενης κινητής συσκευής",
     offers: {
       "@type": "Offer",
       url: abs("/#pricing"),
       priceCurrency: "USD",
-      price: device.priceMonthly,
       availability: "https://schema.org/InStock",
       seller: { "@id": ORGANIZATION_ID },
     },
-  }));
+  };
 }
 
 function faqPageNode(): JsonLdNode {
@@ -109,7 +109,7 @@ function buildGraph(): { "@context": string; "@graph": JsonLdNode[] } {
     "@graph": [
       organizationNode(),
       webSiteNode(),
-      ...productNodes(),
+      serviceNode(),
       faqPageNode(),
     ],
   };

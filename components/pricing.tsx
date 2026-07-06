@@ -1,78 +1,69 @@
-"use client";
+import "server-only";
 
-import { useState } from "react";
-import { ArrowRight, Check, Loader2 } from "lucide-react";
-import { toast } from "sonner";
 import Reveal from "@/components/ui/reveal";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { BorderBeam } from "@/components/ui/border-beam";
-import { ShineBorder } from "@/components/ui/shine-border";
-import { MagicCard } from "@/components/ui/magic-card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import PricingGrid from "@/components/pricing-grid";
+import { AuroraText } from "@/components/ui/aurora-text";
+import { DURATIONS, getRetailCatalog } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
-import {
-  DEVICES,
-  monthlyEquivalent,
-  priceFor,
-  type Cycle,
-  type Device,
-} from "@/lib/devices";
+
+/**
+ * Pricing — SERVER component (RESELLER_PLAN §5.5 Flow A, §5.1).
+ *
+ * Renders the landing pricing section over LIVE CellGods inventory. It calls the
+ * server-only `getRetailCatalog()`, which strips all wholesale cost and returns
+ * only `PublicRetailPhone[]` (retail cents per period). On failure it fails
+ * closed with a Greek demo / retry notice; on success it hands the client-safe
+ * catalog to the client `<PricingGrid/>` (duration toggle + checkout).
+ *
+ * NEVER imports wholesale or the margin %; only retail cents cross to the client.
+ */
 
 // Shared frosted-glass recipe — floats over the global <SiteBackground/> aurora.
 const GLASS =
   "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
-const GLASS_HOVER =
-  "transition-all duration-300 hover:bg-white/70 hover:-translate-y-1 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)]";
 
-export default function Pricing() {
-  const [cycle, setCycle] = useState<Cycle>("monthly");
-  // Which card is mid-request (drives the spinner on that card only).
-  const [pendingId, setPendingId] = useState<string | null>(null);
+// Brand-blue tuned aurora stops for the "Americell" wordmark (#2b6bff → #7c3aed → #5aa2ff).
+const BRAND_AURORA = ["#2b6bff", "#7c3aed", "#5aa2ff"] as const;
 
-  const handleCheckout = async (device: Device) => {
-    setPendingId(device.id);
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ deviceId: device.id, cycle }),
-      });
+/**
+ * BrandBackdrop — purely decorative, aria-hidden.
+ *
+ * A soft brand-gradient glow plus a very faint, repeating "AMERICELL" wordmark
+ * watermark that sits BEHIND the live grid so the brand is felt without ever
+ * competing with the pricing content. Transform/opacity only; no JS, no motion.
+ */
+function BrandBackdrop() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+    >
+      {/* Brand-gradient glow */}
+      <div
+        className="absolute left-1/2 top-1/3 h-[38rem] w-[38rem] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-70 blur-3xl"
+        style={{
+          background:
+            "radial-gradient(circle at center, rgba(43,107,255,0.16), rgba(124,58,237,0.10) 45%, transparent 70%)",
+        }}
+      />
+      {/* Faint repeating AMERICELL watermark — felt, never spammy (~3.5% ink). */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 sm:gap-8">
+        {[0, 1, 2].map((row) => (
+          <span
+            key={row}
+            className="whitespace-nowrap text-[13vw] font-black uppercase leading-none tracking-tighter sm:text-[10vw]"
+            style={{ color: "rgba(43,107,255,0.035)" }}
+          >
+            AMERICELL · AMERICELL
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
 
-      if (res.status === 401) {
-        // Not logged in — send them to sign in.
-        window.location.href = "/login";
-        return;
-      }
-
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && data.url) {
-        window.location.href = data.url as string;
-        return;
-      }
-
-      toast(
-        data.demo
-          ? "Οι πληρωμές είναι σε demo mode — τα κλειδιά Stripe δεν έχουν οριστεί ακόμη."
-          : (data.error ?? "Δεν ήταν δυνατή η έναρξη πληρωμής. Δοκίμασε ξανά."),
-      );
-    } catch {
-      toast("Σφάλμα δικτύου. Δοκίμασε ξανά.");
-    } finally {
-      setPendingId(null);
-    }
-  };
-
-  // Subtly highlight the middle card as the most popular choice.
-  const popularIndex = Math.floor(DEVICES.length / 2);
+export default async function Pricing() {
+  const catalog = await getRetailCatalog();
 
   return (
     <section
@@ -83,195 +74,80 @@ export default function Pricing() {
       <div className="mx-auto w-full max-w-6xl px-6">
         {/* Section header */}
         <Reveal className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-2">
-            Τιμές
-          </p>
+          {/* Branded eyebrow — gradient "A" mark + AuroraText wordmark + label. */}
+          <div className="flex justify-center">
+            <span className="inline-flex items-center gap-2.5 rounded-full border border-white/50 bg-white/60 px-4 py-1.5 text-sm font-semibold uppercase tracking-[0.18em] text-brand-2 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)] ring-1 ring-white/40 backdrop-blur-md">
+              <span
+                aria-hidden="true"
+                className="grid h-5 w-5 place-items-center rounded-md bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-[0.7rem] font-black leading-none text-white shadow-sm ring-1 ring-white/40"
+              >
+                A
+              </span>
+              <AuroraText colors={[...BRAND_AURORA]}>Americell</AuroraText>
+              <span
+                aria-hidden="true"
+                className="h-3 w-px bg-brand-2/30"
+              />
+              Τιμές
+            </span>
+          </div>
           <h2
             id="pricing-heading"
             className="mt-4 text-4xl font-extrabold tracking-tight text-foreground sm:text-5xl lg:text-6xl"
           >
             Μία αληθινή συσκευή,{" "}
             <span className="bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-clip-text text-transparent">
-              ένα απλό πλάνο
+              μία σταθερή τιμή
             </span>
           </h2>
           <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-            Διάλεξε ένα αληθινό τηλέφωνο ΗΠΑ, έλεγξέ το από τον browser σου και
-            πλήρωσε μία σταθερή τιμή. Χωρίς emulators, χωρίς κρυφές χρεώσεις —
-            μόνο αληθινό hardware σε καθαρή οικιακή σύνδεση.
+            Διάλεξε ένα αληθινό τηλέφωνο ΗΠΑ από το ζωντανό απόθεμα της{" "}
+            <span className="font-semibold text-brand-2">Americell</span>, έλεγξέ
+            το από τον browser σου και πλήρωσε μία φορά για όση διάρκεια
+            χρειάζεσαι. Χωρίς emulators, χωρίς κρυφές χρεώσεις — μόνο αληθινό
+            hardware.
           </p>
         </Reveal>
 
-        {/* Billing-cycle toggle — drives the same `cycle` state */}
-        <Reveal delay={0.08} className="mt-12 flex justify-center">
-          <Tabs
-            value={cycle}
-            onValueChange={(value) => setCycle(value as Cycle)}
-            aria-label="Κύκλος χρέωσης"
-          >
-            <TabsList className="h-11 rounded-full border border-white/50 bg-white/60 p-1 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)] ring-1 ring-white/40 backdrop-blur-md">
-              <TabsTrigger
-                value="monthly"
-                className="min-w-[7rem] rounded-full px-5 transition-all duration-300 data-active:bg-gradient-to-r data-active:from-brand data-active:to-brand-2 data-active:text-white data-active:shadow-glow"
-              >
-                Μηνιαία
-              </TabsTrigger>
-              <TabsTrigger
-                value="annual"
-                className="min-w-[7rem] gap-2 rounded-full px-5 transition-all duration-300 data-active:bg-gradient-to-r data-active:from-brand data-active:to-brand-2 data-active:text-white data-active:shadow-glow"
-              >
-                Ετήσια
-                <Badge
-                  variant="secondary"
-                  className="border-transparent bg-brand-2/10 text-[10px] text-brand-2 group-data-active/tabs-list:bg-white/20 group-data-active/tabs-list:text-white"
-                >
-                  Έκπτωση ~20%
-                </Badge>
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </Reveal>
-
-        {/* Device / fleet grid */}
-        <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {DEVICES.map((device, index) => {
-            const isPopular = index === popularIndex;
-            const perMonth = monthlyEquivalent(device, cycle);
-            const annualTotal = priceFor(device, "annual");
-            const isPending = pendingId === device.id;
-
-            return (
-              <Reveal as="article" key={device.id} delay={0.08 * index}>
-                <MagicCard
-                  className={cn(
-                    "h-full rounded-3xl",
-                    isPopular ? "lg:-translate-y-2" : "",
-                  )}
-                  gradientColor="rgba(43,107,255,0.12)"
-                  gradientFrom="var(--color-brand)"
-                  gradientTo="var(--color-brand-2)"
-                  gradientOpacity={0.55}
-                >
-                  <Card
-                    className={cn(
-                      "relative h-full gap-0 border-0 bg-transparent py-0 shadow-none",
-                      // Frosted glass surface floating over the aurora.
-                      GLASS,
-                      isPopular
-                        ? "bg-white/70 ring-white/60 shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)]"
-                        : GLASS_HOVER,
-                    )}
-                  >
-                    {/* Shine + beam accents reserved for the most-popular card */}
-                    {isPopular && (
-                      <>
-                        <ShineBorder
-                          borderWidth={1.5}
-                          duration={12}
-                          shineColor={[
-                            "var(--color-brand)",
-                            "var(--color-brand-2)",
-                            "var(--color-brand-soft)",
-                          ]}
-                        />
-                        <BorderBeam
-                          size={70}
-                          duration={7}
-                          colorFrom="var(--color-brand)"
-                          colorTo="var(--color-brand-2)"
-                        />
-                      </>
-                    )}
-
-                    {/* Accent top bar driven by device.accent */}
-                    <div
-                      aria-hidden="true"
-                      className="absolute inset-x-0 top-0 h-1 rounded-t-3xl"
-                      style={{ backgroundColor: device.accent }}
-                    />
-
-                    <CardHeader className="px-7 pt-8 sm:px-8">
-                      {isPopular && (
-                        <Badge className="absolute right-6 top-6 bg-gradient-to-r from-brand to-brand-2 uppercase tracking-wide text-white shadow-glow">
-                          Πιο δημοφιλές
-                        </Badge>
-                      )}
-                      <CardTitle className="text-xl font-bold tracking-tight text-foreground">
-                        {device.name}
-                      </CardTitle>
-                      <CardDescription className="mt-1.5 text-sm text-muted-foreground">
-                        {device.os} · {device.location}
-                      </CardDescription>
-                    </CardHeader>
-
-                    <CardContent className="flex-1 px-7 sm:px-8">
-                      {/* Price */}
-                      <div className="mt-7 flex items-baseline gap-1.5">
-                        <span className="text-5xl font-extrabold tracking-tight text-foreground">
-                          ${perMonth}
-                        </span>
-                        <span className="text-sm font-medium text-muted-foreground">
-                          /μήνα
-                        </span>
-                      </div>
-                      <p className="mt-1.5 h-5 text-sm text-muted-foreground">
-                        {cycle === "annual"
-                          ? `χρέωση $${annualTotal}/έτος`
-                          : "χρέωση μηνιαία"}
-                      </p>
-
-                      {/* Spec line as a check row */}
-                      <div className="mt-7 flex items-start gap-2.5 border-t border-white/50 pt-6">
-                        <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand/15 to-brand-2/15">
-                          <Check
-                            className="h-3.5 w-3.5 text-brand"
-                            aria-hidden="true"
-                          />
-                        </span>
-                        <p className="text-sm leading-relaxed text-muted-foreground">
-                          {device.specs}
-                        </p>
-                      </div>
-                    </CardContent>
-
-                    <CardFooter className="mt-8 border-t-0 bg-transparent px-7 pb-8 sm:px-8">
-                      <Button
-                        type="button"
-                        onClick={() => handleCheckout(device)}
-                        disabled={isPending}
-                        aria-label={`Απόκτησε ${device.name}`}
-                        className={cn(
-                          "group/cta h-12 w-full rounded-full px-6 text-sm font-semibold transition-all duration-300",
-                          isPopular
-                            ? "bg-gradient-to-r from-brand to-brand-2 text-white shadow-glow hover:opacity-95"
-                            : "bg-foreground text-background hover:bg-foreground/90",
-                        )}
-                      >
-                        {isPending ? (
-                          <>
-                            <Loader2
-                              className="h-4 w-4 animate-spin"
-                              aria-hidden="true"
-                            />
-                            Έναρξη…
-                          </>
-                        ) : (
-                          <>
-                            Απόκτησέ το
-                            <ArrowRight
-                              className="h-4 w-4 transition-transform group-hover/cta:translate-x-0.5"
-                              aria-hidden="true"
-                            />
-                          </>
-                        )}
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                </MagicCard>
-              </Reveal>
-            );
-          })}
-        </div>
+        {catalog.ok ? (
+          <div className="relative isolate mt-4">
+            <BrandBackdrop />
+            <PricingGrid phones={catalog.phones} durations={DURATIONS} />
+          </div>
+        ) : (
+          <Reveal delay={0.08} className="mx-auto mt-14 max-w-xl">
+            <div className={cn(GLASS, "p-8 text-center sm:p-10")}>
+              {catalog.reason === "unconfigured" ? (
+                <>
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-2">
+                    Λειτουργία demo
+                  </p>
+                  <h3 className="mt-3 text-xl font-bold text-foreground">
+                    Το ζωντανό απόθεμα δεν είναι ακόμα συνδεδεμένο
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    Η σύνδεση με τον πάροχο συσκευών δεν έχει ρυθμιστεί σε αυτό το
+                    περιβάλλον, οπότε δεν μπορούμε να εμφανίσουμε ζωντανές τιμές. Οι
+                    πληρωμές και οι ενεργοποιήσεις είναι προσωρινά ανενεργές.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-2">
+                    Προσωρινό πρόβλημα
+                  </p>
+                  <h3 className="mt-3 text-xl font-bold text-foreground">
+                    Δεν φορτώθηκε το απόθεμα
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                    Δεν ήταν δυνατή η φόρτωση των διαθέσιμων συσκευών αυτή τη στιγμή.
+                    Ανανέωσε τη σελίδα σε λίγο για να δεις ζωντανές τιμές.
+                  </p>
+                </>
+              )}
+            </div>
+          </Reveal>
+        )}
       </div>
     </section>
   );

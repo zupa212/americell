@@ -19,30 +19,52 @@ import { ShineBorder } from "@/components/ui/shine-border";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { Particles } from "@/components/ui/particles";
 import { Button } from "@/components/ui/button";
+import HeroPhoneParallax from "@/components/hero-phone-parallax";
 import { cn } from "@/lib/utils";
 
 /**
  * Hero — the marketing centerpiece (Server Component).
  *
  * No client interactivity lives here: entrance motion is delegated to the
- * shared <Reveal> client wrapper, and the floating app tiles bob via the
- * CSS keyframe utilities (animate-float / animate-float-slow) defined in
- * globals.css. The heavy lifting for premium accents is composed from
- * Magic UI + shadcn components (AuroraText, BorderBeam, ShineBorder,
- * Particles, AnimatedShinyText, ShimmerButton, Button) — each client-internal
- * where it needs to be.
+ * shared <Reveal> client wrapper, the floating app tiles bob via the CSS
+ * keyframe utilities (animate-float / animate-float-slow) from globals.css,
+ * and the phone's scroll parallax + idle float live in the tiny
+ * <HeroPhoneParallax> client child. The premium accents are composed from
+ * Magic UI + shadcn (AuroraText, BorderBeam, ShineBorder, Particles,
+ * AnimatedShinyText, ShimmerButton, Button).
+ *
+ * Apple-polish pass: crisper glass eyebrow carrying a small AMERICELL brand
+ * mark (gradient chip + AuroraText wordmark) beside the AnimatedShinyText,
+ * larger/cleaner balanced type with tighter tracking, more generous vertical
+ * rhythm, and a soft brand-gradient glow behind the headline.
  *
  * GLASSMORPHISM: the <section> is fully transparent so the persistent global
  * <SiteBackground/> (light wash + drifting aurora + dot grid, fixed behind
- * everything) shows through. Surfaces above it are frosted glass; the eyebrow
- * is a glass pill and the phone sits in a relative container carrying a
- * BorderBeam, a ShineBorder edge, a faint glass reflection, and ambient
- * <Particles/> for depth. Brand logos (react-icons/si) + a lucide gear are
- * used decoratively; all copy stays honest about real-device management,
- * automation, and testing. No network images.
+ * everything) shows through. Surfaces above it are frosted glass. Brand logos
+ * (react-icons/si) + a lucide gear are decorative; all copy stays honest about
+ * real-device management, automation, and testing. No network images.
  */
 
 type IconType = ComponentType<SVGProps<SVGSVGElement>>;
+
+/** The Americell mark — a phone silhouette with a signal notch. */
+function BrandGlyph({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="7" y="2" width="10" height="20" rx="2.5" />
+      <path d="M11 18h2" />
+    </svg>
+  );
+}
 
 type FloatingTile = {
   name: string;
@@ -216,20 +238,7 @@ function PhoneMockup() {
           {/* wordmark */}
           <div className="absolute inset-x-0 top-28 flex flex-col items-center text-white">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/25 backdrop-blur-sm">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <rect x="7" y="2" width="10" height="20" rx="2.5" />
-                <path d="M11 18h2" />
-              </svg>
+              <BrandGlyph className="h-6 w-6" />
             </div>
             <p className="mt-4 text-2xl font-semibold tracking-tight">
               {SITE.name}
@@ -317,16 +326,41 @@ export default function Hero() {
     // Transparent section — the global <SiteBackground/> (aurora + dot grid)
     // shows through the frosted glass surfaces above it.
     <section id="top" className="relative overflow-hidden">
-      <div className="mx-auto w-full max-w-6xl px-6 py-20 sm:py-28">
-        {/* eyebrow — AnimatedShinyText inside a frosted glass pill */}
+      {/* soft brand-gradient glow behind the headline — keeps AMERICELL's
+          blue→violet presence felt without overpowering the global aurora */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 -top-20 -z-10 flex justify-center"
+      >
+        <div className="h-[440px] w-[860px] max-w-[92vw] rounded-full bg-[radial-gradient(closest-side,rgba(43,107,255,0.20),rgba(124,58,237,0.12),transparent)] blur-2xl" />
+      </div>
+
+      <div className="mx-auto w-full max-w-6xl px-6 py-24 sm:py-32">
+        {/* eyebrow — AMERICELL brand mark + AnimatedShinyText inside a
+            crisp frosted glass pill */}
         <Reveal>
           <div className="flex justify-center">
             <div
               className={cn(
-                "group rounded-full border border-white/50 bg-white/60 px-4 py-1.5 text-sm backdrop-blur-md ring-1 ring-white/40",
-                "shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/70",
+                "group inline-flex items-center gap-2.5 rounded-full py-1 pl-1.5 pr-3.5 text-sm",
+                "border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40",
+                "shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]",
+                "transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/70",
               )}
             >
+              {/* small Americell brand mark */}
+              <span className="flex items-center gap-1.5 rounded-full bg-white/70 py-1 pl-1 pr-2.5 ring-1 ring-white/50">
+                <span className="flex h-5 w-5 items-center justify-center rounded-[7px] bg-gradient-to-br from-brand via-brand-2 to-brand-soft shadow-sm ring-1 ring-white/40">
+                  <BrandGlyph className="h-3 w-3 text-white" />
+                </span>
+                <AuroraText className="text-[13px] font-semibold tracking-tight">
+                  {SITE.name}
+                </AuroraText>
+              </span>
+              <span
+                aria-hidden="true"
+                className="h-3.5 w-px bg-foreground/15"
+              />
               <AnimatedShinyText className="inline-flex items-center justify-center text-brand">
                 Αληθινές συσκευές ΗΠΑ, πλήρως απομακρυσμένα
               </AnimatedShinyText>
@@ -336,7 +370,7 @@ export default function Hero() {
 
         {/* headline — the ONLY h1 */}
         <Reveal delay={0.05}>
-          <h1 className="mx-auto mt-5 max-w-4xl text-center text-5xl font-bold leading-[1.05] tracking-tight text-foreground sm:text-7xl lg:text-8xl">
+          <h1 className="mx-auto mt-8 max-w-4xl text-balance text-center text-5xl font-semibold leading-[1.03] tracking-[-0.03em] text-foreground sm:text-7xl lg:text-[6.5rem]">
             Μετατρέπουμε αληθινά τηλέφωνα ΗΠΑ σε μηχανισμό{" "}
             <AuroraText>τηλεχειρισμού</AuroraText>.
           </h1>
@@ -344,7 +378,7 @@ export default function Hero() {
 
         {/* subhead */}
         <Reveal delay={0.1}>
-          <p className="mx-auto mt-6 max-w-2xl text-center text-lg leading-relaxed text-muted-foreground sm:text-xl">
+          <p className="mx-auto mt-7 max-w-2xl text-pretty text-center text-lg leading-relaxed text-muted-foreground sm:text-xl">
             Με το Americell μπορείς να διαχειριστείς, να αυτοματοποιήσεις και να
             ελέγξεις ένα αληθινό τηλέφωνο ΗΠΑ από οπουδήποτε, ανά πάσα στιγμή.
           </p>
@@ -352,7 +386,7 @@ export default function Hero() {
 
         {/* CTAs */}
         <Reveal delay={0.15}>
-          <div className="mt-9 flex flex-col items-center justify-center gap-5 sm:flex-row">
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5">
             <Link href="/signup" className="inline-flex">
               <ShimmerButton
                 background="var(--foreground)"
@@ -375,7 +409,7 @@ export default function Hero() {
 
         {/* the visual: phone + floating tiles + ambient particles */}
         <Reveal delay={0.2}>
-          <div className="relative mt-20 flex justify-center sm:mt-24">
+          <div className="relative mt-24 flex justify-center sm:mt-28">
             <div className="relative">
               {/* ambient particles drifting behind the phone for depth */}
               <Particles
@@ -388,7 +422,10 @@ export default function Hero() {
               {TILES.map((tile) => (
                 <FloatingTile key={tile.name} tile={tile} />
               ))}
-              <PhoneMockup />
+              {/* subtle scroll parallax + idle float (reduced-motion safe) */}
+              <HeroPhoneParallax>
+                <PhoneMockup />
+              </HeroPhoneParallax>
             </div>
           </div>
         </Reveal>

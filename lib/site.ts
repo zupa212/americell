@@ -13,6 +13,7 @@ export const NAV_LINKS: { label: string; href: string }[] = [
   { label: "Πώς λειτουργεί", href: "/#how" },
   { label: "Τιμές", href: "/#pricing" },
   { label: "Πελάτες", href: "/#clients" },
+  { label: "Blog", href: "/blog" },
 ];
 
 // Stylized social-app tiles for the hero's floating-icon cluster.
