@@ -1,19 +1,20 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import {
-  Activity,
+  Boxes,
+  ChevronRight,
   ClipboardList,
-  CreditCard,
   DollarSign,
   Percent,
-  RotateCcw,
-  ShieldCheck,
+  ScrollText,
   Smartphone,
+  Sparkles,
   TrendingUp,
   TriangleAlert,
-  UserRound,
   Users,
   Wallet,
   Zap,
+  type LucideIcon,
 } from "lucide-react";
 
 import {
@@ -39,9 +40,16 @@ import { isDbConfigured } from "@/lib/db";
 import type { ActivityLog } from "@/db/schema";
 import { StatCard } from "@/components/admin/stat-card";
 import { RevenueChart } from "@/components/admin/revenue-chart";
+import OverviewOrders, {
+  type OverviewOrderRow,
+} from "@/components/admin/overview-orders";
+import OverviewActivity, {
+  type ActivityRow,
+} from "@/components/admin/overview-activity";
+import OverviewRefreshButton from "@/components/admin/overview-refresh";
+import LottiePlayer from "@/components/ui/lottie";
 import { AuroraText } from "@/components/ui/aurora-text";
 import Reveal from "@/components/ui/reveal";
-import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 
@@ -52,15 +60,11 @@ export const dynamic = "force-dynamic";
 const glassCard =
   "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
 
-// Small glass chip that hosts a leading glyph in list rows.
-const glassChip =
-  "flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-white/50 bg-white/60 text-brand backdrop-blur-md [&_svg]:h-4 [&_svg]:w-4";
-
 // CellGods order statuses that count as a live rental (§5.4: `pooled` ≈ active).
 const ACTIVE_STATUSES = new Set(["active", "pooled"]);
 
-/** How many orders to surface in the "recent" list. */
-const RECENT_LIMIT = 8;
+/** How many orders to surface in the "recent" table. */
+const RECENT_LIMIT = 10;
 
 /** How many audit-log entries to surface in the activity feed. */
 const LOG_LIMIT = 8;
@@ -109,67 +113,6 @@ function messageForStatus(status: number): string {
   }
 }
 
-type BadgeVariant = "default" | "secondary" | "outline";
-
-/** Order status → label + Badge variant. */
-function orderStatusBadge(status: string): { label: string; variant: BadgeVariant } {
-  switch (status) {
-    case "active":
-    case "pooled":
-      return { label: "active", variant: "default" };
-    case "expired":
-      return { label: "expired", variant: "outline" };
-    case "deactivated":
-      return { label: "cancelled", variant: "outline" };
-    default:
-      return { label: status, variant: "secondary" };
-  }
-}
-
-/** Actor type → label + Badge variant for the activity feed. */
-function actorTypeBadge(actorType: string): { label: string; variant: BadgeVariant } {
-  switch (actorType) {
-    case "admin":
-      return { label: "Admin", variant: "default" };
-    case "customer":
-      return { label: "Customer", variant: "secondary" };
-    case "system":
-      return { label: "System", variant: "outline" };
-    default:
-      return { label: actorType, variant: "secondary" };
-  }
-}
-
-/** Audit-log action → label (naming convention from lib/logs.ts). */
-const ACTION_LABELS: Record<string, string> = {
-  "customer.signup": "New customer signup",
-  "customer.login": "Customer login",
-  "checkout.started": "Checkout started",
-  "rental.activated": "Rental activated",
-  "rental.refunded": "Refund issued",
-  "rental.pending_credit": "Credit pending",
-  "rental.cancelled": "Rental cancelled",
-  "admin.activate": "Activated by admin",
-  "admin.deactivate": "Deactivated by admin",
-  "admin.topup": "Credit top-up",
-  "admin.auto_topup": "Automatic credit top-up",
-};
-
-function actionLabel(action: string): string {
-  return ACTION_LABELS[action] ?? action;
-}
-
-/** Pick a leading glyph for an audit-log row from its action namespace. */
-function logIcon(action: string): ReactNode {
-  if (action.startsWith("admin.")) return <ShieldCheck />;
-  if (action === "customer.signup" || action === "customer.login")
-    return <UserRound />;
-  if (action === "checkout.started") return <CreditCard />;
-  if (action === "rental.refunded") return <RotateCcw />;
-  if (action.startsWith("rental.")) return <Smartphone />;
-  return <Activity />;
-}
-
 /** Safely read a finite number out of an unknown jsonb metadata blob. */
 function metaNumber(metadata: unknown, key: string): number | null {
   if (metadata && typeof metadata === "object" && key in metadata) {
@@ -177,31 +120,6 @@ function metaNumber(metadata: unknown, key: string): number | null {
     if (typeof value === "number" && Number.isFinite(value)) return value;
   }
   return null;
-}
-
-/** Format an ISO timestamp for display (server-rendered, no hydration). */
-function fmtDate(iso: string): string {
-  const t = Date.parse(iso);
-  if (Number.isNaN(t)) return "—";
-  return new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(t);
-}
-
-/** Compact relative time ("5 minutes ago"), computed at render. */
-function fmtRelative(value: Date): string {
-  const t = value.getTime();
-  if (Number.isNaN(t)) return "—";
-  const diffSec = Math.round((t - Date.now()) / 1000);
-  const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
-  const abs = Math.abs(diffSec);
-  if (abs < 60) return rtf.format(diffSec, "second");
-  if (abs < 3600) return rtf.format(Math.round(diffSec / 60), "minute");
-  if (abs < 86400) return rtf.format(Math.round(diffSec / 3600), "hour");
-  if (abs < 2592000) return rtf.format(Math.round(diffSec / 86400), "day");
-  if (abs < 31536000) return rtf.format(Math.round(diffSec / 2592000), "month");
-  return rtf.format(Math.round(diffSec / 31536000), "year");
 }
 
 const num = (n: number) => n.toLocaleString("en-US");
@@ -275,27 +193,28 @@ async function loadDb(): Promise<{ configured: boolean; data: DbData }> {
 // Presentational fragments
 // ---------------------------------------------------------------------------
 
-function OverviewHeader() {
-  return (
-    <div>
-      <p className="text-sm font-medium text-muted-foreground">
-        Admin dashboard
-      </p>
-      <h1 className="mt-1 text-3xl font-semibold tracking-tight sm:text-4xl">
-        <AuroraText>Overview</AuroraText>
-      </h1>
-      <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-        Live view of credit, revenue, rentals and activity — the full AMERICELL
-        cockpit.
-      </p>
-    </div>
-  );
-}
-
-function SectionHeading({ title, aside }: { title: string; aside?: ReactNode }) {
+function SectionHeading({
+  title,
+  icon: Icon,
+  aside,
+}: {
+  title: string;
+  icon?: LucideIcon;
+  aside?: ReactNode;
+}) {
   return (
     <div className="mb-3 flex items-center justify-between gap-3">
-      <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+      <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+        {Icon ? (
+          <span
+            aria-hidden="true"
+            className="grid h-7 w-7 place-items-center rounded-xl bg-gradient-to-br from-brand/15 to-brand-2/15 text-brand ring-1 ring-white/50"
+          >
+            <Icon className="h-4 w-4" />
+          </span>
+        ) : null}
+        {title}
+      </h2>
       {aside ? (
         <span className="text-sm text-muted-foreground">{aside}</span>
       ) : null}
@@ -303,7 +222,13 @@ function SectionHeading({ title, aside }: { title: string; aside?: ReactNode }) 
   );
 }
 
-function InlineNotice({ message }: { message: string }) {
+function InlineNotice({
+  title = "Could not load data",
+  message,
+}: {
+  title?: string;
+  message: string;
+}) {
   return (
     <div className={cn("flex items-start gap-3 p-5", glassCard)}>
       <TriangleAlert
@@ -311,12 +236,67 @@ function InlineNotice({ message }: { message: string }) {
         aria-hidden="true"
       />
       <div>
-        <p className="font-medium text-foreground">
-          Could not load data
-        </p>
+        <p className="font-medium text-foreground">{title}</p>
         <p className="mt-1 text-sm text-muted-foreground">{message}</p>
       </div>
     </div>
+  );
+}
+
+/** A glass quick-action link tile used in the "Quick actions" row. */
+function QuickAction({
+  href,
+  icon: Icon,
+  label,
+  desc,
+  primary = false,
+}: {
+  href: string;
+  icon: LucideIcon;
+  label: string;
+  desc: string;
+  primary?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "group flex items-center gap-3 rounded-2xl border p-4 outline-none transition-all duration-200 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background",
+        primary
+          ? "border-white/30 bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-white shadow-[0_14px_44px_-16px_rgba(43,107,255,0.6)] ring-1 ring-white/30 hover:shadow-[0_20px_60px_-18px_rgba(43,107,255,0.7)]"
+          : "border-white/50 bg-white/60 text-foreground ring-1 ring-white/40 backdrop-blur-md hover:bg-white/75",
+      )}
+    >
+      <span
+        aria-hidden="true"
+        className={cn(
+          "grid h-10 w-10 shrink-0 place-items-center rounded-xl [&_svg]:h-5 [&_svg]:w-5",
+          primary
+            ? "bg-white/20 text-white ring-1 ring-white/30"
+            : "bg-gradient-to-br from-brand/15 to-brand-2/15 text-brand ring-1 ring-white/50",
+        )}
+      >
+        <Icon />
+      </span>
+      <div className="min-w-0">
+        <p className="text-sm font-semibold">{label}</p>
+        <p
+          className={cn(
+            "truncate text-xs",
+            primary ? "text-white/80" : "text-muted-foreground",
+          )}
+        >
+          {desc}
+        </p>
+      </div>
+      <ChevronRight
+        aria-hidden="true"
+        className={cn(
+          "ml-auto h-4 w-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5",
+          primary ? "text-white/80" : "text-muted-foreground",
+        )}
+      />
+    </Link>
   );
 }
 
@@ -330,6 +310,7 @@ export default async function AdminOverviewPage() {
   const cg = cgResult.ok ? cgResult.data : null;
   const { kpis, logs, revenue } = dbResult.data;
   const dbConfigured = dbResult.configured;
+  const generatedAt = new Date().toISOString();
 
   const currency = cg?.balance.currency || "usd";
 
@@ -337,13 +318,12 @@ export default async function AdminOverviewPage() {
   let activeOrders: Order[] = [];
   let availableCount = 0;
   let marginCents = 0;
-  let recent: Order[] = [];
-  let byPhoneId = new Map<string, InventoryPhone>();
+  let orderRows: OverviewOrderRow[] = [];
   let isLowCredit = false;
   let lowThresholdCents = LOW_CREDIT_FLOOR_CENTS;
 
   if (cg) {
-    byPhoneId = new Map(cg.inventory.map((p) => [p.phone_id, p]));
+    const byPhoneId = new Map(cg.inventory.map((p) => [p.phone_id, p]));
     activeOrders = cg.orders.filter((o) => ACTIVE_STATUSES.has(o.status));
     availableCount = cg.inventory.filter((p) => p.status === "available").length;
 
@@ -361,10 +341,18 @@ export default async function AdminOverviewPage() {
     marginCents = retailSum - wholesaleSum;
 
     // "Recent" proxy: CellGods orders carry no created_at, so order by expiry
-    // (latest-expiring ≈ most-recently activated) and take the top N.
-    recent = [...cg.orders]
+    // (latest-expiring ≈ most-recently activated) and take the top N. Mapped to a
+    // lean, serializable shape for the client table.
+    orderRows = [...cg.orders]
       .sort((a, b) => Date.parse(b.expires_at) - Date.parse(a.expires_at))
-      .slice(0, RECENT_LIMIT);
+      .slice(0, RECENT_LIMIT)
+      .map((order) => ({
+        orderId: order.order_id,
+        model: byPhoneId.get(order.phone_id)?.model ?? order.phone_id,
+        customerEmail: order.customer_email,
+        status: order.status,
+        expiresAt: order.expires_at,
+      }));
 
     // Low-credit signal: warn below the operator's auto-topup threshold if set,
     // otherwise below a sane floor.
@@ -375,12 +363,61 @@ export default async function AdminOverviewPage() {
     isLowCredit = cg.balance.credit_balance_cents < lowThresholdCents;
   }
 
+  // Audit-log rows → lean, serializable shape (amount pre-resolved for top-ups).
+  const activityRows: ActivityRow[] = logs.map((log) => ({
+    id: log.id,
+    action: log.action,
+    actorType: log.actorType,
+    actorEmail: log.actorEmail,
+    createdAt: log.createdAt.toISOString(),
+    amountCents:
+      log.action === "admin.topup" || log.action === "admin.auto_topup"
+        ? metaNumber(log.metadata, "amount_cents")
+        : null,
+  }));
+
   const showRevenueChart = dbConfigured && revenue.length > 0;
+  const totalOrders = cg?.orders.length ?? 0;
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
+    <div className="mx-auto w-full max-w-7xl px-1 py-4 sm:px-3 sm:py-6">
+      {/* ── Header ──────────────────────────────────────────────────────── */}
       <Reveal>
-        <OverviewHeader />
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/60 px-2.5 py-1 text-xs font-medium text-muted-foreground ring-1 ring-white/40 backdrop-blur-md">
+                <LottiePlayer src="/lottie/pulse.json" className="h-4 w-4" />
+                Live cockpit
+              </span>
+            </div>
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+              <AuroraText>Overview</AuroraText>
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+              Live view of credit, revenue, rentals and activity — the full
+              AMERICELL cockpit.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <OverviewRefreshButton generatedAt={generatedAt} />
+            <Link
+              href="/admin/inventory"
+              className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/50 bg-white/60 px-3 text-sm font-medium text-foreground backdrop-blur-md transition-colors hover:bg-white/75 [&_svg]:h-4 [&_svg]:w-4"
+            >
+              <Boxes />
+              Inventory
+            </Link>
+            <Link
+              href="/admin/billing"
+              className="inline-flex h-9 items-center gap-2 rounded-lg border border-white/30 bg-gradient-to-r from-brand via-brand-2 to-brand-soft px-3 text-sm font-medium text-white shadow-[0_10px_30px_-12px_rgba(43,107,255,0.6)] ring-1 ring-white/30 transition-all hover:opacity-95 [&_svg]:h-4 [&_svg]:w-4"
+            >
+              <Wallet />
+              Top up
+            </Link>
+          </div>
+        </div>
       </Reveal>
 
       {/* Prominent operational alert: low reseller credit blocks activations. */}
@@ -388,19 +425,34 @@ export default async function AdminOverviewPage() {
         <Reveal delay={0.03}>
           <Alert
             variant="destructive"
-            className="mt-6 items-center rounded-2xl border-red-300/60 bg-red-50/70 px-4 py-3 shadow-[0_10px_40px_-12px_rgba(190,30,45,0.28)] ring-1 ring-red-200/50 backdrop-blur-xl"
+            className="mt-6 rounded-3xl border-red-300/60 bg-red-50/70 p-4 shadow-[0_10px_40px_-12px_rgba(190,30,45,0.28)] ring-1 ring-red-200/50 backdrop-blur-xl"
           >
-            <TriangleAlert />
-            <AlertTitle>Low credit balance</AlertTitle>
-            <AlertDescription>
-              Balance{" "}
-              <strong className="text-destructive">
-                {fmtMoney(cg.balance.credit_balance_cents, currency)}
-              </strong>{" "}
-              dropped below the {fmtMoney(lowThresholdCents, currency)} threshold.
-              New activations may fail —{" "}
-              <a href="/admin/billing">add credit</a>.
-            </AlertDescription>
+            <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+              <span
+                aria-hidden="true"
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-red-100/70 ring-1 ring-red-200/60"
+              >
+                <LottiePlayer src="/lottie/pulse.json" className="h-9 w-9" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <AlertTitle>Low credit balance</AlertTitle>
+                <AlertDescription>
+                  Balance{" "}
+                  <strong className="text-destructive">
+                    {fmtMoney(cg.balance.credit_balance_cents, currency)}
+                  </strong>{" "}
+                  dropped below the {fmtMoney(lowThresholdCents, currency)}{" "}
+                  threshold. New activations may fail until you add credit.
+                </AlertDescription>
+              </div>
+              <Link
+                href="/admin/billing"
+                className="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-red-300/60 bg-white/70 px-3 text-sm font-medium text-destructive backdrop-blur-md transition-colors hover:bg-white/90 [&_svg]:h-4 [&_svg]:w-4"
+              >
+                <Wallet />
+                Top up now
+              </Link>
+            </div>
           </Alert>
         </Reveal>
       ) : null}
@@ -410,6 +462,7 @@ export default async function AdminOverviewPage() {
         <section className="mt-8">
           <SectionHeading
             title="Live CellGods data"
+            icon={Zap}
             aside={
               cg
                 ? cg.balance.auto_topup.enabled
@@ -420,17 +473,36 @@ export default async function AdminOverviewPage() {
           />
           {cg ? (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {/* Hero: credit balance, with a subtle Lottie pulse + top-up CTA. */}
               <StatCard
+                size="lg"
+                className="sm:col-span-2"
                 label="Credit balance"
                 value={fmtMoney(cg.balance.credit_balance_cents, currency)}
+                tone={isLowCredit ? "warning" : "default"}
+                icon={<Wallet />}
+                accent={
+                  <LottiePlayer
+                    src="/lottie/pulse.json"
+                    className="h-28 w-28"
+                  />
+                }
                 sub={
                   isLowCredit
-                    ? "below threshold"
+                    ? `below ${fmtMoney(lowThresholdCents, currency)} threshold`
                     : cg.balance.auto_topup.enabled
-                      ? "auto top-up on"
-                      : undefined
+                      ? `auto top-up at ${fmtMoney(lowThresholdCents, currency)}`
+                      : "auto top-up off"
                 }
-                icon={<Wallet />}
+                footer={
+                  <Link
+                    href="/admin/billing"
+                    className="inline-flex items-center gap-1 text-sm font-medium text-brand transition-colors hover:text-brand-2"
+                  >
+                    Manage billing
+                    <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                  </Link>
+                }
               />
               <StatCard
                 label="Active orders"
@@ -448,6 +520,7 @@ export default async function AdminOverviewPage() {
                 label="Estimated margin"
                 value={fmtMoney(marginCents, currency)}
                 sub="estimate / month"
+                tone={marginCents > 0 ? "positive" : "default"}
                 icon={<TrendingUp />}
               />
             </div>
@@ -462,9 +535,8 @@ export default async function AdminOverviewPage() {
         <section className="mt-10">
           <SectionHeading
             title="Business metrics"
-            aside={
-              dbConfigured ? `${num(kpis.totalRentals)} rentals` : undefined
-            }
+            icon={TrendingUp}
+            aside={dbConfigured ? `${num(kpis.totalRentals)} rentals` : undefined}
           />
           {dbConfigured ? (
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -473,11 +545,15 @@ export default async function AdminOverviewPage() {
                 value={fmtMoney(kpis.revenueCents, currency)}
                 sub="active book"
                 icon={<DollarSign />}
+                accent={
+                  <LottiePlayer src="/lottie/pulse.json" className="h-24 w-24" />
+                }
               />
               <StatCard
                 label="Gross margin"
                 value={fmtMoney(kpis.grossMarginCents, currency)}
                 sub="retail − wholesale"
+                tone={kpis.grossMarginCents > 0 ? "positive" : "default"}
                 icon={<Percent />}
               />
               <StatCard
@@ -494,21 +570,10 @@ export default async function AdminOverviewPage() {
               />
             </div>
           ) : (
-            <div className={cn("flex items-start gap-3 p-5", glassCard)}>
-              <TriangleAlert
-                className="mt-0.5 h-5 w-5 shrink-0 text-amber-600"
-                aria-hidden="true"
-              />
-              <div>
-                <p className="font-medium text-foreground">
-                  The database is not configured
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Add DATABASE_URL for revenue, margin, rentals, customers and
-                  activity history.
-                </p>
-              </div>
-            </div>
+            <InlineNotice
+              title="The database is not configured"
+              message="Add DATABASE_URL for revenue, margin, rentals, customers and activity history."
+            />
           )}
         </section>
       </Reveal>
@@ -519,11 +584,11 @@ export default async function AdminOverviewPage() {
           <section className="mt-10">
             <SectionHeading
               title="Revenue"
+              icon={DollarSign}
               aside={`last ${num(REVENUE_DAYS)} days`}
             />
-            <div className={cn("p-4 sm:p-6", glassCard)}>
-              <RevenueChart data={revenue} currency={currency} />
-            </div>
+            {/* RevenueChart renders its own glass surface — no double wrapper. */}
+            <RevenueChart data={revenue} currency={currency} />
           </section>
         </Reveal>
       ) : null}
@@ -531,116 +596,56 @@ export default async function AdminOverviewPage() {
       {/* ── Recent orders + activity feed ───────────────────────────────── */}
       <Reveal delay={0.16}>
         <section className="mt-10 grid gap-6 lg:grid-cols-2">
-          {/* Recent CellGods orders */}
-          <div>
-            <SectionHeading
+          {cg ? (
+            <OverviewOrders rows={orderRows} total={totalOrders} />
+          ) : (
+            <InlineNotice
               title="Recent orders"
-              aside={cg ? `${num(cg.orders.length)} total` : undefined}
+              message={cgResult.ok ? "" : cgResult.message}
             />
-            <div className={cn("overflow-hidden", glassCard)}>
-              {!cg ? (
-                <p className="p-6 text-sm text-muted-foreground">
-                  {cgResult.ok ? "" : cgResult.message}
-                </p>
-              ) : recent.length === 0 ? (
-                <p className="p-6 text-sm text-muted-foreground">
-                  No orders yet.
-                </p>
-              ) : (
-                <ul className="divide-y divide-white/40">
-                  {recent.map((order) => {
-                    const item = byPhoneId.get(order.phone_id);
-                    const badge = orderStatusBadge(order.status);
-                    return (
-                      <li
-                        key={order.order_id}
-                        className="flex flex-wrap items-center gap-3 px-5 py-3.5"
-                      >
-                        <span aria-hidden="true" className={glassChip}>
-                          <Smartphone />
-                        </span>
-                        <div className="min-w-0">
-                          <p className="truncate font-medium text-foreground">
-                            {item?.model ?? order.phone_id}
-                          </p>
-                          <p className="truncate text-xs text-muted-foreground">
-                            {order.customer_email}
-                          </p>
-                        </div>
-                        <div className="ml-auto flex items-center gap-3">
-                          <span className="hidden text-xs text-muted-foreground sm:inline">
-                            Expires {fmtDate(order.expires_at)}
-                          </span>
-                          <Badge variant={badge.variant}>{badge.label}</Badge>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
-          </div>
+          )}
 
-          {/* Activity feed (audit log) */}
-          <div>
-            <SectionHeading
+          {dbConfigured ? (
+            <OverviewActivity rows={activityRows} currency={currency} />
+          ) : (
+            <InlineNotice
               title="Recent activity"
-              aside={
-                dbConfigured && logs.length > 0 ? `${num(logs.length)}` : undefined
-              }
+              message="A database connection is required for activity history."
             />
-            <div className={cn("overflow-hidden", glassCard)}>
-              {!dbConfigured ? (
-                <p className="p-6 text-sm text-muted-foreground">
-                  A database connection is required for activity history.
-                </p>
-              ) : logs.length === 0 ? (
-                <p className="p-6 text-sm text-muted-foreground">
-                  No activity yet.
-                </p>
-              ) : (
-                <ul className="divide-y divide-white/40">
-                  {logs.map((log) => {
-                    const badge = actorTypeBadge(log.actorType);
-                    const amount =
-                      log.action === "admin.topup" ||
-                      log.action === "admin.auto_topup"
-                        ? metaNumber(log.metadata, "amount_cents")
-                        : null;
-                    return (
-                      <li
-                        key={log.id}
-                        className="flex flex-wrap items-center gap-3 px-5 py-3.5"
-                      >
-                        <span aria-hidden="true" className={glassChip}>
-                          {logIcon(log.action)}
-                        </span>
-                        <div className="min-w-0">
-                          <p className="truncate font-medium text-foreground">
-                            {actionLabel(log.action)}
-                          </p>
-                          <p className="truncate text-xs text-muted-foreground">
-                            {log.actorEmail ?? "system"}
-                            {amount !== null
-                              ? ` · ${fmtMoney(amount, currency)}`
-                              : ""}
-                          </p>
-                        </div>
-                        <div className="ml-auto flex items-center gap-3">
-                          <span
-                            className="hidden text-xs text-muted-foreground sm:inline"
-                            title={fmtDate(log.createdAt.toISOString())}
-                          >
-                            {fmtRelative(log.createdAt)}
-                          </span>
-                          <Badge variant={badge.variant}>{badge.label}</Badge>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
+          )}
+        </section>
+      </Reveal>
+
+      {/* ── Quick actions ───────────────────────────────────────────────── */}
+      <Reveal delay={0.19}>
+        <section className="mt-10">
+          <SectionHeading title="Quick actions" icon={Sparkles} />
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <QuickAction
+              href="/admin/billing"
+              icon={Wallet}
+              label="Top up credit"
+              desc="Add reseller balance"
+              primary
+            />
+            <QuickAction
+              href="/admin/inventory"
+              icon={Boxes}
+              label="Inventory"
+              desc="Devices & availability"
+            />
+            <QuickAction
+              href="/admin/rentals"
+              icon={Smartphone}
+              label="Rentals"
+              desc="Active device sessions"
+            />
+            <QuickAction
+              href="/admin/logs"
+              icon={ScrollText}
+              label="Audit logs"
+              desc="Full activity trail"
+            />
           </div>
         </section>
       </Reveal>

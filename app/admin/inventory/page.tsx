@@ -1,3 +1,5 @@
+import { Database, TriangleAlert } from "lucide-react";
+
 import { requireAdminPage } from "@/lib/admin";
 import {
   getInventory,
@@ -9,8 +11,8 @@ import InventoryTable, {
   type InventoryRow,
 } from "@/components/admin/inventory-table";
 import { AuroraText } from "@/components/ui/aurora-text";
-import Reveal from "@/components/ui/reveal";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import Reveal from "@/components/ui/reveal";
 import { cn } from "@/lib/utils";
 
 /**
@@ -26,8 +28,9 @@ import { cn } from "@/lib/utils";
  */
 export const dynamic = "force-dynamic";
 
-// Frosted-glass surface — floats over the global aurora (SiteBackground).
-const GLASS =
+// Frosted-glass surface — floats over the global aurora (SiteBackground). Matches
+// the rest of the cockpit.
+const glassCard =
   "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
 
 /** Project a raw inventory phone to the admin table row (retail estimate = checkout math). */
@@ -65,43 +68,57 @@ export default async function AdminInventoryPage() {
     }
   }
 
+  // Snapshot time for the table's live "updated ago" indicator (per-request).
+  const generatedAt = new Date().toISOString();
+
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-      <Reveal className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-muted-foreground">
-          Admin dashboard
-        </p>
-        <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
+    <div className="flex flex-col gap-6">
+      <Reveal>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
           <AuroraText>Inventory</AuroraText>
         </h1>
-        <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+        <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">
           Live CellGods inventory with wholesale price and estimated retail.
-          Activate an available device for a customer.
+          Search, filter, and activate an available device for a customer.
         </p>
       </Reveal>
 
-      <Reveal delay={0.08} className="mt-10">
-        {state === "unconfigured" ? (
-          <Alert>
+      {state === "unconfigured" ? (
+        <Reveal delay={0.05}>
+          <Alert className={cn("border-white/50 bg-white/60 backdrop-blur-md")}>
+            <Database className="h-4 w-4" aria-hidden="true" />
             <AlertTitle>Demo mode</AlertTitle>
             <AlertDescription>
               The CellGods API isn&apos;t configured yet, so there&apos;s no live
-              inventory to show.
+              inventory to show. Add the API credentials to the environment to
+              see devices here.
             </AlertDescription>
           </Alert>
-        ) : state === "error" ? (
-          <Alert variant="destructive">
+        </Reveal>
+      ) : state === "error" ? (
+        <Reveal delay={0.05}>
+          <Alert
+            variant="destructive"
+            className={cn("border-white/50 bg-white/60 backdrop-blur-md")}
+          >
+            <TriangleAlert className="h-4 w-4" aria-hidden="true" />
             <AlertTitle>Failed to load</AlertTitle>
             <AlertDescription>
               Couldn&apos;t load inventory. Refresh the page and try again.
             </AlertDescription>
           </Alert>
-        ) : (
-          <div className={cn(GLASS, "p-1.5 sm:p-2")}>
-            <InventoryTable rows={rows} durations={DURATIONS} />
+        </Reveal>
+      ) : (
+        <Reveal delay={0.05}>
+          <div className={cn("overflow-hidden", glassCard)}>
+            <InventoryTable
+              rows={rows}
+              durations={DURATIONS}
+              generatedAt={generatedAt}
+            />
           </div>
-        )}
-      </Reveal>
-    </main>
+        </Reveal>
+      )}
+    </div>
   );
 }

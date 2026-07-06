@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
-import AdminNav from "@/components/admin/admin-nav";
+import AdminSidebar, { AdminTopbar } from "@/components/admin/admin-sidebar";
 import { Particles } from "@/components/ui/particles";
 import { requireAdminPage } from "@/lib/admin";
 
@@ -17,9 +17,11 @@ export const metadata: Metadata = {
  *
  * The gate runs here for every `/admin/*` page: anonymous visitors are sent to
  * `/login`, signed-in non-owners get a 404 (existence not leaked), owners fall
- * through. Renders the glass chrome (sticky AdminNav) + ambient particles over
- * the global aurora. Route handlers under `/api/admin/*` do NOT inherit this —
- * each must call `requireAdmin()` itself.
+ * through. Renders the edge-to-edge glass dashboard shell — a fixed glass
+ * sidebar on the left (md+), a slim glass topbar (mobile menu trigger + page
+ * context + owner email), and a wide glass main area — all floating on the
+ * global `<SiteBackground/>` aurora. Route handlers under `/api/admin/*` do NOT
+ * inherit this gate — each must call `requireAdmin()` itself.
  */
 export default async function AdminLayout({
   children,
@@ -30,19 +32,27 @@ export default async function AdminLayout({
 
   return (
     <div className="relative min-h-screen">
-      <AdminNav email={email} />
+      {/* Fixed glass rail (md+); on mobile it lives in the topbar's Sheet. */}
+      <AdminSidebar email={email} />
 
-      <main className="relative mx-auto w-full max-w-6xl px-6 py-10">
-        {/* Ambient particles drifting behind the glass for depth. */}
-        <Particles
-          className="pointer-events-none absolute inset-0 -z-[1]"
-          quantity={40}
-          ease={80}
-          color="#2b6bff"
-          staticity={60}
-        />
-        {children}
-      </main>
+      {/* Content column, offset by the sidebar width on md+. */}
+      <div className="relative flex min-h-screen flex-col md:pl-72">
+        <AdminTopbar email={email} />
+
+        <main className="relative flex-1 px-3 pt-3 pb-6 md:px-4">
+          {/* Ambient particles drifting behind the glass for depth. */}
+          <Particles
+            className="pointer-events-none absolute inset-0 -z-[1]"
+            quantity={40}
+            ease={80}
+            color="#2b6bff"
+            staticity={60}
+          />
+          <div className="mx-auto w-full max-w-7xl rounded-3xl border border-white/40 bg-white/40 p-4 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.12)] ring-1 ring-white/30 backdrop-blur-md md:p-6">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

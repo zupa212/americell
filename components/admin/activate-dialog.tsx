@@ -8,7 +8,7 @@ import {
   Copy,
   ExternalLink,
   KeyRound,
-  Loader2,
+  Smartphone,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -22,7 +22,15 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import LottiePlayer from "@/components/ui/lottie";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { fmtMoney } from "@/lib/money";
 import { cn } from "@/lib/utils";
 // Type-only imports from a `server-only` module — erased at build, never bundled.
@@ -59,6 +67,10 @@ type ActivateDialogProps = {
   onClose: () => void;
 };
 
+// Frosted-glass surface recipe — matches the rest of the cockpit.
+const GLASS_PANEL =
+  "rounded-2xl border border-white/50 bg-white/50 ring-1 ring-white/40 backdrop-blur-md";
+
 /**
  * ActivateDialog — admin manual activation (RESELLER_PLAN §6.4).
  *
@@ -67,7 +79,8 @@ type ActivateDialogProps = {
  * owner-only proxy. On success it surfaces the minted `order_id` / PIN /
  * `stream_url` / `charged_cents` / new balance and the 4h token warning, then
  * `router.refresh()`es the inventory once the dialog closes so the now-reserved
- * phone drops out of the available list.
+ * phone drops out of the available list. Now full-glass with a Lottie loader
+ * while the activation is in flight — all data flow is unchanged.
  */
 export default function ActivateDialog({
   phone,
@@ -129,9 +142,7 @@ export default function ActivateDialog({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(
-          (data as { error?: string }).error ?? "Server error",
-        );
+        setError((data as { error?: string }).error ?? "Server error");
         return;
       }
       setResult(data as ActivateResult);
@@ -156,12 +167,26 @@ export default function ActivateDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        className={cn(
+          "gap-5 rounded-3xl border-white/50 bg-white/70 ring-white/40 shadow-[0_20px_70px_-20px_rgba(30,41,120,0.35)] backdrop-blur-2xl sm:max-w-md",
+          "dark:border-white/10 dark:bg-slate-900/80 dark:ring-white/10",
+        )}
+      >
         {result ? (
-          <>
+          <TooltipProvider delay={200}>
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <CheckCircle2 className="size-5 text-emerald-500" aria-hidden />
+              <DialogTitle className="flex items-center gap-2 text-base">
+                <span className="relative inline-flex">
+                  <LottiePlayer
+                    src="/lottie/pulse.json"
+                    className="absolute -inset-1.5 opacity-70"
+                  />
+                  <CheckCircle2
+                    className="relative size-5 text-emerald-500"
+                    aria-hidden
+                  />
+                </span>
                 Activated
               </DialogTitle>
               <DialogDescription>
@@ -174,9 +199,7 @@ export default function ActivateDialog({
                 <span className="font-mono text-xs break-all">
                   {result.order_id}
                 </span>
-                <CopyButton
-                  onClick={() => copy(result.order_id, "Order ID")}
-                />
+                <CopyButton onClick={() => copy(result.order_id, "Order ID")} />
               </ResultRow>
 
               <ResultRow label="PIN">
@@ -197,48 +220,59 @@ export default function ActivateDialog({
                   Open stream
                   <ExternalLink className="size-3.5" aria-hidden />
                 </a>
-                <CopyButton
-                  onClick={() => copy(result.stream_url, "Link")}
-                />
+                <CopyButton onClick={() => copy(result.stream_url, "Link")} />
               </ResultRow>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl border border-border/60 bg-muted/40 p-3">
+                <div className={cn("p-3", GLASS_PANEL)}>
                   <p className="text-xs text-muted-foreground">Charged</p>
-                  <p className="mt-0.5 text-sm font-semibold">
+                  <p className="mt-0.5 text-sm font-semibold text-foreground">
                     {fmtMoney(result.charged_cents, result.currency)}
                   </p>
                 </div>
-                <div className="rounded-xl border border-border/60 bg-muted/40 p-3">
+                <div className={cn("p-3", GLASS_PANEL)}>
                   <p className="text-xs text-muted-foreground">New balance</p>
-                  <p className="mt-0.5 text-sm font-semibold">
+                  <p className="mt-0.5 text-sm font-semibold text-foreground">
                     {fmtMoney(result.credit_balance_cents, result.currency)}
                   </p>
                 </div>
               </div>
 
-              <p className="inline-flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-3 py-2 text-xs font-medium text-amber-600 dark:text-amber-400">
-                <Clock className="size-3.5" aria-hidden />
-                The link expires in 4 hours — after that, re-enter the PIN for a new link.
+              <p className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500/10 px-3 py-2 text-xs font-medium text-amber-600 ring-1 ring-amber-500/20 dark:text-amber-400">
+                <Clock className="size-3.5 shrink-0" aria-hidden />
+                The link expires in 4 hours — after that, re-enter the PIN for a
+                new link.
               </p>
 
               <Button
                 type="button"
-                className="mt-1 w-full"
+                className="mt-1 w-full bg-gradient-to-r from-brand to-brand-2 text-white hover:opacity-90"
                 onClick={() => handleOpenChange(false)}
               >
-                Close
+                Done
               </Button>
             </div>
-          </>
+          </TooltipProvider>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <DialogHeader>
-              <DialogTitle>Activate device</DialogTitle>
+              <DialogTitle className="flex items-center gap-2 text-base">
+                <span
+                  className={cn(
+                    "flex size-8 items-center justify-center rounded-xl text-brand",
+                    GLASS_PANEL,
+                  )}
+                >
+                  <Smartphone className="size-4" aria-hidden />
+                </span>
+                Activate device
+              </DialogTitle>
               <DialogDescription>
                 {phone?.model} — create a rental for a customer.
               </DialogDescription>
             </DialogHeader>
+
+            <Separator className="bg-white/50" />
 
             <div className="flex flex-col gap-2">
               <Label htmlFor="activate-email">Customer email</Label>
@@ -251,6 +285,7 @@ export default function ActivateDialog({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={pending}
+                className="border-white/50 bg-white/50 ring-1 ring-white/30 backdrop-blur-md"
               />
             </div>
 
@@ -260,7 +295,7 @@ export default function ActivateDialog({
                 value={period}
                 onValueChange={(v) => selectPeriod(v as BillingPeriod)}
               >
-                <TabsList className="w-full">
+                <TabsList className="w-full border border-white/50 bg-white/40 ring-1 ring-white/30 backdrop-blur-md">
                   {durations.map((d) => (
                     <TabsTrigger
                       key={d.period}
@@ -286,13 +321,14 @@ export default function ActivateDialog({
                 value={days}
                 onChange={(e) => setDays(Math.floor(Number(e.target.value)))}
                 disabled={pending}
+                className="border-white/50 bg-white/50 ring-1 ring-white/30 backdrop-blur-md"
               />
             </div>
 
             {error && (
               <p
                 role="alert"
-                className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive"
+                className="rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive ring-1 ring-destructive/20"
               >
                 {error}
               </p>
@@ -304,13 +340,21 @@ export default function ActivateDialog({
                 variant="outline"
                 onClick={() => handleOpenChange(false)}
                 disabled={pending}
+                className="border-white/50 bg-white/50 backdrop-blur-md hover:bg-white/70"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={!canSubmit}>
+              <Button
+                type="submit"
+                disabled={!canSubmit}
+                className="gap-2 bg-gradient-to-r from-brand to-brand-2 text-white hover:opacity-90"
+              >
                 {pending ? (
                   <>
-                    <Loader2 className="size-4 animate-spin" aria-hidden />
+                    <LottiePlayer
+                      src="/lottie/loader.json"
+                      className="size-4"
+                    />
                     Activating…
                   </>
                 ) : (
@@ -333,7 +377,7 @@ function ResultRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-1 rounded-xl border border-border/60 bg-muted/30 p-3">
+    <div className={cn("flex flex-col gap-1 p-3", GLASS_PANEL)}>
       <p className="text-xs text-muted-foreground">{label}</p>
       <div className="flex items-center justify-between gap-3">{children}</div>
     </div>
@@ -342,15 +386,22 @@ function ResultRow({
 
 function CopyButton({ onClick }: { onClick: () => void }) {
   return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="icon-sm"
-      onClick={onClick}
-      aria-label="Copy"
-      className={cn("shrink-0 text-muted-foreground hover:text-foreground")}
-    >
-      <Copy className="size-4" aria-hidden />
-    </Button>
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            onClick={onClick}
+            aria-label="Copy"
+            className={cn("shrink-0 text-muted-foreground hover:text-foreground")}
+          />
+        }
+      >
+        <Copy className="size-4" aria-hidden />
+      </TooltipTrigger>
+      <TooltipContent>Copy</TooltipContent>
+    </Tooltip>
   );
 }

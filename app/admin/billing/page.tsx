@@ -1,4 +1,12 @@
-import { Wallet, Settings2, TriangleAlert, ReceiptText } from "lucide-react";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  ReceiptText,
+  Repeat,
+  Settings2,
+  TriangleAlert,
+  Wallet,
+} from "lucide-react";
 
 import { requireAdminPage } from "@/lib/admin";
 import {
@@ -15,6 +23,7 @@ import Reveal from "@/components/ui/reveal";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { ShineBorder } from "@/components/ui/shine-border";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -23,6 +32,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import LottiePlayer from "@/components/ui/lottie";
 
 import LedgerTable from "@/components/admin/ledger-table";
 import TopupDialog from "@/components/admin/topup-dialog";
@@ -33,9 +43,23 @@ import BillingToast from "@/components/admin/billing-toast";
 const glassCard =
   "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
 
+const glassTile =
+  "rounded-2xl border border-white/50 bg-white/55 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-16px_rgba(30,41,120,0.18)]";
+
 // Below this the balance is flagged as low (heuristic; the real guard is the
 // checkout credit preflight + auto-topup).
 const LOW_BALANCE_CENTS = 1000;
+
+/** Roll the ledger up into headline stats for the hero KPI cards. */
+function summarizeLedger(entries: LedgerEntry[]) {
+  let credited = 0;
+  let spent = 0;
+  for (const e of entries) {
+    if (e.delta_cents >= 0) credited += e.delta_cents;
+    else spent += -e.delta_cents;
+  }
+  return { credited, spent, count: entries.length };
+}
 
 export default async function AdminBillingPage({
   searchParams,
@@ -65,9 +89,11 @@ export default async function AdminBillingPage({
   const currency = balance?.currency ?? "usd";
   const low =
     balance != null && balance.credit_balance_cents < LOW_BALANCE_CENTS;
+  const stats = summarizeLedger(ledger);
+  const autoOn = balance?.auto_topup.enabled ?? false;
 
-  // The /admin layout already provides the centered `max-w-6xl` main container
-  // and ambient particles, so this page renders plain content inside it.
+  // The /admin layout already provides the wide `max-w-7xl` glass main container
+  // and ambient particles, so this page renders edge-to-edge content inside it.
   return (
     <div>
       <BillingToast status={topupStatus} />
@@ -78,7 +104,7 @@ export default async function AdminBillingPage({
             <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               Billing &amp; Credit
             </h1>
-            <p className="mt-1.5 text-sm text-muted-foreground">
+            <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">
               The prepaid reseller balance that funds every activation, the
               transaction history, and your top-up settings.
             </p>
@@ -135,16 +161,26 @@ export default async function AdminBillingPage({
                 colorTo="var(--color-brand-2)"
               />
 
-              <div className="flex flex-wrap items-start justify-between gap-6">
+              <div className="grid gap-8 lg:grid-cols-[1.15fr_1fr] lg:items-center">
+                {/* Credit figure */}
                 <div>
                   <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                     <Wallet className="h-4 w-4 text-brand" aria-hidden="true" />
                     Available credit
+                    <span className="relative ml-1 inline-flex items-center">
+                      <LottiePlayer
+                        src="/lottie/pulse.json"
+                        className="h-6 w-6"
+                      />
+                      <span className="sr-only">Live balance</span>
+                    </span>
                   </div>
-                  <div className="mt-2 text-4xl font-bold tracking-tight text-foreground tabular-nums sm:text-5xl">
+
+                  <div className="mt-2 text-5xl font-bold tracking-tight text-foreground tabular-nums sm:text-6xl">
                     {fmtMoney(balance.credit_balance_cents, currency)}
                   </div>
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
+
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
                     {low && (
                       <Badge variant="destructive">
                         <TriangleAlert aria-hidden="true" />
@@ -152,25 +188,89 @@ export default async function AdminBillingPage({
                       </Badge>
                     )}
                     <Badge
-                      variant={
-                        balance.auto_topup.enabled ? "secondary" : "outline"
-                      }
+                      className={cn(
+                        "border-transparent",
+                        autoOn
+                          ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300"
+                          : "bg-muted text-muted-foreground",
+                      )}
                     >
-                      Auto top-up:{" "}
-                      {balance.auto_topup.enabled ? "on" : "off"}
+                      <Repeat aria-hidden="true" />
+                      Auto top-up: {autoOn ? "on" : "off"}
                     </Badge>
-                    {balance.auto_topup.enabled && (
+                    {autoOn && (
                       <span className="text-xs text-muted-foreground">
                         at{" "}
                         {fmtMoney(
                           balance.auto_topup.threshold_cents,
                           currency,
                         )}{" "}
-                        → +
-                        {fmtMoney(balance.auto_topup.amount_cents, currency)}
+                        → +{fmtMoney(balance.auto_topup.amount_cents, currency)}
                       </span>
                     )}
                   </div>
+
+                  <div className="mt-6 flex flex-wrap items-center gap-2">
+                    <TopupDialog label="Add credit" />
+                    {low && (
+                      <span className="text-xs text-muted-foreground">
+                        Keep a buffer so activations never stall.
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* KPI cards */}
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+                  <Card className={cn("border-transparent", glassTile)}>
+                    <CardContent className="flex flex-col gap-1">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                        <ArrowUpRight
+                          className="size-3.5 text-emerald-600"
+                          aria-hidden="true"
+                        />
+                        Credited
+                      </span>
+                      <span className="text-lg font-semibold text-foreground tabular-nums">
+                        {fmtMoney(stats.credited, currency)}
+                      </span>
+                    </CardContent>
+                  </Card>
+
+                  <Card className={cn("border-transparent", glassTile)}>
+                    <CardContent className="flex flex-col gap-1">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                        <ArrowDownRight
+                          className="size-3.5 text-rose-600"
+                          aria-hidden="true"
+                        />
+                        Spent
+                      </span>
+                      <span className="text-lg font-semibold text-foreground tabular-nums">
+                        {fmtMoney(stats.spent, currency)}
+                      </span>
+                    </CardContent>
+                  </Card>
+
+                  <Card
+                    className={cn(
+                      "col-span-2 border-transparent sm:col-span-1 lg:col-span-1 xl:col-span-1",
+                      glassTile,
+                    )}
+                  >
+                    <CardContent className="flex flex-col gap-1">
+                      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                        <ReceiptText
+                          className="size-3.5 text-brand"
+                          aria-hidden="true"
+                        />
+                        Transactions
+                      </span>
+                      <span className="text-lg font-semibold text-foreground tabular-nums">
+                        {stats.count}
+                      </span>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             </section>
@@ -191,7 +291,7 @@ export default async function AdminBillingPage({
               </TabsList>
 
               <TabsContent value="ledger">
-                <div className={cn("mt-4 overflow-hidden p-2 sm:p-4", glassCard)}>
+                <div className={cn("mt-4 overflow-hidden", glassCard)}>
                   <LedgerTable entries={ledger} currency={currency} />
                 </div>
               </TabsContent>
@@ -203,8 +303,8 @@ export default async function AdminBillingPage({
                     glassCard,
                   )}
                 >
-                  <div className="flex flex-col gap-3">
-                    <div>
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div className="max-w-md">
                       <h2 className="text-base font-semibold text-foreground">
                         Add credit
                       </h2>
@@ -213,12 +313,10 @@ export default async function AdminBillingPage({
                         to top up your balance.
                       </p>
                     </div>
-                    <div>
-                      <TopupDialog />
-                    </div>
+                    <TopupDialog label="Add credit" />
                   </div>
 
-                  <Separator />
+                  <Separator className="bg-white/50" />
 
                   <AutoTopupForm autoTopup={balance.auto_topup} />
                 </div>

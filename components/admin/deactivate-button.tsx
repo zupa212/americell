@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, PowerOff, TriangleAlert } from "lucide-react";
+import { PowerOff, TriangleAlert } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -14,25 +14,35 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogMedia,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import LottiePlayer from "@/components/ui/lottie";
+import { cn } from "@/lib/utils";
 
 /**
  * Owner-only "deactivate order" control (RESELLER_PLAN §6.3, §6.4).
  *
- * Wraps a destructive AlertDialog whose copy makes the money-safety rule
- * explicit: deactivating releases the phone on CellGods but issues NO refund
- * (§7.3 — refunds only ever happen on AMERICELL's own Stripe). On confirm it
- * POSTs the CellGods `order_id` to the admin proxy and `router.refresh()`es the
- * Server Component table so the freed order drops out of the list.
+ * A frosted-glass, destructive AlertDialog whose copy makes the money-safety
+ * rule explicit: deactivating releases the phone on CellGods but issues NO
+ * refund (§7.3 — refunds only ever happen on AMERICELL's own Stripe). On confirm
+ * it POSTs the CellGods `order_id` to the admin proxy, then `router.refresh()`es
+ * the Server Component so the freed order drops out; an optional `onDone` lets a
+ * host (e.g. the details Sheet) react to a successful release.
  */
 export default function DeactivateButton({
   orderId,
   label,
+  onDone,
+  className,
 }: {
   orderId: string;
   /** Human name for the dialog copy (model, falling back to the order id). */
   label: string;
+  /** Called after a successful deactivation (in addition to router.refresh). */
+  onDone?: () => void;
+  /** Extra classes for the trigger button (e.g. full-width in a Sheet). */
+  className?: string;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -53,6 +63,7 @@ export default function DeactivateButton({
         toast.success("Order deactivated.");
         setOpen(false);
         router.refresh();
+        onDone?.();
         return;
       }
       toast.error(data.error ?? "Couldn't deactivate.");
@@ -70,15 +81,21 @@ export default function DeactivateButton({
         variant="ghost"
         size="sm"
         onClick={() => setOpen(true)}
-        className="h-8 gap-1.5 rounded-full text-destructive hover:bg-destructive/10"
+        className={cn(
+          "h-8 gap-1.5 rounded-full text-destructive hover:bg-destructive/10",
+          className,
+        )}
       >
         <PowerOff className="h-3.5 w-3.5" aria-hidden="true" />
         Deactivate
       </Button>
 
       <AlertDialog open={open} onOpenChange={setOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="border border-white/50 bg-white/70 ring-white/40 backdrop-blur-xl">
           <AlertDialogHeader>
+            <AlertDialogMedia className="bg-destructive/10 text-destructive">
+              <PowerOff aria-hidden="true" />
+            </AlertDialogMedia>
             <AlertDialogTitle>Deactivate order?</AlertDialogTitle>
             <AlertDialogDescription>
               <span className="font-medium text-foreground">{label}</span> will
@@ -88,15 +105,15 @@ export default function DeactivateButton({
 
           <div
             role="alert"
-            className="flex items-start gap-2 rounded-2xl border border-amber-300/60 bg-amber-50/70 px-3 py-2 text-sm text-amber-800"
+            className="flex items-start gap-2 rounded-2xl border border-amber-300/60 bg-amber-50/70 px-3 py-2 text-sm text-amber-800 backdrop-blur-md dark:bg-amber-500/10 dark:text-amber-200"
           >
             <TriangleAlert
               className="mt-0.5 h-4 w-4 shrink-0"
               aria-hidden="true"
             />
             <span>
-              <span className="font-semibold">No refund is issued.</span>{" "}
-              Credit is not returned — this action is final.
+              <span className="font-semibold">No refund is issued.</span> Credit
+              is not returned — this action is final.
             </span>
           </div>
 
@@ -108,7 +125,10 @@ export default function DeactivateButton({
               onClick={deactivate}
             >
               {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                <LottiePlayer
+                  src="/lottie/loader.json"
+                  className="h-4 w-4"
+                />
               ) : (
                 <PowerOff className="h-4 w-4" aria-hidden="true" />
               )}
