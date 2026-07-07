@@ -1,10 +1,27 @@
 import "server-only";
 
 import Reveal from "@/components/ui/reveal";
-import PricingGrid from "@/components/pricing-grid";
+import PricingGrid, { type CryptoProvider } from "@/components/pricing-grid";
 import { AuroraText } from "@/components/ui/aurora-text";
 import { DURATIONS, getRetailCatalog } from "@/lib/pricing";
+import { isMoonpayConfigured } from "@/lib/moonpay";
+import { isNowpaymentsConfigured } from "@/lib/nowpayments";
+import { isCoinbaseConfigured } from "@/lib/coinbase";
 import { cn } from "@/lib/utils";
+
+/**
+ * Crypto payment options offered in the "Pay with crypto" picker. `configured`
+ * is read from the SERVER-ONLY provider flags (env), so the client only learns
+ * which options exist — never any keys. `noKyc` surfaces the no-sign-up options
+ * the customer can pay with anonymously.
+ */
+function cryptoProviders(): CryptoProvider[] {
+  return [
+    { id: "nowpayments", label: "Crypto (no sign-up)", note: "100+ coins · no KYC", noKyc: true, configured: isNowpaymentsConfigured },
+    { id: "coinbase", label: "Coinbase Commerce", note: "Pay from any wallet · no KYC", noKyc: true, configured: isCoinbaseConfigured },
+    { id: "moonpay", label: "MoonPay", note: "Card or bank → crypto", noKyc: false, configured: isMoonpayConfigured },
+  ];
+}
 
 /**
  * Pricing — SERVER component (RESELLER_PLAN §5.5 Flow A, §5.1).
@@ -112,7 +129,11 @@ export default async function Pricing() {
         {catalog.ok ? (
           <div className="relative isolate mt-4">
             <BrandBackdrop />
-            <PricingGrid phones={catalog.phones} durations={DURATIONS} />
+            <PricingGrid
+              phones={catalog.phones}
+              durations={DURATIONS}
+              cryptoProviders={cryptoProviders()}
+            />
           </div>
         ) : (
           <Reveal delay={0.08} className="mx-auto mt-14 max-w-xl">

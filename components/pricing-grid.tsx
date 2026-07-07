@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, BadgeCheck, Check, Coins, Loader2 } from "lucide-react";
+import { ArrowRight, BadgeCheck, Check, Coins, Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import Reveal from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { ShineBorder } from "@/components/ui/shine-border";
 import { MagicCard } from "@/components/ui/magic-card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { fmtMoney } from "@/lib/money";
 import { cn } from "@/lib/utils";
 // Types ONLY — `@/lib/pricing` is server-only, so these imports are erased at
@@ -32,11 +39,24 @@ type DurationOption = {
   label: string;
 };
 
+/** A crypto payment option shown in the "Pay with crypto" picker. */
+export type CryptoProvider = {
+  id: "moonpay" | "nowpayments" | "coinbase";
+  label: string;
+  note: string;
+  /** True for options a customer can pay with no sign-up / no KYC. */
+  noKyc: boolean;
+  /** Whether this provider's keys exist in the environment. */
+  configured: boolean;
+};
+
 type PricingGridProps = {
   /** Client-safe live catalog — retail cents only, NO wholesale. */
   phones: PublicRetailPhone[];
   /** The three rental durations with English labels (server passes `DURATIONS`). */
   durations: readonly DurationOption[];
+  /** Crypto options for the picker (server passes which are configured). */
+  cryptoProviders?: CryptoProvider[];
 };
 
 type CheckoutResponse = { url?: string; error?: string; demo?: boolean };
@@ -49,12 +69,18 @@ type CheckoutResponse = { url?: string; error?: string; demo?: boolean };
  * `{ phoneId, period }` to `/api/checkout` — the price is (re)computed server-
  * side, so the client can never dictate what it pays.
  */
-export default function PricingGrid({ phones, durations }: PricingGridProps) {
+export default function PricingGrid({
+  phones,
+  durations,
+  cryptoProviders = [],
+}: PricingGridProps) {
   const [period, setPeriod] = useState<BillingPeriod>("monthly");
   // Which card is mid-request (drives the spinner on that card only).
   const [pendingId, setPendingId] = useState<string | null>(null);
-  // Which card is mid crypto-request (MoonPay).
-  const [cryptoId, setCryptoId] = useState<string | null>(null);
+  // The phone whose crypto-provider picker is open (null = closed).
+  const [cryptoPhone, setCryptoPhone] = useState<PublicRetailPhone | null>(null);
+  // Which crypto provider is mid-request (drives the row spinner).
+  const [cryptoBusy, setCryptoBusy] = useState<CryptoProvider["id"] | null>(null);
 
   const activeLabel =
     durations.find((d) => d.period === period)?.label ?? "";
@@ -93,14 +119,18 @@ export default function PricingGrid({ phones, durations }: PricingGridProps) {
     }
   };
 
-  // Pay with crypto via MoonPay — same server-priced flow, returns a widget URL.
-  const handleCrypto = async (phone: PublicRetailPhone) => {
-    setCryptoId(phone.phoneId);
+  // Pay with crypto via the chosen provider — same server-priced flow, returns a
+  // hosted payment URL. Provider choice is sent to the unified crypto endpoint.
+  const startCrypto = async (
+    phone: PublicRetailPhone,
+    provider: CryptoProvider["id"],
+  ) => {
+    setCryptoBusy(provider);
     try {
-      const res = await fetch("/api/moonpay/url", {
+      const res = await fetch("/api/crypto/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ phoneId: phone.phoneId, period }),
+        body: JSON.stringify({ phoneId: phone.phoneId, period, provider }),
       });
       if (res.status === 401) {
         window.location.href = "/login";
@@ -119,7 +149,7 @@ export default function PricingGrid({ phones, durations }: PricingGridProps) {
     } catch {
       toast("Network error. Please try again.");
     } finally {
-      setCryptoId(null);
+      setCryptoBusy(null);
     }
   };
 
@@ -320,20 +350,15 @@ export default function PricingGrid({ phones, durations }: PricingGridProps) {
                       )}
                     </Button>
 
-                    {/* Secondary: pay with crypto (MoonPay) */}
+                    {/* Secondary: pay with crypto — opens the provider picker. */}
                     {phone.available && (
                       <button
                         type="button"
-                        onClick={() => handleCrypto(phone)}
-                        disabled={cryptoId === phone.phoneId}
+                        onClick={() => setCryptoPhone(phone)}
                         aria-label={`Pay for ${phone.model} with crypto`}
-                        className="mt-3 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-full border border-white/50 bg-white/40 px-4 py-2 text-xs font-semibold text-muted-foreground backdrop-blur-md transition-all duration-300 hover:bg-white/70 hover:text-foreground disabled:opacity-60"
+                        className="mt-3 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-full border border-white/50 bg-white/40 px-4 py-2 text-xs font-semibold text-muted-foreground backdrop-blur-md transition-all duration-300 hover:bg-white/70 hover:text-foreground"
                       >
-                        {cryptoId === phone.phoneId ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-                        ) : (
-                          <Coins className="h-3.5 w-3.5" aria-hidden="true" />
-                        )}
+                        <Coins className="h-3.5 w-3.5" aria-hidden="true" />
                         Pay with crypto
                       </button>
                     )}
@@ -344,6 +369,97 @@ export default function PricingGrid({ phones, durations }: PricingGridProps) {
           );
         })}
       </div>
+
+      {/* Crypto provider picker */}
+      <Dialog
+        open={cryptoPhone !== null}
+        onOpenChange={(open) => {
+          if (!open && !cryptoBusy) setCryptoPhone(null);
+        }}
+      >
+        <DialogContent className="max-w-md rounded-3xl border-white/50 bg-white/80 backdrop-blur-xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-extrabold tracking-tight">
+              Pay with crypto
+            </DialogTitle>
+            <DialogDescription>
+              {cryptoPhone ? (
+                <>
+                  {cryptoPhone.model} ·{" "}
+                  <span className="font-semibold text-foreground">
+                    {fmtMoney(cryptoPhone.retail[period], cryptoPhone.currency)}
+                  </span>{" "}
+                  / {activeLabel}. Pick how you&apos;d like to pay — your device
+                  activates the moment payment confirms.
+                </>
+              ) : null}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="mt-2 flex flex-col gap-3">
+            {cryptoProviders.map((provider) => {
+              const busy = cryptoBusy === provider.id;
+              const disabled = cryptoBusy !== null;
+              return (
+                <button
+                  key={provider.id}
+                  type="button"
+                  onClick={() => cryptoPhone && startCrypto(cryptoPhone, provider.id)}
+                  disabled={disabled}
+                  className={cn(
+                    "group flex w-full items-center gap-3 rounded-2xl border border-white/60 bg-white/60 px-4 py-3.5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/80 hover:shadow-[0_16px_40px_-20px_rgba(43,107,255,0.45)] disabled:pointer-events-none disabled:opacity-60",
+                  )}
+                >
+                  <span
+                    aria-hidden="true"
+                    className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand/15 to-brand-2/15 text-brand"
+                  >
+                    {busy ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : provider.noKyc ? (
+                      <ShieldCheck className="h-5 w-5" />
+                    ) : (
+                      <Coins className="h-5 w-5" />
+                    )}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-2">
+                      <span className="truncate text-sm font-bold text-foreground">
+                        {provider.label}
+                      </span>
+                      {provider.noKyc && (
+                        <Badge className="border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0 text-[0.65rem] font-semibold text-emerald-600">
+                          No KYC
+                        </Badge>
+                      )}
+                      {!provider.configured && (
+                        <Badge
+                          variant="secondary"
+                          className="border-transparent bg-muted px-1.5 py-0 text-[0.65rem] font-medium text-muted-foreground"
+                        >
+                          Demo
+                        </Badge>
+                      )}
+                    </span>
+                    <span className="mt-0.5 block truncate text-xs text-muted-foreground">
+                      {provider.note}
+                    </span>
+                  </span>
+                  <ArrowRight
+                    className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+                    aria-hidden="true"
+                  />
+                </button>
+              );
+            })}
+          </div>
+
+          <p className="mt-1 text-center text-[0.7rem] leading-relaxed text-muted-foreground">
+            Prices are set in USD and settle in crypto. Payment is processed by
+            the provider you choose.
+          </p>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
