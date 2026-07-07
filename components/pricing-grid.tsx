@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, BadgeCheck, Check, Loader2 } from "lucide-react";
+import { ArrowRight, BadgeCheck, Check, Coins, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Reveal from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
@@ -53,6 +53,8 @@ export default function PricingGrid({ phones, durations }: PricingGridProps) {
   const [period, setPeriod] = useState<BillingPeriod>("monthly");
   // Which card is mid-request (drives the spinner on that card only).
   const [pendingId, setPendingId] = useState<string | null>(null);
+  // Which card is mid crypto-request (MoonPay).
+  const [cryptoId, setCryptoId] = useState<string | null>(null);
 
   const activeLabel =
     durations.find((d) => d.period === period)?.label ?? "";
@@ -88,6 +90,36 @@ export default function PricingGrid({ phones, durations }: PricingGridProps) {
       toast("Network error. Please try again.");
     } finally {
       setPendingId(null);
+    }
+  };
+
+  // Pay with crypto via MoonPay — same server-priced flow, returns a widget URL.
+  const handleCrypto = async (phone: PublicRetailPhone) => {
+    setCryptoId(phone.phoneId);
+    try {
+      const res = await fetch("/api/moonpay/url", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ phoneId: phone.phoneId, period }),
+      });
+      if (res.status === 401) {
+        window.location.href = "/login";
+        return;
+      }
+      const data: CheckoutResponse = await res.json().catch(() => ({}));
+      if (res.ok && data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      toast(
+        data.demo
+          ? "Crypto payments are in demo mode — not configured yet."
+          : (data.error ?? "Couldn't start crypto checkout. Please try again."),
+      );
+    } catch {
+      toast("Network error. Please try again.");
+    } finally {
+      setCryptoId(null);
     }
   };
 
@@ -287,6 +319,24 @@ export default function PricingGrid({ phones, durations }: PricingGridProps) {
                         "Unavailable"
                       )}
                     </Button>
+
+                    {/* Secondary: pay with crypto (MoonPay) */}
+                    {phone.available && (
+                      <button
+                        type="button"
+                        onClick={() => handleCrypto(phone)}
+                        disabled={cryptoId === phone.phoneId}
+                        aria-label={`Pay for ${phone.model} with crypto`}
+                        className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-full border border-white/50 bg-white/40 px-4 py-2 text-xs font-semibold text-muted-foreground backdrop-blur-md transition-all duration-300 hover:bg-white/70 hover:text-foreground disabled:opacity-60"
+                      >
+                        {cryptoId === phone.phoneId ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                        ) : (
+                          <Coins className="h-3.5 w-3.5" aria-hidden="true" />
+                        )}
+                        Pay with crypto
+                      </button>
+                    )}
                   </div>
                 </div>
               </MagicCard>
