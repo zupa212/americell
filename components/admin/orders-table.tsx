@@ -538,18 +538,21 @@ export default function OrdersTable({ orders }: { orders: AdminOrderRow[] }) {
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <Tabs value={group} onValueChange={(v) => setGroup(v as GroupKey)}>
-            <TabsList className="border border-white/50 bg-white/50 backdrop-blur-md">
-              {TABS.map((tab) => (
-                <TabsTrigger key={tab.key} value={tab.key}>
-                  {tab.label}
-                  <span className="ml-1.5 rounded-full bg-foreground/10 px-1.5 text-[11px] tabular-nums text-muted-foreground">
-                    {tab.count}
-                  </span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+          {/* Horizontal scroll on narrow screens so the 5 tabs never overflow the page. */}
+          <div className="-mx-1 max-w-full overflow-x-auto px-1 pb-1 sm:mx-0 sm:overflow-visible sm:px-0 sm:pb-0">
+            <Tabs value={group} onValueChange={(v) => setGroup(v as GroupKey)}>
+              <TabsList className="border border-white/50 bg-white/50 backdrop-blur-md">
+                {TABS.map((tab) => (
+                  <TabsTrigger key={tab.key} value={tab.key}>
+                    {tab.label}
+                    <span className="ml-1.5 rounded-full bg-foreground/10 px-1.5 text-[11px] tabular-nums text-muted-foreground">
+                      {tab.count}
+                    </span>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          </div>
 
           <p className="text-xs text-muted-foreground tabular-nums">
             {visible.length.toLocaleString("en-US")} of{" "}

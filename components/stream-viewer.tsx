@@ -154,14 +154,14 @@ export default function StreamViewer({
 
         <span className="text-xs text-muted-foreground">Expires in {countdown}</span>
 
-        <div className="ml-auto flex items-center gap-1.5">
+        <div className="flex w-full items-center gap-1.5 sm:ml-auto sm:w-auto">
           {pin ? (
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={copyPin}
-              className="gap-1.5 rounded-full border-white/50 bg-white/60 font-mono tracking-[0.2em] backdrop-blur-md"
+              className="h-11 flex-1 gap-1.5 rounded-full border-white/50 bg-white/60 font-mono tracking-[0.2em] backdrop-blur-md sm:h-7 sm:flex-initial"
             >
               {copied ? (
                 <Check className="h-3.5 w-3.5" aria-hidden="true" />
@@ -177,7 +177,7 @@ export default function StreamViewer({
               size="sm"
               onClick={revealPin}
               disabled={pinLoading}
-              className="gap-1.5 rounded-full border-white/50 bg-white/60 backdrop-blur-md"
+              className="h-11 flex-1 gap-1.5 rounded-full border-white/50 bg-white/60 backdrop-blur-md sm:h-7 sm:flex-initial"
             >
               {pinLoading ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
@@ -192,7 +192,7 @@ export default function StreamViewer({
             variant="outline"
             size="sm"
             onClick={reloadStream}
-            className="gap-1.5 rounded-full border-white/50 bg-white/60 backdrop-blur-md"
+            className="h-11 flex-1 gap-1.5 rounded-full border-white/50 bg-white/60 backdrop-blur-md sm:h-7 sm:flex-initial"
           >
             <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
             <span className="hidden sm:inline">Reload</span>
@@ -201,7 +201,7 @@ export default function StreamViewer({
             type="button"
             size="sm"
             onClick={fullscreen}
-            className="gap-1.5 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white"
+            className="h-11 flex-1 gap-1.5 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white sm:h-7 sm:flex-initial"
           >
             <Maximize className="h-3.5 w-3.5" aria-hidden="true" />
             <span className="hidden sm:inline">Fullscreen</span>
@@ -216,7 +216,7 @@ export default function StreamViewer({
           ref={frameRef}
           src={streamUrl}
           title={`Americell — remote control ${model}`}
-          className="h-[72vh] w-full border-0 bg-black"
+          className="h-[68dvh] max-h-[820px] min-h-[420px] w-full border-0 bg-black sm:h-[72vh]"
           allow="autoplay; fullscreen; clipboard-read; clipboard-write; accelerometer; gyroscope"
           referrerPolicy="no-referrer"
         />

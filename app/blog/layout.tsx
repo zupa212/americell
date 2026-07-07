@@ -20,7 +20,7 @@ import { SITE } from "@/lib/site";
 export default function BlogLayout({ children }: { children: ReactNode }) {
   const year = new Date().getFullYear();
 
-  const chrome = "mx-auto w-full max-w-5xl px-6";
+  const chrome = "mx-auto w-full max-w-5xl px-5 sm:px-6";
   const focus =
     "rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50";
 

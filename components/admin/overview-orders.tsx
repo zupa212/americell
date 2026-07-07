@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { RelativeTime } from "@/components/admin/relative-time";
+import { cn } from "@/lib/utils";
 
 /**
  * OverviewOrders — the "Recent orders" panel on the admin overview.
@@ -112,7 +113,7 @@ export default function OverviewOrders({
           </Badge>
         </div>
 
-        <div className="relative">
+        <div className="relative w-full sm:w-52">
           <Search
             className="pointer-events-none absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2 text-muted-foreground"
             aria-hidden="true"
@@ -122,7 +123,7 @@ export default function OverviewOrders({
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search device or email"
             aria-label="Search recent orders"
-            className="h-9 w-52 bg-white/60 pl-8"
+            className="h-9 w-full bg-white/60 pl-8"
           />
         </div>
 
@@ -130,7 +131,7 @@ export default function OverviewOrders({
           value={status}
           onChange={(e) => setStatus(e.target.value as StatusFilter)}
           aria-label="Filter by status"
-          className={SELECT_CLASS}
+          className={cn(SELECT_CLASS, "flex-1 sm:flex-none")}
         >
           <option value="all">All statuses</option>
           <option value="active">Active</option>

@@ -26,7 +26,7 @@ export default function PostCard({ post }: { post: BlogPost }) {
       href={`/blog/${post.slug}`}
       className={cn(
         "group relative flex h-full flex-col",
-        "border border-neutral-200 bg-white p-7 sm:p-8",
+        "border border-neutral-200 bg-white p-6 sm:p-8",
         "transition-[transform,border-color] duration-300 ease-out",
         "hover:-translate-y-1 hover:border-neutral-900",
         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900",
@@ -38,7 +38,7 @@ export default function PostCard({ post }: { post: BlogPost }) {
         <span>{post.readingMinutes} min read</span>
       </div>
 
-      <h2 className="mt-4 text-xl font-bold leading-snug tracking-tight text-neutral-900 sm:text-2xl">
+      <h2 className="mt-4 text-xl font-bold leading-snug tracking-tight text-neutral-900 [overflow-wrap:anywhere] sm:text-2xl">
         {post.title}
       </h2>
 

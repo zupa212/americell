@@ -56,7 +56,7 @@ export default function SiteHeader() {
       <div className="mx-auto w-full max-w-5xl px-4 pt-3 sm:pt-4">
         <div
           className={cn(
-            "flex h-14 items-center justify-between gap-2 rounded-full border border-white/50 pl-5 pr-2",
+            "flex h-14 items-center justify-between gap-1.5 rounded-full border border-white/50 pl-4 pr-2 sm:gap-2 sm:pl-5",
             "bg-white/55 ring-1 ring-white/50 backdrop-blur-2xl backdrop-saturate-150",
             "transition-all duration-300",
             scrolled
@@ -77,7 +77,7 @@ export default function SiteHeader() {
               <span className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/25 to-white/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               <span className="relative">A</span>
             </span>
-            <span className="text-lg font-bold tracking-tighter">
+            <span className="text-base font-bold tracking-tighter sm:text-lg">
               <AuroraText>{SITE.name}</AuroraText>
             </span>
           </a>
@@ -102,7 +102,7 @@ export default function SiteHeader() {
           </NavigationMenu>
 
           {/* Right cluster */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1 sm:gap-1.5">
             {/* Language dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger
@@ -142,7 +142,7 @@ export default function SiteHeader() {
             {/* Get started (primary, animated gradient) */}
             <Button
               size="sm"
-              className="rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] font-semibold text-white shadow-sm shadow-brand/25 ring-1 ring-white/30 transition-all duration-300 animate-gradient hover:-translate-y-0.5 hover:opacity-95 hover:shadow-[0_16px_40px_-16px_rgba(43,107,255,0.55)]"
+              className="min-h-11 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] px-4 font-semibold text-white shadow-sm shadow-brand/25 ring-1 ring-white/30 transition-all duration-300 animate-gradient hover:-translate-y-0.5 hover:opacity-95 hover:shadow-[0_16px_40px_-16px_rgba(43,107,255,0.55)] sm:min-h-0 sm:px-2.5"
               render={<a href="/signup" />}
               nativeButton={false}
             >
@@ -156,7 +156,7 @@ export default function SiteHeader() {
                   <Button
                     variant="ghost"
                     size="icon-sm"
-                    className="rounded-full text-foreground transition-all duration-300 hover:bg-white/70 md:hidden"
+                    className="min-h-11 min-w-11 rounded-full text-foreground transition-all duration-300 hover:bg-white/70 md:hidden"
                     aria-label="Open menu"
                   />
                 }

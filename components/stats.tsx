@@ -109,7 +109,7 @@ export default function Stats() {
       aria-labelledby="stats-heading"
       className="relative overflow-hidden"
     >
-      <div className="relative mx-auto w-full max-w-6xl px-6 py-24 sm:py-32">
+      <div className="relative mx-auto w-full max-w-6xl px-4 py-24 sm:px-6 sm:py-32">
         <Reveal className="mx-auto max-w-2xl text-center" as="div">
           <header>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">
@@ -141,7 +141,7 @@ export default function Stats() {
               <Reveal key={stat.label} as="div" delay={i * 0.08}>
                 <div
                   className={cn(
-                    "group relative flex h-full flex-col items-center justify-center overflow-hidden p-6 text-center sm:p-8",
+                    "group relative flex h-full flex-col items-center justify-center overflow-hidden p-4 text-center sm:p-8",
                     glassSurface,
                     glassHover
                   )}
@@ -155,7 +155,7 @@ export default function Stats() {
                   <div className="relative">
                     <div
                       className={cn(
-                        "text-5xl font-bold leading-none tracking-tight sm:text-6xl",
+                        "text-4xl font-bold leading-none tracking-tight sm:text-6xl",
                         gradientText
                       )}
                     >

@@ -59,6 +59,7 @@ export function ContactForm() {
               minLength={2}
               autoComplete="name"
               placeholder="Your name"
+              className="h-11 sm:h-8"
             />
           </div>
 
@@ -71,6 +72,7 @@ export function ContactForm() {
               required
               autoComplete="email"
               placeholder="you@example.com"
+              className="h-11 sm:h-8"
             />
           </div>
 
@@ -96,7 +98,7 @@ export function ContactForm() {
             type="submit"
             size="lg"
             disabled={pending}
-            className="w-full rounded-full"
+            className="h-11 w-full rounded-full sm:h-9"
           >
             {pending ? "Sending…" : "Send message"}
           </Button>

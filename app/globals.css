@@ -101,6 +101,10 @@ html {
 body {
   /* transparent so the fixed <SiteBackground/> shows through the glass UI */
   background: transparent;
+  /* Mobile safety net: clip any incidental horizontal bleed (e.g. decorative
+     glows / floating tiles) without breaking sticky headers — `clip` (unlike
+     `hidden`) does not create a scroll container. */
+  overflow-x: clip;
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;

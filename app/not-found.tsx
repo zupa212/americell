@@ -13,7 +13,7 @@ export const metadata = buildMetadata({
 export default function NotFound() {
   return (
     <PageShell>
-      <div className="mx-auto w-full max-w-3xl px-6 py-16 sm:py-24">
+      <div className="mx-auto w-full max-w-3xl px-5 py-12 sm:px-6 sm:py-24">
         <div className="flex flex-col items-center text-center">
           <p className="bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-clip-text text-7xl font-bold tracking-tight text-transparent sm:text-8xl">
             404
@@ -28,7 +28,7 @@ export default function NotFound() {
           <div className="mt-10">
             <Button
               size="lg"
-              className="bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white shadow-sm shadow-brand/25 hover:opacity-95"
+              className="h-11 w-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white shadow-sm shadow-brand/25 hover:opacity-95 sm:h-9 sm:w-auto"
               render={<Link href="/" />}
               nativeButton={false}
             >

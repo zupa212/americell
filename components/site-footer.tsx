@@ -59,7 +59,7 @@ export default function SiteFooter() {
         {SITE.name} footer
       </h2>
 
-      <div className="mx-auto w-full max-w-6xl px-6 py-16 sm:py-20">
+      <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
         <Reveal className="grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-8">
           {/* Brand block */}
           <div className="md:col-span-5">

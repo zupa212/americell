@@ -16,7 +16,7 @@ const LAST_UPDATED = "July 1, 2026";
 export default function PrivacyPage() {
   return (
     <PageShell>
-      <article className="mx-auto w-full max-w-3xl px-6 py-16 sm:py-24">
+      <article className="mx-auto w-full max-w-3xl px-5 py-12 sm:px-6 sm:py-24">
         <Alert className="mb-10">
           <AlertDescription>
             Template copy — to be reviewed by legal counsel.

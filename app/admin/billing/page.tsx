@@ -176,7 +176,7 @@ export default async function AdminBillingPage({
                     </span>
                   </div>
 
-                  <div className="mt-2 text-5xl font-bold tracking-tight text-foreground tabular-nums sm:text-6xl">
+                  <div className="mt-2 text-4xl font-bold tracking-tight text-foreground tabular-nums break-words sm:text-5xl lg:text-6xl">
                     {fmtMoney(balance.credit_balance_cents, currency)}
                   </div>
 

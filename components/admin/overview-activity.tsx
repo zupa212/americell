@@ -133,7 +133,7 @@ export default function OverviewActivity({
           </span>
         </div>
 
-        <div className="relative">
+        <div className="relative w-full sm:w-44">
           <Search
             className="pointer-events-none absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2 text-muted-foreground"
             aria-hidden="true"
@@ -143,7 +143,7 @@ export default function OverviewActivity({
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search activity"
             aria-label="Search activity"
-            className="h-9 w-44 bg-white/60 pl-8"
+            className="h-9 w-full bg-white/60 pl-8"
           />
         </div>
 
@@ -151,7 +151,7 @@ export default function OverviewActivity({
           value={actor}
           onChange={(e) => setActor(e.target.value as ActorFilter)}
           aria-label="Filter by actor"
-          className={SELECT_CLASS}
+          className={cn(SELECT_CLASS, "flex-1 sm:flex-none")}
         >
           <option value="all">All actors</option>
           <option value="admin">Admin</option>

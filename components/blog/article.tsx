@@ -26,7 +26,7 @@ function MarkdownLink({ href, children }: ComponentPropsWithoutRef<"a">) {
   const url = href ?? "#";
   const isInternal = url.startsWith("/") || url.startsWith("#");
   const classes =
-    "font-medium text-neutral-900 underline decoration-neutral-400 underline-offset-[3px] transition-colors hover:decoration-neutral-900";
+    "font-medium text-neutral-900 underline decoration-neutral-400 underline-offset-[3px] [overflow-wrap:anywhere] transition-colors hover:decoration-neutral-900";
 
   if (isInternal) {
     return (
@@ -68,7 +68,9 @@ function MarkdownCode({
 }
 
 // Shared body-copy sizing so paragraphs, lists and quotes read as one column.
-const bodyText = "text-[1.075rem] leading-[1.8] text-neutral-800";
+// `break-words` guards against long unbreakable strings/URLs on narrow phones.
+const bodyText =
+  "text-[1.0625rem] leading-[1.8] text-neutral-800 break-words sm:text-[1.075rem]";
 
 // Element → styled renderer map for react-markdown. Strictly black & white,
 // editorial typography tuned for comfortable long-form reading.
@@ -127,6 +129,17 @@ const markdownComponents: Components = {
     </pre>
   ),
   hr: () => <hr className="my-14 border-t border-neutral-200" />,
+  img: ({ src, alt }) => (
+    // Markdown images come from our own trusted post content. Constrain to the
+    // reading column so they never cause horizontal overflow on phones.
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={typeof src === "string" ? src : undefined}
+      alt={alt ?? ""}
+      loading="lazy"
+      className="mt-8 h-auto w-full max-w-full rounded-xl border border-neutral-200"
+    />
+  ),
   table: ({ children }) => (
     <div className="mt-8 overflow-x-auto rounded-xl border border-neutral-200">
       <table className="w-full border-collapse text-left text-sm">
@@ -162,13 +175,13 @@ export default function Article({ post }: { post: BlogPost }) {
   return (
     <article
       className={cn(
-        "relative overflow-hidden rounded-3xl border border-neutral-200 bg-white text-neutral-900",
-        "px-6 py-10 shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:px-10 sm:py-14",
+        "relative overflow-hidden rounded-2xl border border-neutral-200 bg-white text-neutral-900",
+        "px-5 py-8 shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:rounded-3xl sm:px-10 sm:py-14",
       )}
     >
       <div className="mx-auto max-w-2xl">
         <header className="border-b border-neutral-200 pb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-[2.5rem] sm:leading-[1.1]">
+          <h1 className="text-[1.75rem] font-bold leading-tight tracking-tight text-neutral-900 [overflow-wrap:anywhere] sm:text-[2.5rem] sm:leading-[1.1]">
             {post.title}
           </h1>
           <div className="mt-6 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-sm text-neutral-500">

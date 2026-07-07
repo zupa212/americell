@@ -28,10 +28,10 @@ export default function CallToAction() {
       aria-labelledby="cta-heading"
       className="relative overflow-hidden py-24 sm:py-32"
     >
-      <div className="relative mx-auto w-full max-w-6xl px-6">
+      <div className="relative mx-auto w-full max-w-6xl px-4 sm:px-6">
         <Reveal
           className={cn(
-            "relative isolate overflow-hidden rounded-3xl px-6 py-20 text-center sm:px-12 sm:py-28",
+            "relative isolate overflow-hidden rounded-3xl px-5 py-16 text-center sm:px-12 sm:py-28",
             "border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40",
             "shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]",
             "transition-all duration-300 hover:bg-white/70",
@@ -79,7 +79,7 @@ export default function CallToAction() {
 
             <h2
               id="cta-heading"
-              className="mt-6 text-balance text-5xl font-semibold leading-[1.02] tracking-[-0.03em] text-foreground sm:text-6xl lg:text-7xl"
+              className="mt-6 text-balance break-words text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-6xl sm:leading-[1.02] lg:text-7xl"
             >
               Put a real{" "}
               <AuroraText colors={["#2b6bff", "#7c3aed", "#22d3ee"]}>

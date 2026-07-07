@@ -10,6 +10,7 @@ import {
   markRefunded,
 } from "@/lib/rentals";
 import { activateRental } from "@/lib/activation";
+import { logEvent } from "@/lib/logs";
 import {
   isMoonpayConfigured,
   verifyMoonpayWebhook,
@@ -79,6 +80,13 @@ export async function POST(req: Request) {
   if (owned) {
     try {
       await activateRental(owned);
+      await logEvent({
+        actorType: "system",
+        action: "rental.activated",
+        targetType: "rental",
+        targetId: rental.id,
+        metadata: { method: "moonpay", model: rental.model, retailCents: rental.retailCents },
+      });
     } catch (err) {
       if (err instanceof CellgodsError) {
         const { status: st } = err;
@@ -91,10 +99,12 @@ export async function POST(req: Request) {
         }
         if (st === 402) {
           await markActivationPendingCredit(sid, err.message);
+          await logEvent({ actorType: "system", action: "rental.pending_credit", targetType: "rental", targetId: rental.id, metadata: { method: "moonpay" } });
           console.error(`[ALERT] moonpay: insufficient CellGods credit — rental=${rental.id} queued: ${err.message}`);
         } else {
           // Terminal — no auto-refund for crypto; mark + alert for manual refund.
           await markRefunded(sid);
+          await logEvent({ actorType: "system", action: "rental.refunded", targetType: "rental", targetId: rental.id, metadata: { method: "moonpay", status: st, manual: true } });
           console.error(`[ALERT] moonpay: terminal activation failure rental=${rental.id} status=${st} — MANUAL crypto refund required: ${err.message}`);
         }
       } else {

@@ -12,12 +12,12 @@ import { cn } from "@/lib/utils";
 export default function Faq() {
   return (
     <section id="faq" className="relative overflow-hidden">
-      <div className="relative mx-auto w-full max-w-6xl px-6 py-24 sm:py-32">
+      <div className="relative mx-auto w-full max-w-6xl px-4 py-24 sm:px-6 sm:py-32">
         <Reveal className="mx-auto max-w-3xl text-center">
           <p className="inline-flex items-center rounded-full border border-white/50 bg-white/60 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-brand-2 backdrop-blur-xl ring-1 ring-white/40">
             FAQ
           </p>
-          <h2 className="mt-6 text-5xl font-extrabold leading-[0.95] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+          <h2 className="mt-6 text-balance break-words text-4xl font-extrabold leading-[0.98] tracking-tight text-foreground sm:text-6xl sm:leading-[0.95] lg:text-7xl">
             Questions?{" "}
             <AuroraText>Answered.</AuroraText>
           </h2>
@@ -31,7 +31,7 @@ export default function Faq() {
           <Accordion
             defaultValue={FAQS[0] ? [FAQS[0].q] : []}
             className={cn(
-              "rounded-3xl border border-white/50 bg-white/60 px-6 backdrop-blur-xl",
+              "rounded-3xl border border-white/50 bg-white/60 px-5 backdrop-blur-xl sm:px-6",
               "ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]",
               "transition-all duration-300 hover:bg-white/70 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)]",
             )}
@@ -42,10 +42,10 @@ export default function Faq() {
                 value={item.q}
                 className="border-white/40"
               >
-                <AccordionTrigger className="gap-6 py-6 text-lg font-semibold tracking-tight text-foreground/90 transition-colors duration-300 hover:no-underline data-[panel-open]:text-brand-2">
+                <AccordionTrigger className="gap-4 py-6 text-lg font-semibold tracking-tight text-foreground/90 transition-colors duration-300 hover:no-underline data-[panel-open]:text-brand-2 sm:gap-6">
                   {item.q}
                 </AccordionTrigger>
-                <AccordionContent className="pr-14 pb-6 text-base leading-relaxed text-muted-foreground">
+                <AccordionContent className="pr-4 pb-6 text-base leading-relaxed text-muted-foreground sm:pr-14">
                   {item.a}
                 </AccordionContent>
               </AccordionItem>

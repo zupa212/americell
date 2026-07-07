@@ -13,7 +13,7 @@ export const metadata: Metadata = buildMetadata({
 export default function ContactPage() {
   return (
     <PageShell>
-      <div className="mx-auto w-full max-w-3xl px-6 py-16 sm:py-24">
+      <div className="mx-auto w-full max-w-3xl px-5 py-12 sm:px-6 sm:py-24">
         <h1 className="text-3xl font-bold sm:text-4xl">Contact</h1>
         <p className="mt-4 leading-relaxed text-muted-foreground">
           Have a question about Americell? Send us a message and we’ll get back

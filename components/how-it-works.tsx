@@ -24,7 +24,7 @@ export default function HowItWorks() {
       aria-labelledby="how-heading"
       className="relative overflow-hidden"
     >
-      <div className="relative mx-auto w-full max-w-6xl px-6 py-24 sm:py-32">
+      <div className="relative mx-auto w-full max-w-6xl px-4 py-24 sm:px-6 sm:py-32">
         <Reveal className="max-w-3xl" as="div">
           <header>
             <p className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-brand">
@@ -63,7 +63,7 @@ export default function HowItWorks() {
             <Reveal key={step.n} as="li" delay={i * 0.1}>
               <Card
                 className={cn(
-                  "relative h-full gap-4 overflow-hidden p-8",
+                  "relative h-full gap-4 overflow-hidden p-6 sm:p-8",
                   glassSurface,
                   glassHover
                 )}

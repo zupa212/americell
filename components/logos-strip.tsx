@@ -33,7 +33,7 @@ export default function LogosStrip() {
           "shadow-[0_10px_40px_-16px_rgba(30,41,120,0.15)]",
         )}
       >
-        <div className="relative mx-auto w-full max-w-6xl px-6 py-10 sm:py-12">
+        <div className="relative mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
           <Reveal>
             <p className="text-center text-base font-bold tracking-tight text-foreground sm:text-lg">
               Real <span className={gradientWord}>US devices</span>

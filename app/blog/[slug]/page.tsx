@@ -114,7 +114,7 @@ export default async function BlogPostPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: jsonLd }}
       />
 
-      <div className="mx-auto w-full max-w-3xl px-6 py-16 sm:py-24">
+      <div className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6 sm:py-24">
         {/* Editorial header: breadcrumb, title, meta */}
         <Reveal>
           <header>
@@ -148,7 +148,7 @@ export default async function BlogPostPage({ params }: PageProps) {
               </ol>
             </nav>
 
-            <h1 className="mt-8 text-4xl font-bold leading-[1.08] tracking-tight text-neutral-900 sm:text-5xl">
+            <h1 className="mt-8 text-3xl font-bold leading-[1.12] tracking-tight text-neutral-900 [overflow-wrap:anywhere] sm:text-5xl sm:leading-[1.08]">
               {post.title}
             </h1>
 

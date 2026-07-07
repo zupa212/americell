@@ -29,13 +29,13 @@ const glassCard =
 
 // Smooth, legible glass inputs.
 const glassInput =
-  "border-white/50 bg-white/60 backdrop-blur-md transition-all duration-300 focus-visible:bg-white/80 focus-visible:ring-brand/40";
+  "h-11 border-white/50 bg-white/60 backdrop-blur-md transition-all duration-300 focus-visible:bg-white/80 focus-visible:ring-brand/40 sm:h-8";
 
 export default function LoginPage() {
   const [state, action, pending] = useActionState(login, initial);
 
   return (
-    <main className="relative flex min-h-[80vh] flex-col items-center justify-center overflow-hidden px-6 py-16">
+    <main className="relative flex min-h-[80vh] flex-col items-center justify-center overflow-hidden px-5 py-12 sm:px-6 sm:py-16">
       {/* Ambient particles drifting behind the glass for depth. */}
       <Particles
         className="pointer-events-none absolute inset-0 -z-[1]"

@@ -85,7 +85,7 @@ export default function BenefitsStack() {
       aria-labelledby="why-heading"
       className="relative py-24 sm:py-32"
     >
-      <div className="mx-auto w-full max-w-5xl px-6">
+      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
         {/* Section header */}
         <Reveal className="mx-auto max-w-2xl text-center">
           <p className="text-sm font-semibold uppercase tracking-wide text-brand">
@@ -112,7 +112,7 @@ export default function BenefitsStack() {
                 className={cn(
                   GLASS,
                   "group relative flex min-h-[clamp(19rem,54vh,30rem)] w-full",
-                  "flex-col justify-between overflow-hidden p-8 sm:p-12"
+                  "flex-col justify-between overflow-hidden p-6 sm:p-12"
                 )}
               >
                 {/* Animated brand accents — pure CSS/transform, GPU-friendly */}

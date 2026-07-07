@@ -29,7 +29,11 @@ export default function Error({
           get in touch with us.
         </p>
       </div>
-      <Button size="lg" onClick={() => reset()}>
+      <Button
+        size="lg"
+        onClick={() => reset()}
+        className="h-11 px-6 sm:h-9 sm:px-2.5"
+      >
         Try again
       </Button>
     </div>

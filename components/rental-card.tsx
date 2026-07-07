@@ -384,7 +384,7 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
                 variant="outline"
                 onClick={revealPin}
                 disabled={pinLoading}
-                className="h-10 w-full justify-start gap-2 rounded-2xl border-white/50 bg-white/50 backdrop-blur-md"
+                className="h-11 w-full justify-start gap-2 rounded-2xl border-white/50 bg-white/50 backdrop-blur-md sm:h-10"
               >
                 {pinLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -420,7 +420,7 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
                 variant="outline"
                 onClick={renew}
                 disabled={renewLoading}
-                className="h-10 flex-1 gap-2 rounded-full border-white/50 bg-white/50 backdrop-blur-md"
+                className="h-11 flex-1 gap-2 rounded-full border-white/50 bg-white/50 backdrop-blur-md sm:h-10"
               >
                 {renewLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -433,7 +433,7 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
                 type="button"
                 variant="ghost"
                 onClick={() => setCancelOpen(true)}
-                className="h-10 flex-1 gap-2 rounded-full text-destructive hover:bg-destructive/10"
+                className="h-11 flex-1 gap-2 rounded-full text-destructive hover:bg-destructive/10 sm:h-10"
               >
                 <XCircle className="h-4 w-4" aria-hidden="true" />
                 Cancel

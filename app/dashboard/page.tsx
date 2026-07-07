@@ -101,7 +101,7 @@ export default async function DashboardPage() {
   return (
     <div className="relative min-h-screen">
       <header className="sticky top-0 z-40 border-b border-white/40 bg-white/50 backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-3">
+        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
           <Link
             href="/"
             className="flex items-center gap-2.5 rounded-lg outline-none transition-all duration-300 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
@@ -120,7 +120,7 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      <main className="relative mx-auto w-full max-w-5xl px-6 py-12">
+      <main className="relative mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
         {/* Ambient particles drifting behind the glass for depth. */}
         <Particles
           className="pointer-events-none absolute inset-0 -z-[1]"
@@ -190,7 +190,7 @@ export default async function DashboardPage() {
               <CardContent>
                 <Button
                   size="lg"
-                  className="h-11 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft px-5 text-white shadow-sm shadow-brand/25 transition-all duration-300 hover:-translate-y-0.5 hover:opacity-95 hover:shadow-[0_16px_40px_-16px_rgba(43,107,255,0.5)]"
+                  className="h-11 w-full rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft px-5 text-white shadow-sm shadow-brand/25 transition-all duration-300 hover:-translate-y-0.5 hover:opacity-95 hover:shadow-[0_16px_40px_-16px_rgba(43,107,255,0.5)] sm:w-auto"
                   render={<Link href="/#pricing" />}
                   nativeButton={false}
                 >

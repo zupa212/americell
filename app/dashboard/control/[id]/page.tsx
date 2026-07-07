@@ -44,7 +44,7 @@ export default async function ControlPage({
   return (
     <div className="relative flex min-h-screen flex-col">
       <header className="sticky top-0 z-40 border-b border-white/40 bg-white/55 backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-6 py-3">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:gap-3 sm:px-6">
           <Link
             href="/dashboard"
             className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/60 hover:text-foreground"
@@ -61,7 +61,10 @@ export default async function ControlPage({
             </span>
             <span className="tracking-tight">
               <AuroraText>Americell</AuroraText>
-              <span className="text-muted-foreground"> · Remote control</span>
+              <span className="hidden text-muted-foreground sm:inline">
+                {" "}
+                · Remote control
+              </span>
             </span>
           </div>
           <span className="hidden text-sm text-muted-foreground sm:block">

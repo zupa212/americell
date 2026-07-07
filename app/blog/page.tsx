@@ -23,7 +23,7 @@ export default function BlogIndexPage() {
 
   return (
     <div className="min-h-screen bg-white text-neutral-900">
-      <div className="mx-auto w-full max-w-5xl px-6 py-16 sm:py-24 lg:py-28">
+      <div className="mx-auto w-full max-w-5xl px-5 py-16 sm:px-6 sm:py-24 lg:py-28">
         {/* Masthead */}
         <Reveal>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-neutral-500">
@@ -34,7 +34,7 @@ export default function BlogIndexPage() {
             The Blog
           </p>
 
-          <h1 className="mt-5 text-5xl font-black leading-[0.95] tracking-tight text-neutral-900 sm:text-7xl">
+          <h1 className="mt-5 text-4xl font-black leading-[0.95] tracking-tight text-neutral-900 sm:text-7xl">
             Field notes
           </h1>
 

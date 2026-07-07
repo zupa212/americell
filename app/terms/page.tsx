@@ -25,7 +25,7 @@ export default function TermsPage() {
 
   return (
     <PageShell>
-      <article className="mx-auto w-full max-w-3xl px-6 py-16 sm:py-24">
+      <article className="mx-auto w-full max-w-3xl px-5 py-12 sm:px-6 sm:py-24">
         <Alert className="mb-10">
           <Info className="h-4 w-4" />
           <AlertDescription>

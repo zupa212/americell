@@ -71,7 +71,7 @@ export default async function Pricing() {
       aria-labelledby="pricing-heading"
       className="relative isolate py-24 sm:py-32"
     >
-      <div className="mx-auto w-full max-w-6xl px-6">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         {/* Section header */}
         <Reveal className="mx-auto max-w-2xl text-center">
           {/* Branded eyebrow — gradient "A" mark + AuroraText wordmark + label. */}
@@ -93,7 +93,7 @@ export default async function Pricing() {
           </div>
           <h2
             id="pricing-heading"
-            className="mt-5 text-balance text-5xl font-black leading-[0.95] tracking-tighter text-foreground sm:text-6xl lg:text-7xl"
+            className="mt-5 text-balance break-words text-4xl font-black leading-[0.98] tracking-tighter text-foreground sm:text-6xl sm:leading-[0.95] lg:text-7xl"
           >
             One real phone.{" "}
             <span className="animate-gradient bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] bg-clip-text text-transparent">

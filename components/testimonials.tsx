@@ -17,7 +17,7 @@ export default function Testimonials() {
       id="clients"
       className="relative isolate overflow-hidden py-24 sm:py-32"
     >
-      <div className="mx-auto w-full max-w-6xl px-6">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <Reveal className="max-w-3xl">
           {/* Flashy frosted-glass eyebrow with a live brand-gradient dot */}
           <div

@@ -492,7 +492,7 @@ export default function Hero() {
         <div className="h-[440px] w-[860px] max-w-[92vw] rounded-full bg-[radial-gradient(closest-side,rgba(43,107,255,0.20),rgba(124,58,237,0.12),transparent)] blur-2xl" />
       </div>
 
-      <div className="mx-auto w-full max-w-6xl px-6 py-24 sm:py-32">
+      <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-32">
         {/* eyebrow — AMERICELL brand mark + AnimatedShinyText inside a
             crisp frosted glass pill */}
         <Reveal>
@@ -527,7 +527,7 @@ export default function Hero() {
 
         {/* headline — the ONLY h1 */}
         <Reveal delay={0.05}>
-          <h1 className="mx-auto mt-8 max-w-5xl text-balance text-center text-5xl font-bold leading-[0.92] tracking-[-0.045em] text-foreground sm:text-7xl lg:text-[6.5rem]">
+          <h1 className="mx-auto mt-8 max-w-5xl text-balance break-words text-center text-4xl font-bold leading-[0.95] tracking-[-0.045em] text-foreground sm:text-7xl sm:leading-[0.92] lg:text-[6.5rem]">
             Real US phones.{" "}
             <br className="hidden sm:block" />
             In your{" "}
@@ -571,8 +571,8 @@ export default function Hero() {
 
         {/* the visual: phone + floating tiles + ambient particles */}
         <Reveal delay={0.2}>
-          <div className="relative mt-24 flex justify-center sm:mt-28">
-            <div className="relative">
+          <div className="relative mt-20 flex justify-center sm:mt-28">
+            <div className="relative origin-top scale-[0.8] -mb-24 sm:mb-0 sm:scale-100">
               {/* ambient particles drifting behind the phone for depth */}
               <Particles
                 className="pointer-events-none absolute -inset-24 -z-10"

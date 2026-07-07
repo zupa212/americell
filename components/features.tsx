@@ -27,7 +27,7 @@ export default function Features() {
       aria-labelledby="features-heading"
       className="py-24 sm:py-32"
     >
-      <div className="mx-auto w-full max-w-6xl px-6">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         {/* Section header */}
         <Reveal className="max-w-3xl">
           {/* Flashy frosted-glass eyebrow with a live brand-gradient dot */}

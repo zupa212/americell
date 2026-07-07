@@ -552,7 +552,7 @@ export default function CustomersTable({
         }}
       >
         {detail ? (
-          <DialogContent className="max-w-md border-white/50 bg-white/80 ring-white/40 backdrop-blur-xl">
+          <DialogContent className="sm:max-w-md border-white/50 bg-white/80 ring-white/40 backdrop-blur-xl">
             <DialogHeader>
               <div className="flex items-center gap-3">
                 <Avatar email={detail.email} className="h-11 w-11 text-sm" />
