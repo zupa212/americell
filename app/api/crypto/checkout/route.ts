@@ -8,8 +8,9 @@ import { logEvent } from "@/lib/logs";
 import { buildMoonpayUrl, isMoonpayConfigured } from "@/lib/moonpay";
 import { createNowpaymentsInvoice, isNowpaymentsConfigured } from "@/lib/nowpayments";
 import { createCoinbaseCharge, isCoinbaseConfigured } from "@/lib/coinbase";
+import { createBtcpayInvoice, isBtcpayConfigured } from "@/lib/btcpay";
 
-type Provider = "moonpay" | "nowpayments" | "coinbase";
+type Provider = "moonpay" | "nowpayments" | "coinbase" | "btcpay";
 
 /**
  * Unified crypto checkout. Same server-priced, credit-preflighted, pending-rental
@@ -36,6 +37,7 @@ export async function POST(req: Request) {
     moonpay: isMoonpayConfigured,
     nowpayments: isNowpaymentsConfigured,
     coinbase: isCoinbaseConfigured,
+    btcpay: isBtcpayConfigured,
   };
   if (!provider || !(provider in configured)) {
     return Response.json({ error: "Unknown crypto provider." }, { status: 400 });
@@ -115,6 +117,13 @@ export async function POST(req: Request) {
         ipnUrl: `${origin}/api/nowpayments/webhook`,
         successUrl: `${origin}/dashboard?crypto=success`,
         cancelUrl: `${origin}/#pricing`,
+      }));
+    } else if (provider === "btcpay") {
+      ({ url } = await createBtcpayInvoice({
+        amountUsd,
+        orderId: rental.id,
+        description,
+        redirectUrl: `${origin}/dashboard?crypto=success`,
       }));
     } else {
       ({ url } = await createCoinbaseCharge({

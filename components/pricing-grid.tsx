@@ -41,7 +41,7 @@ type DurationOption = {
 
 /** A crypto payment option shown in the "Pay with crypto" picker. */
 export type CryptoProvider = {
-  id: "moonpay" | "nowpayments" | "coinbase";
+  id: "moonpay" | "nowpayments" | "coinbase" | "btcpay";
   label: string;
   note: string;
   /** True for options a customer can pay with no sign-up / no KYC. */
@@ -349,6 +349,14 @@ export default function PricingGrid({
                         "Unavailable"
                       )}
                     </Button>
+
+                    {/* Payment methods hint — Stripe surfaces whatever is enabled
+                        in the dashboard (wallets, Link, Cash App, PayPal, BNPL). */}
+                    {phone.available && (
+                      <p className="mt-2 text-center text-[0.7rem] text-muted-foreground">
+                        Card · Apple&nbsp;Pay · Google&nbsp;Pay &amp; more
+                      </p>
+                    )}
 
                     {/* Secondary: pay with crypto — opens the provider picker. */}
                     {phone.available && (

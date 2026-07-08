@@ -7,6 +7,7 @@ import { DURATIONS, getRetailCatalog } from "@/lib/pricing";
 import { isMoonpayConfigured } from "@/lib/moonpay";
 import { isNowpaymentsConfigured } from "@/lib/nowpayments";
 import { isCoinbaseConfigured } from "@/lib/coinbase";
+import { isBtcpayConfigured } from "@/lib/btcpay";
 import { cn } from "@/lib/utils";
 
 /**
@@ -18,6 +19,7 @@ import { cn } from "@/lib/utils";
 function cryptoProviders(): CryptoProvider[] {
   return [
     { id: "nowpayments", label: "Crypto (no sign-up)", note: "100+ coins · no KYC", noKyc: true, configured: isNowpaymentsConfigured },
+    { id: "btcpay", label: "Bitcoin & Lightning", note: "Self-custody · no KYC", noKyc: true, configured: isBtcpayConfigured },
     { id: "coinbase", label: "Coinbase Commerce", note: "Pay from any wallet · no KYC", noKyc: true, configured: isCoinbaseConfigured },
     { id: "moonpay", label: "MoonPay", note: "Card or bank → crypto", noKyc: false, configured: isMoonpayConfigured },
   ];
