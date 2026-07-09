@@ -86,7 +86,9 @@ export function buildMetadata(overrides: MetadataOverrides = {}): Metadata {
 
   const resolvedTitle: Metadata["title"] = title ?? {
     default: DEFAULT_TITLE,
-    template: `%s · ${SITE_NAME}`,
+    // Brand-first so every browser tab visibly starts with "Americell" even when
+    // the tab is narrow and the browser truncates the end.
+    template: `${SITE_NAME} · %s`,
   };
 
   // Deep-merge object-valued overrides; if a caller passes a string/null (both

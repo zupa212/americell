@@ -1,7 +1,7 @@
 import "server-only";
 
 import {
-  getInventory,
+  getInventoryForBrowse,
   isCellgodsConfigured,
   type InventoryPhone,
   type Platform,
@@ -123,7 +123,9 @@ export async function getRetailCatalog(): Promise<
 > {
   if (!isCellgodsConfigured) return { ok: false, reason: "unconfigured" };
   try {
-    const inventory = await getInventory();
+    // Cached browse read — the public catalog tolerates ~45s staleness in
+    // exchange for an instant homepage. Checkout re-checks live availability.
+    const inventory = await getInventoryForBrowse();
     return { ok: true, phones: inventory.map(toPublicRetailPhone) };
   } catch {
     return { ok: false, reason: "error" };

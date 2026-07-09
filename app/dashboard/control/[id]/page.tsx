@@ -9,7 +9,9 @@ import { AuroraText } from "@/components/ui/aurora-text";
 import StreamViewer from "@/components/stream-viewer";
 
 export const metadata: Metadata = {
-  title: "Remote control · Americell",
+  // → "Americell · Remote control" via the brand-first template. Never leaks the
+  // upstream provider's name in the tab (white-label).
+  title: "Remote control",
   robots: { index: false, follow: false },
 };
 

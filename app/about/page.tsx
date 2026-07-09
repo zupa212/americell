@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
-  title: "About Americell",
+  title: "About", // → "Americell · About"
   description:
     "Americell gives you access to real US smartphones you control from your browser. Learn what it is, who it’s for, our values, and our mission.",
   alternates: { canonical: "/about" },

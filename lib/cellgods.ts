@@ -133,7 +133,16 @@ type Envelope<T> = { success: true; data: T } | { success: false; error: string 
 
 async function request<T>(
   path: string,
-  init?: { method?: "GET" | "POST"; body?: unknown },
+  init?: {
+    method?: "GET" | "POST";
+    body?: unknown;
+    /**
+     * When set, the response is cached by Next's Data Cache for this many
+     * seconds (ISR-style). Omit for `no-store` — the default for every
+     * money-critical call (balance, activate, checkout availability, …).
+     */
+    revalidate?: number;
+  },
 ): Promise<T> {
   if (!API_KEY) throw new CellgodsNotConfiguredError();
 
@@ -150,7 +159,9 @@ async function request<T>(
       },
       body: init?.body ? JSON.stringify(init.body) : undefined,
       signal: controller.signal,
-      cache: "no-store",
+      ...(typeof init?.revalidate === "number"
+        ? { next: { revalidate: init.revalidate } }
+        : { cache: "no-store" }),
     });
   } catch (err) {
     throw new CellgodsError(
@@ -180,8 +191,20 @@ async function request<T>(
 
 // ── Endpoints ────────────────────────────────────────────────────────────────
 
+/** LIVE inventory — no caching. Use at buy/activation time (availability must be fresh). */
 export function getInventory(): Promise<InventoryPhone[]> {
   return request<InventoryPhone[]>("/inventory");
+}
+
+/**
+ * BROWSE inventory — cached ~`revalidateSeconds` (default 45s) via Next's Data
+ * Cache. Used for the public catalog/homepage so it renders instantly instead of
+ * round-tripping CellGods on every request. NEVER use for checkout/activation.
+ */
+export function getInventoryForBrowse(
+  revalidateSeconds = 45,
+): Promise<InventoryPhone[]> {
+  return request<InventoryPhone[]>("/inventory", { revalidate: revalidateSeconds });
 }
 
 export function getBalance(): Promise<Balance> {

@@ -24,6 +24,9 @@ import {
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
+// → "Americell · Dashboard" via the brand-first title template.
+export const metadata = { title: "Dashboard" };
+
 // Frosted-glass surface recipe — floats over the global aurora (SiteBackground).
 const glassCard =
   "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
