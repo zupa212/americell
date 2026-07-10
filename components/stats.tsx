@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 import { animate, useInView, useReducedMotion } from "motion/react";
 import { AuroraText } from "@/components/ui/aurora-text";
 import { ShineBorder } from "@/components/ui/shine-border";
+import { BorderBeam } from "@/components/ui/border-beam";
 import Reveal from "@/components/ui/reveal";
 import { cn } from "@/lib/utils";
 
@@ -146,10 +147,37 @@ export default function Stats() {
                     glassHover
                   )}
                 >
+                  {/* Always-on subtle shimmer trim. */}
                   <ShineBorder
                     shineColor={["#2b6bff", "#7c3aed", "#5aa2ff"]}
                     borderWidth={1}
                     duration={14}
+                  />
+
+                  {/* Premium brand beam that traces the border on hover — two
+                      offset passes for a continuous, luminous edge. */}
+                  <div className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                    <BorderBeam
+                      colorFrom="#2b6bff"
+                      colorTo="#7c3aed"
+                      size={70}
+                      duration={6}
+                      borderWidth={1.5}
+                    />
+                    <BorderBeam
+                      colorFrom="#7c3aed"
+                      colorTo="#5aa2ff"
+                      size={70}
+                      duration={6}
+                      delay={3}
+                      borderWidth={1.5}
+                    />
+                  </div>
+
+                  {/* Soft brand wash that blooms from the base on hover. */}
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-brand/10 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                   />
 
                   <div className="relative">

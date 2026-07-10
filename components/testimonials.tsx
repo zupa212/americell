@@ -1,15 +1,81 @@
 import { Quote } from "lucide-react";
 import Reveal from "@/components/ui/reveal";
+import { Marquee } from "@/components/ui/marquee";
 import { ShineBorder } from "@/components/ui/shine-border";
+import { BorderBeam } from "@/components/ui/border-beam";
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
-import { TESTIMONIALS } from "@/lib/site";
+import { TESTIMONIALS, type Testimonial } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
+/**
+ * Testimonials — a buttery, seamless Marquee of frosted-glass quote cards.
+ *
+ * Server component: presentational only. Each quote lives on the shared glass
+ * recipe with an always-on ShineBorder trim; on hover a BorderBeam traces the
+ * edge, the card lifts, and the whole marquee gently pauses (pauseOnHover) so
+ * the reader can settle on a single quote. A symmetric mask fade dissolves the
+ * row into the aurora on both edges. All quotes/authors are preserved verbatim.
+ */
+
 const glassCard = cn(
-  "relative h-full overflow-hidden rounded-3xl border border-white/50 bg-white/60 p-7 backdrop-blur-xl",
+  "group/card relative flex h-full w-[19rem] shrink-0 flex-col overflow-hidden rounded-3xl border border-white/50 bg-white/60 p-7 backdrop-blur-xl sm:w-[23rem]",
   "ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]",
   "transition-all duration-300 hover:bg-white/70 hover:-translate-y-1 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)]",
 );
+
+// Symmetric mask fade — dissolves the scrolling row into the aurora on both
+// edges rather than clipping it with a hard cut.
+const edgeFade = {
+  maskImage:
+    "linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%)",
+  WebkitMaskImage:
+    "linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%)",
+} as const;
+
+function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
+  return (
+    <figure className={glassCard}>
+      {/* Always-on subtle trim. */}
+      <ShineBorder
+        className="rounded-3xl"
+        borderWidth={1}
+        duration={16}
+        shineColor={["#2b6bff", "#7aa2ff", "#b9c9ff"]}
+      />
+
+      {/* Brand beam that traces the border while the card is hovered. */}
+      <div className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-500 group-hover/card:opacity-100">
+        <BorderBeam
+          colorFrom="#2b6bff"
+          colorTo="#7c3aed"
+          size={90}
+          duration={6}
+          borderWidth={1.5}
+        />
+      </div>
+
+      <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/50 bg-white/60 text-brand backdrop-blur-md ring-1 ring-white/40">
+        <Quote
+          aria-hidden="true"
+          className="h-5 w-5"
+          fill="currentColor"
+          strokeWidth={0}
+        />
+      </span>
+
+      <blockquote className="mt-4 flex-1 text-pretty text-base leading-relaxed text-foreground">
+        “{testimonial.quote}”
+      </blockquote>
+
+      <figcaption className="mt-6 flex flex-col items-start gap-0.5 border-t border-white/40 pt-5">
+        <div className="text-sm font-bold text-foreground">
+          {testimonial.name}
+        </div>
+        <div className="text-sm text-muted-foreground">{testimonial.role}</div>
+      </figcaption>
+    </figure>
+  );
+}
 
 export default function Testimonials() {
   return (
@@ -49,47 +115,20 @@ export default function Testimonials() {
           </p>
         </Reveal>
 
-        <ul className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-3">
-          {TESTIMONIALS.map((testimonial, index) => (
-            <Reveal
-              key={testimonial.name}
-              as="li"
-              delay={0.1 * index}
-              className="list-none"
-            >
-              <figure className={glassCard}>
-                <ShineBorder
-                  className="rounded-3xl"
-                  borderWidth={1}
-                  duration={16}
-                  shineColor={["#2b6bff", "#7aa2ff", "#b9c9ff"]}
+        <Reveal as="div" delay={0.05} className="mt-14">
+          {/* Mask fade on the wrapper; the Marquee keeps generous vertical
+              padding so hover lift + soft shadow aren't clipped. */}
+          <div className="relative" style={edgeFade}>
+            <Marquee pauseOnHover className="[--duration:46s] [--gap:1.5rem] py-4 sm:py-6">
+              {TESTIMONIALS.map((testimonial) => (
+                <TestimonialCard
+                  key={testimonial.name}
+                  testimonial={testimonial}
                 />
-
-                <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/50 bg-white/60 text-brand backdrop-blur-md ring-1 ring-white/40">
-                  <Quote
-                    aria-hidden="true"
-                    className="h-5 w-5"
-                    fill="currentColor"
-                    strokeWidth={0}
-                  />
-                </span>
-
-                <blockquote className="mt-4 flex-1 text-base leading-relaxed text-foreground">
-                  “{testimonial.quote}”
-                </blockquote>
-
-                <figcaption className="mt-6 flex flex-col items-start gap-0.5 border-t border-white/40 pt-5">
-                  <div className="text-sm font-bold text-foreground">
-                    {testimonial.name}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {testimonial.role}
-                  </div>
-                </figcaption>
-              </figure>
-            </Reveal>
-          ))}
-        </ul>
+              ))}
+            </Marquee>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

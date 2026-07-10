@@ -1,12 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Globe, Menu } from "lucide-react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+  type Variants,
+} from "motion/react";
 
 import { cn } from "@/lib/utils";
 import { NAV_LINKS, SITE } from "@/lib/site";
 import { AuroraText } from "@/components/ui/aurora-text";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -31,36 +42,83 @@ import {
 import { Separator } from "@/components/ui/separator";
 
 /**
- * SiteHeader — a FLOATING, fully-rounded glassmorphism pill nav (Apple-style).
+ * SiteHeader — a FLOATING, fully-rounded glassmorphism pill nav (Apple-style)
+ * with buttery motion.
  *
  * The bar is a detached `rounded-full` frosted-glass pill that never touches the
- * top edge (a `pt-3/pt-4` gap keeps it floating over the global aurora). It stays
- * pinned while scrolling and tightens its shadow/opacity once the page moves.
- * Brand mark + AuroraText wordmark on the left; shadcn NavigationMenu in the
- * center (md+); language DropdownMenu + Log in + Get started (animated gradient)
- * on the right; a hamburger-triggered Sheet on mobile.
+ * top edge. It smoothly hides on scroll-down and reveals on scroll-up
+ * (`useScroll` + `useMotionValueEvent`), and tightens its shadow/opacity once the
+ * page moves. Nav items share a single spring-animated "magnetic" pill
+ * (`layoutId`) that glides to whatever is hovered/active. Brand + AuroraText
+ * wordmark on the left; shadcn NavigationMenu in the center (md+); language
+ * DropdownMenu + Log in + a Magic UI ShimmerButton "Get started" CTA on the
+ * right; a hamburger-triggered Sheet on mobile with staggered items.
+ *
+ * All motion honors `prefers-reduced-motion` and animates transform/opacity only.
  */
+
+const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const LANGUAGES = ["English"] as const;
+const BRAND_GRADIENT =
+  "linear-gradient(110deg, #2b6bff 0%, #7c3aed 45%, #5aa2ff 100%)";
+
+const mobileList: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.06, delayChildren: 0.08 } },
+};
+const mobileItem: Variants = {
+  hidden: { opacity: 0, x: 18 },
+  show: { opacity: 1, x: 0, transition: { duration: 0.42, ease: EASE } },
+};
+
 export default function SiteHeader() {
+  const prefersReducedMotion = useReducedMotion();
+  const pathname = usePathname();
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [hovered, setHovered] = useState<string | null>(null);
+  const lastY = useRef(0);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  // Buttery hide-on-scroll-down / reveal-on-scroll-up driven by the scroll MV.
+  const { scrollY } = useScroll();
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setScrolled(latest > 8);
+    const previous = lastY.current;
+    if (!menuOpen) {
+      if (latest > 140 && latest > previous + 6) setHidden(true);
+      else if (latest < previous - 6) setHidden(false);
+    }
+    lastY.current = latest;
+  });
+
+  // Exact-match active section (Home on "/", Blog on "/blog"); the shared pill
+  // rests here whenever nothing is hovered.
+  const activeHref =
+    NAV_LINKS.find((link) => link.href === pathname)?.href ?? null;
+  const highlighted = hovered ?? activeHref;
+  const shouldHide = hidden && !menuOpen && !prefersReducedMotion;
 
   return (
     <header className="sticky top-0 z-50">
-      <div className="mx-auto w-full max-w-5xl px-4 pt-3 sm:pt-4">
+      <motion.div
+        className="mx-auto w-full max-w-5xl px-4 pt-3 sm:pt-4"
+        initial={prefersReducedMotion ? false : { y: -80, opacity: 0 }}
+        animate={{ y: shouldHide ? -120 : 0, opacity: 1 }}
+        transition={
+          prefersReducedMotion
+            ? { duration: 0 }
+            : { type: "spring", stiffness: 320, damping: 34, mass: 0.9 }
+        }
+      >
         <div
           className={cn(
             "flex h-14 items-center justify-between gap-1.5 rounded-full border border-white/50 pl-4 pr-2 sm:gap-2 sm:pl-5",
             "bg-white/55 ring-1 ring-white/50 backdrop-blur-2xl backdrop-saturate-150",
-            "transition-all duration-300",
+            "transition-[background-color,box-shadow] duration-300",
             scrolled
-              ? "bg-white/65 shadow-[0_16px_50px_-16px_rgba(30,41,120,0.38)]"
+              ? "bg-white/70 shadow-[0_16px_50px_-16px_rgba(30,41,120,0.38)]"
               : "shadow-[0_10px_40px_-14px_rgba(30,41,120,0.28)]",
           )}
         >
@@ -82,22 +140,48 @@ export default function SiteHeader() {
             </span>
           </a>
 
-          {/* Center nav (md+) */}
+          {/* Center nav (md+) — shared magnetic pill glides between items */}
           <NavigationMenu className="hidden md:flex" aria-label="Navigation">
-            <NavigationMenuList className="gap-0.5">
-              {NAV_LINKS.map((link) => (
-                <NavigationMenuItem key={link.href}>
-                  <NavigationMenuLink
-                    href={link.href}
-                    className={cn(
-                      "rounded-full px-3 py-2 text-sm font-medium text-muted-foreground",
-                      "transition-all duration-300 hover:bg-white/70 hover:text-foreground",
-                    )}
+            <NavigationMenuList
+              className="gap-0.5"
+              onMouseLeave={() => setHovered(null)}
+            >
+              {NAV_LINKS.map((link) => {
+                const isHot = highlighted === link.href;
+                return (
+                  <NavigationMenuItem
+                    key={link.href}
+                    onMouseEnter={() => setHovered(link.href)}
                   >
-                    {link.label}
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              ))}
+                    <NavigationMenuLink
+                      href={link.href}
+                      onFocus={() => setHovered(link.href)}
+                      className={cn(
+                        "relative rounded-full px-3 py-2 text-sm font-medium text-muted-foreground",
+                        "transition-colors duration-300 hover:bg-transparent hover:text-foreground focus:bg-transparent",
+                        isHot && "text-foreground",
+                      )}
+                    >
+                      {isHot &&
+                        (prefersReducedMotion ? (
+                          <span className="absolute inset-0 rounded-full bg-white/75 ring-1 ring-white/60 shadow-[0_4px_16px_-6px_rgba(30,41,120,0.25)]" />
+                        ) : (
+                          <motion.span
+                            layoutId="nav-pill"
+                            className="absolute inset-0 rounded-full bg-white/75 ring-1 ring-white/60 shadow-[0_4px_16px_-6px_rgba(30,41,120,0.25)]"
+                            transition={{
+                              type: "spring",
+                              stiffness: 380,
+                              damping: 32,
+                              mass: 0.8,
+                            }}
+                          />
+                        ))}
+                      <span className="relative z-10">{link.label}</span>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                );
+              })}
             </NavigationMenuList>
           </NavigationMenu>
 
@@ -139,15 +223,25 @@ export default function SiteHeader() {
               Log in
             </Button>
 
-            {/* Get started (primary, animated gradient) */}
-            <Button
-              size="sm"
-              className="min-h-11 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] px-4 font-semibold text-white shadow-sm shadow-brand/25 ring-1 ring-white/30 transition-all duration-300 animate-gradient hover:-translate-y-0.5 hover:opacity-95 hover:shadow-[0_16px_40px_-16px_rgba(43,107,255,0.55)] sm:min-h-0 sm:px-2.5"
-              render={<a href="/signup" />}
-              nativeButton={false}
+            {/* Get started (primary) — Magic UI ShimmerButton wrapped in an
+                accessible link (link owns focus + name; shimmer is decorative). */}
+            <a
+              href="/signup"
+              aria-label="Get started"
+              className="group/cta relative inline-flex rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
-              Get started
-            </Button>
+              <ShimmerButton
+                tabIndex={-1}
+                aria-hidden="true"
+                background={BRAND_GRADIENT}
+                shimmerColor="#ffffff"
+                shimmerDuration="2.6s"
+                borderRadius="9999px"
+                className="h-11 min-h-11 px-4 py-0 text-sm font-semibold shadow-sm shadow-brand/25 ring-1 ring-white/25 transition-transform duration-300 group-hover/cta:-translate-y-0.5 sm:h-9 sm:min-h-0 sm:px-3.5"
+              >
+                Get started
+              </ShimmerButton>
+            </a>
 
             {/* Mobile menu (Sheet) */}
             <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
@@ -178,59 +272,101 @@ export default function SiteHeader() {
                     <span className="text-lg font-bold tracking-tighter">
                       <AuroraText>{SITE.name}</AuroraText>
                     </span>
+                    <Badge
+                      variant="secondary"
+                      className="ml-1 gap-1.5 border border-white/50 bg-white/60 text-[10px] font-semibold tracking-wide text-brand uppercase"
+                    >
+                      <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand/70" />
+                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand" />
+                      </span>
+                      Live
+                    </Badge>
                   </SheetTitle>
                   <SheetDescription>Mobile navigation</SheetDescription>
                 </SheetHeader>
 
-                <nav
-                  aria-label="Mobile navigation"
-                  className="flex flex-col gap-1 px-4"
-                >
-                  {NAV_LINKS.map((link) => (
-                    <SheetClose
-                      key={link.href}
-                      render={
-                        <a
-                          href={link.href}
-                          className="rounded-xl px-3 py-2.5 text-base font-medium text-foreground transition-all duration-300 hover:bg-white/60 hover:backdrop-blur-md"
+                <AnimatePresence>
+                  <motion.nav
+                    aria-label="Mobile navigation"
+                    className="flex flex-col gap-1 px-4"
+                    variants={mobileList}
+                    initial={prefersReducedMotion ? false : "hidden"}
+                    animate="show"
+                  >
+                    {NAV_LINKS.map((link) => (
+                      <motion.div
+                        key={link.href}
+                        variants={prefersReducedMotion ? undefined : mobileItem}
+                      >
+                        <SheetClose
+                          render={
+                            <a
+                              href={link.href}
+                              className="flex items-center justify-between rounded-xl px-3 py-2.5 text-base font-medium text-foreground transition-all duration-300 hover:bg-white/60 hover:backdrop-blur-md"
+                            />
+                          }
                         >
                           {link.label}
-                        </a>
-                      }
-                    />
-                  ))}
-                </nav>
+                        </SheetClose>
+                      </motion.div>
+                    ))}
+                  </motion.nav>
+                </AnimatePresence>
 
                 <Separator className="my-4 bg-white/50" />
 
-                <div className="flex flex-col gap-2 px-4 pb-4">
+                <motion.div
+                  className="flex flex-col gap-2 px-4 pb-4"
+                  initial={
+                    prefersReducedMotion ? false : { opacity: 0, y: 12 }
+                  }
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={
+                    prefersReducedMotion
+                      ? { duration: 0 }
+                      : {
+                          duration: 0.4,
+                          ease: EASE,
+                          delay: 0.08 + 0.06 * NAV_LINKS.length,
+                        }
+                  }
+                >
                   <Button
                     variant="outline"
                     size="lg"
                     className="h-11 w-full rounded-full border-white/50 bg-white/60 font-medium backdrop-blur-md transition-all duration-300 hover:bg-white/70"
-                    render={<a href="/login" onClick={() => setMenuOpen(false)} />}
+                    render={
+                      <a href="/login" onClick={() => setMenuOpen(false)} />
+                    }
                     nativeButton={false}
                   >
                     Log in
                   </Button>
-                  <Button
-                    size="lg"
-                    className="h-11 w-full rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] font-semibold text-white shadow-sm shadow-brand/25 ring-1 ring-white/30 transition-all duration-300 animate-gradient hover:opacity-95 hover:shadow-[0_16px_40px_-16px_rgba(43,107,255,0.55)]"
-                    render={
-                      <a href="/signup" onClick={() => setMenuOpen(false)} />
-                    }
-                    nativeButton={false}
+                  <a
+                    href="/signup"
+                    aria-label="Get started"
+                    onClick={() => setMenuOpen(false)}
+                    className="group/cta relative inline-flex w-full rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   >
-                    Get started
-                  </Button>
-                </div>
+                    <ShimmerButton
+                      tabIndex={-1}
+                      aria-hidden="true"
+                      background={BRAND_GRADIENT}
+                      shimmerColor="#ffffff"
+                      shimmerDuration="2.6s"
+                      borderRadius="9999px"
+                      className="h-11 w-full px-4 py-0 text-sm font-semibold shadow-sm shadow-brand/25 ring-1 ring-white/25"
+                    >
+                      Get started
+                    </ShimmerButton>
+                  </a>
+                </motion.div>
               </SheetContent>
             </Sheet>
           </div>
         </div>
-      </div>
+      </motion.div>
     </header>
   );
 }
-
-const LANGUAGES = ["English"] as const;

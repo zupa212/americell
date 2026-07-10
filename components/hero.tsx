@@ -1,5 +1,15 @@
+"use client";
+
 import type { ComponentType, SVGProps } from "react";
+import { useRef } from "react";
 import Link from "next/link";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  type Variants,
+} from "motion/react";
 import {
   SiInstagram,
   SiTiktok,
@@ -11,41 +21,77 @@ import {
 } from "react-icons/si";
 import { Settings, Pause, Send } from "lucide-react";
 import { SITE } from "@/lib/site";
-import Reveal from "@/components/ui/reveal";
 import { AuroraText } from "@/components/ui/aurora-text";
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { ShineBorder } from "@/components/ui/shine-border";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { Particles } from "@/components/ui/particles";
+import { DotPattern } from "@/components/ui/dot-pattern";
 import { Button } from "@/components/ui/button";
 import HeroPhoneParallax from "@/components/hero-phone-parallax";
 import { cn } from "@/lib/utils";
 
 /**
- * Hero — the marketing centerpiece (Server Component). THE STAR.
+ * Hero — the marketing centerpiece (Client Component). THE STAR.
  *
- * No client interactivity lives here: entrance motion is delegated to the
- * shared <Reveal> client wrapper, the floating app tiles bob via the CSS
- * keyframe utilities (animate-float / animate-float-slow) from globals.css,
- * and the phone's scroll parallax + idle float live in the tiny
- * <HeroPhoneParallax> client child. The premium accents are composed from
- * Magic UI + shadcn (AuroraText, BorderBeam, ShineBorder, Particles,
- * AnimatedShinyText, ShimmerButton, Button).
+ * The entrance is a single, coordinated, buttery stagger driven by Framer
+ * Motion variants (motion/react): the eyebrow → headline → subline → CTAs →
+ * trust row → device visual draw in one at a time on mount, each fading up
+ * from y+24 while a 6px blur dissolves (ease [0.16,1,0.3,1]). Because the hero
+ * sits above the fold we play on mount (initial → animate) rather than
+ * whileInView, which reads as more premium here. Everything honors
+ * prefers-reduced-motion by rendering perfectly static.
+ *
+ * Depth comes from three transform-only layers that never touch layout:
+ *   • the headline's brand bloom drifts with a small scroll parallax
+ *     (useScroll + useTransform, ~30px)
+ *   • the phone gets its own scroll parallax + idle float via the tiny
+ *     <HeroPhoneParallax> client child (so it moves relative to the app tiles)
+ *   • the floating app tiles bob on the CSS float keyframes from globals.css
  *
  * Flashy · minimal · BOLD (US-English): a huge, few-words headline with an
- * animated blue→violet→cyan gradient keyword, one short subline, a ShimmerButton
- * "Get started" + a subtle "See pricing", and a noticeably BIGGER, more premium
- * phone mockup sitting over the wild animated gradient. The device draws in its
- * native 286×580 coordinate system, then scales up inside a correctly-sized
- * outer box so the floating app tiles stay anchored around it.
+ * animated blue→violet→cyan AuroraText keyword, one short subline, a
+ * ShimmerButton "Get started" (/signup) + a subtle glass "See pricing"
+ * (#pricing), an honest trust row, and a noticeably BIGGER, premium phone
+ * mockup drawn in its native 286×580 coordinate system then scaled up so the
+ * floating tiles stay anchored.
  *
  * GLASSMORPHISM: the <section> is fully transparent so the persistent global
  * <SiteBackground/> (light wash + drifting aurora + dot grid, fixed behind
- * everything) shows through. Surfaces above it are frosted glass. Brand logos
- * (react-icons/si) + a lucide gear are decorative; all copy stays honest about
- * real-device control, automation, and testing. No network images.
+ * everything) shows through. Surfaces above it are frosted glass. The premium
+ * accents are composed from Magic UI + shadcn (AuroraText, AnimatedShinyText,
+ * ShimmerButton, Particles, DotPattern, BorderBeam, ShineBorder, Button).
+ * Brand logos (react-icons/si) + a lucide gear are decorative; all copy stays
+ * honest about real-device control, automation, and testing. No network images.
  */
+
+// Signature easing + a coordinated stagger for the whole hero entrance.
+const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
+const containerVariants: Variants = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.1, delayChildren: 0.06 },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 24, filter: "blur(6px)" },
+  show: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: {
+      duration: 0.62,
+      ease: EASE_OUT,
+      filter: { duration: 0.5, ease: "easeOut" },
+    },
+  },
+};
+
+// Snappy spring for CTA / eyebrow micro-interactions.
+const PRESS_SPRING = { type: "spring", stiffness: 400, damping: 17 } as const;
 
 type IconType = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -202,7 +248,7 @@ function FloatingTile({ tile }: { tile: FloatingTile }) {
 }
 
 /**
- * PhoneMockup — a pure-CSS, Apple-grade device (Server Component), scaled up.
+ * PhoneMockup — a pure-CSS, Apple-grade device, scaled up.
  *
  * It draws in a native 286×580 coordinate system so every meticulously
  * calibrated offset (side buttons, Dynamic Island, status bar, glass card…)
@@ -478,120 +524,188 @@ function PhoneMockup() {
   );
 }
 
+// Honest, one-word product highlights for the trust row.
+const TRUST_POINTS = ["No emulators", "US datacenters", "Live in your browser"];
+
 export default function Hero() {
+  const prefersReducedMotion = useReducedMotion();
+
+  // Small scroll-linked parallax for the headline's brand bloom (transform
+  // only). The phone gets its own parallax inside <HeroPhoneParallax>.
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+  const bloomY = useTransform(scrollYProgress, [0, 1], [0, -30]);
+
+  // Motion props are gated on reduced-motion: when reduced, spreads are empty
+  // objects so every element renders static and fully visible.
+  const container = prefersReducedMotion
+    ? {}
+    : { variants: containerVariants, initial: "hidden", animate: "show" };
+  const item = prefersReducedMotion ? {} : { variants: itemVariants };
+  const press = prefersReducedMotion
+    ? {}
+    : {
+        whileHover: { scale: 1.03 },
+        whileTap: { scale: 0.97 },
+        transition: PRESS_SPRING,
+      };
+
   return (
     // Transparent section — the global <SiteBackground/> (aurora + dot grid)
     // shows through the frosted glass surfaces above it.
-    <section id="top" className="relative overflow-hidden">
+    <section ref={sectionRef} id="top" className="relative overflow-hidden">
       {/* soft brand-gradient glow behind the headline — keeps AMERICELL's
-          blue→violet presence felt without overpowering the global aurora */}
-      <div
+          blue→violet presence felt without overpowering the global aurora.
+          Drifts up gently on scroll for depth (transform only). */}
+      <motion.div
         aria-hidden="true"
+        style={
+          prefersReducedMotion
+            ? undefined
+            : { y: bloomY, willChange: "transform" }
+        }
         className="pointer-events-none absolute inset-x-0 -top-20 -z-10 flex justify-center"
       >
         <div className="h-[440px] w-[860px] max-w-[92vw] rounded-full bg-[radial-gradient(closest-side,rgba(43,107,255,0.20),rgba(124,58,237,0.12),transparent)] blur-2xl" />
-      </div>
+      </motion.div>
 
-      <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-32">
+      <motion.div
+        {...container}
+        className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-32"
+      >
         {/* eyebrow — AMERICELL brand mark + AnimatedShinyText inside a
             crisp frosted glass pill */}
-        <Reveal>
-          <div className="flex justify-center">
-            <div
-              className={cn(
-                "group inline-flex items-center gap-2.5 rounded-full py-1 pl-1.5 pr-3.5 text-sm",
-                "border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40",
-                "shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]",
-                "transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/70",
-              )}
-            >
-              {/* small Americell brand mark */}
-              <span className="flex items-center gap-1.5 rounded-full bg-white/70 py-1 pl-1 pr-2.5 ring-1 ring-white/50">
-                <span className="flex h-5 w-5 items-center justify-center rounded-[7px] bg-gradient-to-br from-brand via-brand-2 to-brand-soft shadow-sm ring-1 ring-white/40">
-                  <BrandGlyph className="h-3 w-3 text-white" />
-                </span>
-                <AuroraText className="text-[13px] font-semibold tracking-tight">
-                  {SITE.name}
-                </AuroraText>
+        <motion.div {...item} className="flex justify-center">
+          <motion.div
+            {...press}
+            className={cn(
+              "group inline-flex items-center gap-2.5 rounded-full py-1 pl-1.5 pr-3.5 text-sm",
+              "border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40",
+              "shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]",
+              "transition-colors duration-300 hover:bg-white/70",
+            )}
+          >
+            {/* small Americell brand mark */}
+            <span className="flex items-center gap-1.5 rounded-full bg-white/70 py-1 pl-1 pr-2.5 ring-1 ring-white/50">
+              <span className="flex h-5 w-5 items-center justify-center rounded-[7px] bg-gradient-to-br from-brand via-brand-2 to-brand-soft shadow-sm ring-1 ring-white/40">
+                <BrandGlyph className="h-3 w-3 text-white" />
               </span>
-              <span
-                aria-hidden="true"
-                className="h-3.5 w-px bg-foreground/15"
-              />
-              <AnimatedShinyText className="inline-flex items-center justify-center text-brand">
-                Real US devices, fully remote
-              </AnimatedShinyText>
-            </div>
-          </div>
-        </Reveal>
+              <AuroraText className="text-[13px] font-semibold tracking-tight">
+                {SITE.name}
+              </AuroraText>
+            </span>
+            <span aria-hidden="true" className="h-3.5 w-px bg-foreground/15" />
+            <AnimatedShinyText className="inline-flex items-center justify-center text-brand">
+              Real US devices, fully remote
+            </AnimatedShinyText>
+          </motion.div>
+        </motion.div>
 
         {/* headline — the ONLY h1 */}
-        <Reveal delay={0.05}>
-          <h1 className="mx-auto mt-8 max-w-5xl text-balance break-words text-center text-4xl font-bold leading-[0.95] tracking-[-0.045em] text-foreground sm:text-7xl sm:leading-[0.92] lg:text-[6.5rem]">
-            Real US phones.{" "}
-            <br className="hidden sm:block" />
-            In your{" "}
-            <span className="bg-gradient-to-r from-brand via-brand-2 to-[#22d3ee] bg-[length:200%_auto] bg-clip-text text-transparent motion-safe:animate-gradient">
-              browser
-            </span>
-            .
-          </h1>
-        </Reveal>
+        <motion.h1
+          {...item}
+          className="mx-auto mt-8 max-w-5xl text-balance break-words text-center text-4xl font-bold leading-[0.95] tracking-[-0.045em] text-foreground sm:text-7xl sm:leading-[0.92] lg:text-[6.5rem]"
+        >
+          Real US phones.{" "}
+          <br className="hidden sm:block" />
+          In your{" "}
+          <AuroraText colors={["#2b6bff", "#7c3aed", "#22d3ee"]} speed={1.2}>
+            browser
+          </AuroraText>
+          .
+        </motion.h1>
 
         {/* subhead */}
-        <Reveal delay={0.1}>
-          <p className="mx-auto mt-7 max-w-2xl text-pretty text-center text-lg leading-relaxed text-muted-foreground sm:text-xl">
-            Live iPhones and Androids in US datacenters. Tap, type, install, and
-            automate — from anywhere.
-          </p>
-        </Reveal>
+        <motion.p
+          {...item}
+          className="mx-auto mt-7 max-w-2xl text-pretty text-center text-lg leading-relaxed text-muted-foreground sm:text-xl"
+        >
+          Live iPhones and Androids in US datacenters. Tap, type, install, and
+          automate — from anywhere.
+        </motion.p>
 
         {/* CTAs */}
-        <Reveal delay={0.15}>
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5">
-            <Link href="/signup" className="inline-flex">
+        <motion.div
+          {...item}
+          className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5"
+        >
+          <motion.div {...press} className="inline-flex">
+            <Link href="/signup" className="inline-flex" aria-label="Get started">
               <ShimmerButton
                 background="var(--foreground)"
-                className="h-12 px-7 text-sm font-medium shadow-soft transition-all duration-300 hover:-translate-y-0.5"
+                className="h-12 px-7 text-sm font-medium shadow-soft"
               >
                 Get started
               </ShimmerButton>
             </Link>
+          </motion.div>
+          <motion.div {...press} className="inline-flex">
             <Button
               variant="ghost"
               size="lg"
-              className="h-12 rounded-full px-6 text-sm font-medium text-muted-foreground transition-all duration-300 hover:-translate-y-0.5"
+              className="h-12 rounded-full px-6 text-sm font-medium text-muted-foreground"
               render={<a href="#pricing" />}
               nativeButton={false}
             >
               See pricing
             </Button>
-          </div>
-        </Reveal>
+          </motion.div>
+        </motion.div>
 
-        {/* the visual: phone + floating tiles + ambient particles */}
-        <Reveal delay={0.2}>
-          <div className="relative mt-20 flex justify-center sm:mt-28">
-            <div className="relative origin-top scale-[0.8] -mb-24 sm:mb-0 sm:scale-100">
-              {/* ambient particles drifting behind the phone for depth */}
-              <Particles
-                className="pointer-events-none absolute -inset-24 -z-10"
-                quantity={70}
-                ease={80}
-                color="#2b6bff"
-                staticity={40}
+        {/* trust row — honest product highlights */}
+        <motion.ul
+          {...item}
+          aria-label="Product highlights"
+          className="mx-auto mt-8 flex max-w-xl flex-wrap items-center justify-center gap-2.5"
+        >
+          {TRUST_POINTS.map((point) => (
+            <li
+              key={point}
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/50 bg-white/50 px-3 py-1 text-xs font-medium text-muted-foreground ring-1 ring-white/40 backdrop-blur-md"
+            >
+              <span
+                aria-hidden="true"
+                className="h-1.5 w-1.5 rounded-full bg-gradient-to-br from-brand to-brand-2"
               />
-              {TILES.map((tile) => (
-                <FloatingTile key={tile.name} tile={tile} />
-              ))}
-              {/* subtle scroll parallax + idle float (reduced-motion safe) */}
-              <HeroPhoneParallax>
-                <PhoneMockup />
-              </HeroPhoneParallax>
-            </div>
+              {point}
+            </li>
+          ))}
+        </motion.ul>
+
+        {/* the visual: phone + floating tiles + ambient particles / dots */}
+        <motion.div
+          {...item}
+          className="relative mt-20 flex justify-center sm:mt-28"
+        >
+          <div className="relative origin-top scale-[0.8] -mb-24 sm:mb-0 sm:scale-100">
+            {/* subtle dot grid behind the device, softly masked to the center */}
+            <DotPattern
+              width={24}
+              height={24}
+              cr={1.1}
+              className="pointer-events-none -z-20 text-brand/20 [mask-image:radial-gradient(280px_circle_at_50%_45%,white,transparent_72%)]"
+            />
+            {/* ambient particles drifting behind the phone for depth */}
+            <Particles
+              className="pointer-events-none absolute -inset-24 -z-10"
+              quantity={70}
+              ease={80}
+              color="#2b6bff"
+              staticity={40}
+            />
+            {TILES.map((tile) => (
+              <FloatingTile key={tile.name} tile={tile} />
+            ))}
+            {/* subtle scroll parallax + idle float (reduced-motion safe) */}
+            <HeroPhoneParallax>
+              <PhoneMockup />
+            </HeroPhoneParallax>
           </div>
-        </Reveal>
-      </div>
+        </motion.div>
+      </motion.div>
     </section>
   );
 }

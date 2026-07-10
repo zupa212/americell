@@ -10,16 +10,27 @@ import { cn } from "@/lib/utils";
  * is transparent so the global aurora shows through; the strip itself is a
  * slim frosted-glass band (bg-white/50 backdrop-blur-md border-y border-white/40)
  * containing a short, bold English trust line whose key nouns animate through
- * the brand gradient, followed by an infinite Magic UI <Marquee> of client
- * wordmarks rendered in a muted, uppercase, tracking-wide style. Left/right
- * fade masks blend the scrolling row into the glass surface. The intro content
- * is wrapped in the <Reveal> client wrapper for a subtle scroll-in.
+ * the brand gradient, followed by a seamless, infinite Magic UI <Marquee> of
+ * client wordmarks — each paired with a tiny brand-gradient marker that lights
+ * up on hover. A symmetric mask fade dissolves the scrolling row into the glass
+ * on both edges (revealing the aurora behind, not a hard white overlay), and
+ * the whole row gently pauses on hover. The intro content is wrapped in the
+ * <Reveal> client wrapper for a subtle scroll-in.
  */
 
 // Animated brand-gradient text: blue → violet → cyan, GPU-only pan that
 // respects prefers-reduced-motion via the motion-safe variant.
 const gradientWord =
   "bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] bg-clip-text text-transparent motion-safe:animate-gradient";
+
+// Soft, symmetric edge fade. A mask (not a white overlay) dissolves the row
+// into whatever sits behind the glass — so it reads correctly over the aurora.
+const edgeFade = {
+  maskImage:
+    "linear-gradient(to right, transparent 0%, #000 9%, #000 91%, transparent 100%)",
+  WebkitMaskImage:
+    "linear-gradient(to right, transparent 0%, #000 9%, #000 91%, transparent 100%)",
+} as const;
 
 export default function LogosStrip() {
   return (
@@ -54,28 +65,28 @@ export default function LogosStrip() {
             </p>
           </Reveal>
 
-          <div className="relative mt-5 sm:mt-6">
-            <Marquee pauseOnHover className="[--duration:28s]">
-              {CLIENT_LOGOS.map((name) => (
-                <span
-                  key={name}
-                  className="mx-8 text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground/60 transition-colors duration-300 hover:text-brand"
-                >
-                  {name}
-                </span>
-              ))}
-            </Marquee>
-
-            {/* Left/right fade masks blend the row into the glass surface */}
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 left-0 w-1/6 bg-gradient-to-r from-white/60 to-transparent"
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-y-0 right-0 w-1/6 bg-gradient-to-l from-white/60 to-transparent"
-            />
-          </div>
+          <Reveal delay={0.16} as="div" className="mt-5 sm:mt-6">
+            {/* Mask fade lives on the wrapper so the seamless Marquee row
+                dissolves into the glass on both edges. */}
+            <div className="relative" style={edgeFade}>
+              <Marquee pauseOnHover className="[--duration:34s] [--gap:0px]">
+                {CLIENT_LOGOS.map((name) => (
+                  <div
+                    key={name}
+                    className="group/logo mx-7 flex items-center gap-2.5 sm:mx-9"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="h-1.5 w-1.5 rounded-full bg-gradient-to-br from-brand to-brand-2 opacity-40 transition-all duration-300 group-hover/logo:scale-125 group-hover/logo:opacity-100"
+                    />
+                    <span className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground/60 transition-colors duration-300 group-hover/logo:text-brand">
+                      {name}
+                    </span>
+                  </div>
+                ))}
+              </Marquee>
+            </div>
+          </Reveal>
         </div>
       </div>
     </section>
