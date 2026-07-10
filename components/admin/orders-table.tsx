@@ -64,6 +64,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import DeactivateButton from "@/components/admin/deactivate-button";
+import { EmptyState } from "@/components/admin/empty-state";
 import LottiePlayer from "@/components/ui/lottie";
 import { cn } from "@/lib/utils";
 
@@ -139,6 +140,32 @@ const STATUS_META: Record<string, { label: string; className: string }> = {
 
 function statusMeta(status: string): { label: string; className: string } {
   return STATUS_META[status] ?? { label: status, className: "bg-muted text-muted-foreground" };
+}
+
+/** Consistent semantic status pill with a leading tone dot (premium accent). */
+function StatusBadge({
+  status,
+  className,
+}: {
+  status: string;
+  className?: string;
+}) {
+  const meta = statusMeta(status);
+  return (
+    <Badge
+      className={cn(
+        "gap-1.5 border-transparent font-medium ring-1 ring-inset ring-current/15",
+        meta.className,
+        className,
+      )}
+    >
+      <span
+        aria-hidden="true"
+        className="size-1.5 shrink-0 rounded-full bg-current opacity-70"
+      />
+      {meta.label}
+    </Badge>
+  );
 }
 
 // ── Sorting ─────────────────────────────────────────────────────────────────
@@ -434,31 +461,32 @@ export default function OrdersTable({ orders }: { orders: AdminOrderRow[] }) {
     return [...filtered].sort((a, b) => compareRows(a, b, sort));
   }, [orders, query, group, sort]);
 
-  // Whole-table empty state: no orders exist at all.
+  // Whole-table empty state: no orders exist at all. Uses the shared EmptyState,
+  // neutralised so it blends into the page's glass card instead of nesting a
+  // second frosted panel.
   if (orders.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-3 px-4 py-16 text-center">
-        <LottiePlayer src="/lottie/pulse.json" className="h-24 w-24" />
-        <p className="text-sm font-medium text-foreground">No orders right now</p>
-        <p className="max-w-xs text-sm text-muted-foreground">
-          Live rentals appear here the moment a customer activates a device on
-          CellGods.
-        </p>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={refresh}
-          disabled={isRefreshing}
-          className="mt-1 border-white/50 bg-white/60 backdrop-blur-md"
-        >
-          <RefreshCw
-            className={cn("h-3.5 w-3.5", isRefreshing && "animate-spin")}
-            aria-hidden="true"
-          />
-          Refresh
-        </Button>
-      </div>
+      <EmptyState
+        className="rounded-none border-0 bg-transparent shadow-none ring-0"
+        title="No orders right now"
+        description="Live rentals appear here the moment a customer activates a device on CellGods."
+        action={
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={refresh}
+            disabled={isRefreshing}
+            className="border-white/50 bg-white/60 backdrop-blur-md"
+          >
+            <RefreshCw
+              className={cn("h-3.5 w-3.5", isRefreshing && "animate-spin")}
+              aria-hidden="true"
+            />
+            Refresh
+          </Button>
+        }
+      />
     );
   }
 
@@ -579,7 +607,7 @@ export default function OrdersTable({ orders }: { orders: AdminOrderRow[] }) {
           )}
         >
           <TableHeader>
-            <TableRow className="border-white/40 hover:bg-transparent">
+            <TableRow className="border-white/40 bg-white/35 hover:bg-white/35 dark:bg-white/5 [&>th]:h-11 [&>th]:text-[11px] [&>th]:font-semibold [&>th]:tracking-wide [&>th]:text-muted-foreground [&>th]:uppercase">
               <TableHead>Order</TableHead>
               <TableHead>Device</TableHead>
               <TableHead>Customer</TableHead>
@@ -601,31 +629,52 @@ export default function OrdersTable({ orders }: { orders: AdminOrderRow[] }) {
               </TableRow>
             ) : (
               visible.map((o) => {
-                const meta = statusMeta(o.status);
                 const deviceLabel = o.model ?? o.phone_id;
                 const canDeactivate = ACTIVE_STATUSES.has(o.status);
                 return (
-                  <TableRow key={o.order_id} className="border-white/40">
-                    <TableCell className="font-mono text-xs text-muted-foreground">
-                      {o.order_id}
+                  <TableRow
+                    key={o.order_id}
+                    className="border-white/40 transition-colors hover:bg-white/40 dark:hover:bg-white/5"
+                  >
+                    <TableCell>
+                      <Tooltip>
+                        <TooltipTrigger
+                          render={
+                            <span className="inline-block max-w-[9rem] cursor-default truncate align-middle font-mono text-xs text-muted-foreground" />
+                          }
+                        >
+                          {o.order_id}
+                        </TooltipTrigger>
+                        <TooltipContent className="font-mono text-xs">
+                          {o.order_id}
+                        </TooltipContent>
+                      </Tooltip>
                     </TableCell>
                     <TableCell>
-                      <span className="font-medium text-foreground">
-                        {deviceLabel}
-                      </span>
-                      {o.model ? (
-                        <span className="block font-mono text-[11px] text-muted-foreground">
-                          {o.phone_id}
+                      <span className="inline-flex items-center gap-2">
+                        <span
+                          aria-hidden="true"
+                          className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-white/50 bg-white/50 text-muted-foreground backdrop-blur-md"
+                        >
+                          <Smartphone className="size-3.5" />
                         </span>
-                      ) : null}
+                        <span className="flex flex-col">
+                          <span className="font-medium text-foreground">
+                            {deviceLabel}
+                          </span>
+                          {o.model ? (
+                            <span className="font-mono text-[11px] text-muted-foreground">
+                              {o.phone_id}
+                            </span>
+                          ) : null}
+                        </span>
+                      </span>
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
+                    <TableCell className="max-w-[16rem] truncate text-muted-foreground">
                       {o.customer_email}
                     </TableCell>
                     <TableCell>
-                      <Badge className={cn("border-transparent", meta.className)}>
-                        {meta.label}
-                      </Badge>
+                      <StatusBadge status={o.status} />
                     </TableCell>
                     <TableCell>
                       <ExpiryCell iso={o.expiresAt} label={o.expiresLabel} />

@@ -39,7 +39,7 @@ export default async function AdminLayout({
       <div className="relative flex min-h-screen flex-col md:pl-72">
         <AdminTopbar email={email} />
 
-        <main className="relative flex-1 px-3 pt-3 pb-6 md:px-4">
+        <main className="relative flex-1 px-3 pt-3 pb-6 md:px-5 md:pt-4 md:pb-8">
           {/* Ambient particles drifting behind the glass for depth. */}
           <Particles
             className="pointer-events-none absolute inset-0 -z-[1]"
@@ -48,7 +48,10 @@ export default async function AdminLayout({
             color="#2b6bff"
             staticity={60}
           />
-          <div className="mx-auto w-full max-w-7xl rounded-3xl border border-white/40 bg-white/40 p-4 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.12)] ring-1 ring-white/30 backdrop-blur-md md:p-6">
+          {/* The shared glass "canvas" every admin page settles onto — a single
+              calm frosted surface floating on the aurora, so pages inherit one
+              consistent frame regardless of their own inner cards. */}
+          <div className="mx-auto min-h-[calc(100svh-6rem)] w-full max-w-7xl rounded-3xl border border-white/50 bg-white/40 p-4 shadow-[0_18px_60px_-24px_rgba(30,41,120,0.18)] ring-1 ring-white/40 backdrop-blur-md md:p-6">
             {children}
           </div>
         </main>
