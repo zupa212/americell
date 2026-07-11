@@ -6,8 +6,15 @@ import { auth } from "@/auth";
 import { isDbConfigured } from "@/lib/db";
 import type { Rental } from "@/db/schema";
 import { listRentalsForUser, markExpired } from "@/lib/rentals";
+import { DURATIONS, getRetailCatalog } from "@/lib/pricing";
+import { isMoonpayConfigured } from "@/lib/moonpay";
+import { isNowpaymentsConfigured } from "@/lib/nowpayments";
+import { isCoinbaseConfigured } from "@/lib/coinbase";
+import { isBtcpayConfigured } from "@/lib/btcpay";
 import RentalCard, { type RentalCardData } from "@/components/rental-card";
 import DashboardUserMenu from "@/components/dashboard-user-menu";
+import DashboardBuyPanel from "@/components/dashboard-buy-panel";
+import { type CryptoProvider } from "@/components/pricing-grid";
 import { AuroraText } from "@/components/ui/aurora-text";
 import { BorderBeam } from "@/components/ui/border-beam";
 import Reveal from "@/components/ui/reveal";
@@ -33,6 +40,21 @@ const glassHover =
 
 // Statuses that entitle a live rental (§5.4: `pooled` is active-equivalent).
 const ACTIVE_STATUSES = new Set(["active", "pooled"]);
+
+/**
+ * Crypto payment options offered in the in-dashboard "Pay with crypto" picker.
+ * `configured` is read from the SERVER-ONLY provider flags (env), so the client
+ * only learns which options exist — never any keys. Identical to the landing
+ * `pricing.tsx` helper so both checkout surfaces stay in lockstep.
+ */
+function cryptoProviders(): CryptoProvider[] {
+  return [
+    { id: "nowpayments", label: "Crypto (no sign-up)", note: "100+ coins · no KYC", noKyc: true, configured: isNowpaymentsConfigured },
+    { id: "btcpay", label: "Bitcoin & Lightning", note: "Self-custody · no KYC", noKyc: true, configured: isBtcpayConfigured },
+    { id: "coinbase", label: "Coinbase Commerce", note: "Pay from any wallet · no KYC", noKyc: true, configured: isCoinbaseConfigured },
+    { id: "moonpay", label: "MoonPay", note: "Card or bank → crypto", noKyc: false, configured: isMoonpayConfigured },
+  ];
+}
 
 /**
  * Project a full `Rental` row down to the client-safe shape RentalCard needs.
@@ -99,6 +121,11 @@ export default async function DashboardPage() {
   const email = session.user.email ?? "";
   const hasAny = active.length > 0 || history.length > 0;
 
+  // Live retail catalog for the in-dashboard rent panel. Fails closed on the
+  // server (never fetched on the client) so the page stays a pure Server
+  // Component with the panel as its single client island.
+  const catalog = await getRetailCatalog();
+
   return (
     <div className="relative min-h-screen">
       <header className="sticky top-0 z-40 border-b border-white/40 bg-white/50 backdrop-blur-xl">
@@ -131,6 +158,48 @@ export default async function DashboardPage() {
             and time remaining.
           </p>
         </Reveal>
+
+        {/* Rent-a-phone shelf — greets zero-rental & db-unconfigured users first,
+            renders independently of the rentals DB, rides the existing gap-8. */}
+        {catalog.ok ? (
+          <DashboardBuyPanel
+            phones={catalog.phones}
+            durations={DURATIONS}
+            cryptoProviders={cryptoProviders()}
+          />
+        ) : (
+          <Reveal delay={0.05}>
+            <div className={cn(glassCard, "p-6")}>
+              {catalog.reason === "unconfigured" ? (
+                <>
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-2">
+                    Demo mode
+                  </p>
+                  <h2 className="mt-2 text-base font-semibold tracking-tight text-foreground">
+                    Live inventory isn&rsquo;t wired up yet
+                  </h2>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                    The device provider isn&rsquo;t configured in this
+                    environment, so we can&rsquo;t show live pricing right now.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-2">
+                    Temporary hiccup
+                  </p>
+                  <h2 className="mt-2 text-base font-semibold tracking-tight text-foreground">
+                    Inventory didn&rsquo;t load
+                  </h2>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                    We couldn&rsquo;t load available devices just now. Refresh in
+                    a moment to see live pricing.
+                  </p>
+                </>
+              )}
+            </div>
+          </Reveal>
+        )}
 
         {!isDbConfigured || dbError ? (
           <Reveal delay={0.05}>
