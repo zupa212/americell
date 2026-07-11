@@ -16,7 +16,7 @@ import {
 /**
  * DashboardUserMenu — account dropdown for the dashboard header.
  *
- * Shows the signed-in email and exposes "Αποσύνδεση" via a shadcn
+ * Shows the signed-in email and exposes "Sign out" via a shadcn
  * DropdownMenu. The sign-out item submits the `logout` server action
  * through a real <form>, so the flow keeps working without JS.
  */
@@ -29,7 +29,7 @@ export default function DashboardUserMenu({ email }: { email: string }) {
             variant="outline"
             size="lg"
             className="gap-2"
-            aria-label="Μενού λογαριασμού"
+            aria-label="Account menu"
           />
         }
       >
@@ -49,7 +49,7 @@ export default function DashboardUserMenu({ email }: { email: string }) {
             }
           >
             <LogOut className="h-4 w-4" aria-hidden="true" />
-            Αποσύνδεση
+            Sign out
           </DropdownMenuItem>
         </form>
       </DropdownMenuContent>

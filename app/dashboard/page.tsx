@@ -10,8 +10,6 @@ import RentalCard, { type RentalCardData } from "@/components/rental-card";
 import DashboardUserMenu from "@/components/dashboard-user-menu";
 import { AuroraText } from "@/components/ui/aurora-text";
 import { BorderBeam } from "@/components/ui/border-beam";
-import { ShineBorder } from "@/components/ui/shine-border";
-import { Particles } from "@/components/ui/particles";
 import Reveal from "@/components/ui/reveal";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -123,21 +121,12 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      <main className="relative mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
-        {/* Ambient particles drifting behind the glass for depth. */}
-        <Particles
-          className="pointer-events-none absolute inset-0 -z-[1]"
-          quantity={40}
-          ease={80}
-          color="#2b6bff"
-          staticity={60}
-        />
-
+      <main className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12">
         <Reveal>
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             Your rentals
           </h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">
+          <p className="mt-2 text-sm text-muted-foreground">
             Manage the real US phones you&rsquo;ve rented — PIN, remote control,
             and time remaining.
           </p>
@@ -145,7 +134,7 @@ export default async function DashboardPage() {
 
         {!isDbConfigured || dbError ? (
           <Reveal delay={0.05}>
-            <Alert className={cn("mt-8 border-white/50 bg-white/60 backdrop-blur-md")}>
+            <Alert className={cn("border-white/50 bg-white/60 backdrop-blur-md")}>
               <Database className="h-4 w-4" aria-hidden="true" />
               <AlertTitle>The database isn&rsquo;t connected yet.</AlertTitle>
               <AlertDescription>
@@ -159,17 +148,11 @@ export default async function DashboardPage() {
           <Reveal delay={0.05}>
             <Card
               className={cn(
-                "relative mt-8 items-center py-12 text-center",
+                "relative items-center py-12 text-center",
                 glassCard,
                 glassHover,
               )}
             >
-              <ShineBorder
-                className="rounded-3xl"
-                borderWidth={1}
-                duration={12}
-                shineColor={["var(--color-brand)", "var(--color-brand-2)"]}
-              />
               <BorderBeam
                 size={90}
                 duration={8}
@@ -203,7 +186,7 @@ export default async function DashboardPage() {
             </Card>
           </Reveal>
         ) : (
-          <div className="mt-8 flex flex-col gap-10">
+          <div className="flex flex-col gap-8">
             {active.length > 0 ? (
               <section>
                 <Reveal>
@@ -213,7 +196,7 @@ export default async function DashboardPage() {
                 </Reveal>
                 <ul className="mt-4 grid gap-4 sm:grid-cols-2">
                   {active.map((rental, i) => (
-                    <Reveal as="li" key={rental.id} delay={i * 0.06}>
+                    <Reveal as="li" key={rental.id} delay={Math.min(i, 3) * 0.05}>
                       <RentalCard rental={rental} />
                     </Reveal>
                   ))}
@@ -230,7 +213,7 @@ export default async function DashboardPage() {
                 </Reveal>
                 <ul className="mt-4 grid gap-4 sm:grid-cols-2">
                   {history.map((rental, i) => (
-                    <Reveal as="li" key={rental.id} delay={i * 0.06}>
+                    <Reveal as="li" key={rental.id} delay={Math.min(i, 3) * 0.05}>
                       <RentalCard rental={rental} />
                     </Reveal>
                   ))}

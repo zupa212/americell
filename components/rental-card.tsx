@@ -27,8 +27,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ShineBorder } from "@/components/ui/shine-border";
-import { BorderBeam } from "@/components/ui/border-beam";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -89,31 +87,45 @@ function periodLabel(period: string): string {
   }
 }
 
-/** Status → Badge variant + label. */
-function statusBadge(status: string): {
-  variant: "default" | "secondary" | "destructive" | "outline";
-  label: string;
-} {
+/**
+ * Status-chip palette — one intent per colour, reusing the same emerald/amber/
+ * rose hues as the freshness chip so the whole card reads as a single palette.
+ *   green = live · amber = in-flight · red = refunded · muted = finished
+ */
+const statusChip = {
+  green: "border-emerald-300/60 bg-emerald-50/70 text-emerald-700",
+  amber: "border-amber-300/60 bg-amber-50/70 text-amber-700",
+  red: "border-rose-300/60 bg-rose-50/70 text-rose-700",
+  muted: "border-white/60 bg-white/50 text-muted-foreground",
+} as const;
+
+/**
+ * Status → status-chip className + label, driven only by `rental.status`.
+ * One explicit map (no reuse of the generic grey Badge variants): green for a
+ * live rental, amber while it's still in-flight, red for a refund, muted once
+ * it's finished. The label strings are unchanged.
+ */
+function statusBadge(status: string): { className: string; label: string } {
   switch (status) {
     case "active":
     case "pooled":
-      return { variant: "default", label: "active" };
+      return { className: statusChip.green, label: "active" };
     case "pending_payment":
-      return { variant: "secondary", label: "payment pending" };
+      return { className: statusChip.amber, label: "payment pending" };
     case "paid":
-      return { variant: "secondary", label: "processing" };
+      return { className: statusChip.amber, label: "processing" };
     case "activating":
-      return { variant: "secondary", label: "activating…" };
+      return { className: statusChip.amber, label: "activating…" };
     case "activation_pending_credit":
-      return { variant: "destructive", label: "on hold" };
+      return { className: statusChip.amber, label: "on hold" };
     case "refunded":
-      return { variant: "outline", label: "refunded" };
+      return { className: statusChip.red, label: "refunded" };
     case "expired":
-      return { variant: "outline", label: "expired" };
+      return { className: statusChip.muted, label: "expired" };
     case "deactivated":
-      return { variant: "outline", label: "canceled" };
+      return { className: statusChip.muted, label: "canceled" };
     default:
-      return { variant: "secondary", label: status };
+      return { className: statusChip.muted, label: status };
   }
 }
 
@@ -281,30 +293,15 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
 
   return (
     <Card className={cn("relative h-full", glassCard, glassHover)}>
-      {isActive ? (
-        <>
-          <ShineBorder
-            className="rounded-3xl"
-            borderWidth={1}
-            duration={14}
-            shineColor={["var(--color-brand)", "var(--color-brand-2)"]}
-          />
-          <BorderBeam
-            size={80}
-            duration={10}
-            colorFrom="var(--color-brand)"
-            colorTo="var(--color-brand-2)"
-          />
-        </>
-      ) : null}
-
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <Smartphone className="h-4 w-4 text-brand" aria-hidden="true" />
           {rental.model}
         </CardTitle>
         <CardAction>
-          <Badge variant={badge.variant}>{badge.label}</Badge>
+          <Badge variant="outline" className={badge.className}>
+            {badge.label}
+          </Badge>
         </CardAction>
         <div className="mt-1 flex flex-wrap items-center gap-2">
           <Badge variant="outline" className="gap-1">
