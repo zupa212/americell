@@ -316,6 +316,58 @@ body {
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* ── Dark admin cockpit ───────────────────────────────────────────────────────
+   Scoped to /admin only (its root carries `dark admin-dark`); marketing pages
+   never do, so they stay light. shadcn tokens flip via `.dark`; here we (a) keep
+   the AMERICELL brand blue for primary/rings, (b) tint every surface a deep
+   blue-black, and (c) remap the literal frosted-WHITE glass utilities the cockpit
+   uses into frosted-DARK, so panels read dark instead of bright. */
+.admin-dark {
+  --background: oklch(0.17 0.028 264);
+  --foreground: oklch(0.98 0.005 264);
+  --card: oklch(0.21 0.03 264);
+  --card-foreground: oklch(0.98 0.005 264);
+  --popover: oklch(0.2 0.03 264);
+  --popover-foreground: oklch(0.98 0.005 264);
+  --primary: #2b6bff;
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.27 0.025 264);
+  --secondary-foreground: oklch(0.98 0.005 264);
+  --muted: oklch(0.27 0.025 264);
+  --muted-foreground: oklch(0.74 0.03 264);
+  --accent: oklch(0.28 0.03 264);
+  --accent-foreground: oklch(0.98 0.005 264);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: #3b82f6;
+}
+
+/* Frosted-WHITE panel surfaces (opacity 40–75) → frosted-DARK. The /10–/30 and
+   /90 whites (gradient-button icon tiles, active-pill dot) are intentionally NOT
+   matched, so they stay light on the vivid brand gradients. */
+.admin-dark [class*="bg-white/4"],
+.admin-dark [class*="bg-white/5"],
+.admin-dark [class*="bg-white/6"],
+.admin-dark [class*="bg-white/7"] {
+  background-color: rgb(228 235 255 / 0.055) !important;
+}
+.admin-dark [class*="hover:bg-white/6"]:hover,
+.admin-dark [class*="hover:bg-white/7"]:hover,
+.admin-dark [class*="hover:bg-white/9"]:hover {
+  background-color: rgb(228 235 255 / 0.12) !important;
+}
+/* Glass hairline borders + rings → subtle light-on-dark. */
+.admin-dark [class*="border-white/3"],
+.admin-dark [class*="border-white/4"],
+.admin-dark [class*="border-white/5"] {
+  border-color: rgb(255 255 255 / 0.1) !important;
+}
+.admin-dark [class*="ring-white/3"],
+.admin-dark [class*="ring-white/4"],
+.admin-dark [class*="ring-white/5"] {
+  --tw-ring-color: rgb(255 255 255 / 0.08) !important;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

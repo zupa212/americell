@@ -31,7 +31,16 @@ export default async function AdminLayout({
   const { email } = await requireAdminPage();
 
   return (
-    <div className="relative min-h-screen">
+    <div className="dark admin-dark relative min-h-screen text-foreground">
+      {/* Dark cockpit backdrop — covers the global light aurora for /admin only. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 -z-[5] bg-[#0b1020]"
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_-5%,rgba(43,107,255,0.20),transparent_65%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(55%_45%_at_85%_105%,rgba(124,58,237,0.18),transparent_65%)]" />
+      </div>
+
       {/* Fixed glass rail (md+); on mobile it lives in the topbar's Sheet. */}
       <AdminSidebar email={email} />
 
