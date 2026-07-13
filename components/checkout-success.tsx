@@ -95,7 +95,7 @@ export default function CheckoutSuccess({ activeCount }: { activeCount: number }
       role="status"
       aria-live="polite"
       className={cn(
-        "relative flex items-start gap-3 rounded-2xl border p-4 pr-11 ring-1 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]",
+        "relative flex items-start gap-3 rounded-2xl border p-4 pr-12 ring-1 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]",
         ready
           ? "border-emerald-500/30 bg-emerald-50/80 ring-emerald-500/10"
           : pending
@@ -120,7 +120,7 @@ export default function CheckoutSuccess({ activeCount }: { activeCount: number }
         type="button"
         onClick={dismiss}
         aria-label="Dismiss"
-        className="absolute right-2.5 top-2.5 grid h-7 w-7 place-items-center rounded-full text-muted-foreground outline-none transition-colors hover:bg-black/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+        className="absolute right-2 top-2 grid h-9 w-9 place-items-center rounded-full text-muted-foreground outline-none transition-colors hover:bg-black/5 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
       >
         <X className="h-4 w-4" aria-hidden="true" />
       </button>

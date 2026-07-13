@@ -1,7 +1,16 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
+import {
+  Eye,
+  EyeOff,
+  Loader2,
+  Lock,
+  Mail,
+  ShieldCheck,
+  TriangleAlert,
+} from "lucide-react";
 import { login, type AuthState } from "@/app/actions/auth";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { ShineBorder } from "@/components/ui/shine-border";
@@ -27,15 +36,24 @@ const initial: AuthState = { error: null };
 const glassCard =
   "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
 
-// Smooth, legible glass inputs.
+// Smooth, legible glass inputs. Roomy (h-11) on mobile for comfortable tapping,
+// tightening to the app's dense field height (h-8) from sm up. text-base on the
+// primitive keeps mobile Safari from zooming on focus.
 const glassInput =
   "h-11 border-white/50 bg-white/60 backdrop-blur-md transition-all duration-300 focus-visible:bg-white/80 focus-visible:ring-brand/40 sm:h-8";
 
+// Leading glyph nested inside a glass input.
+const leadingIcon =
+  "pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground";
+
 export default function LoginPage() {
   const [state, action, pending] = useActionState(login, initial);
+  const [showPassword, setShowPassword] = useState(false);
+  // Flag both credential fields on a failed sign-in (undefined = attribute absent).
+  const invalid = state.error ? true : undefined;
 
   return (
-    <main className="relative flex min-h-[80vh] flex-col items-center justify-center overflow-hidden px-5 py-12 sm:px-6 sm:py-16">
+    <main className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-4 py-10 sm:px-6 sm:py-16">
       {/* Ambient particles drifting behind the glass for depth. */}
       <Particles
         className="pointer-events-none absolute inset-0 -z-[1]"
@@ -45,19 +63,30 @@ export default function LoginPage() {
         staticity={60}
       />
 
-      <Reveal className="flex w-full flex-col items-center">
+      <Reveal className="flex w-full max-w-sm flex-col items-center">
+        {/* Brand mark — mirrors the site-header lockup for a consistent identity. */}
         <Link
           href="/"
-          className="mb-8 text-lg font-bold tracking-tight text-foreground"
+          aria-label="Americell — Home"
+          className="group mb-7 inline-flex items-center gap-2.5 rounded-full outline-none transition-transform duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:mb-8"
         >
-          <AuroraText>Americell</AuroraText>
+          <span
+            aria-hidden="true"
+            className="relative flex size-8 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] text-base font-bold text-white shadow-sm shadow-brand/20 ring-1 ring-white/40 transition-transform duration-300 group-hover:scale-105 motion-safe:group-hover:animate-gradient"
+          >
+            <span className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/25 to-white/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <span className="relative">A</span>
+          </span>
+          <span className="text-lg font-bold tracking-tight">
+            <AuroraText>Americell</AuroraText>
+          </span>
         </Link>
 
         <Card
           className={cn(
-            "relative w-full max-w-sm overflow-hidden py-6",
+            "relative w-full overflow-hidden py-6 sm:py-7",
             glassCard,
-            "transition-all duration-300 hover:bg-white/70 hover:-translate-y-1 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)]",
+            "transition-all duration-300 hover:-translate-y-1 hover:bg-white/70 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)] motion-reduce:transition-none motion-reduce:hover:translate-y-0",
           )}
         >
           <ShineBorder
@@ -84,26 +113,50 @@ export default function LoginPage() {
             <form action={action} className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  className={glassInput}
-                />
+                <div className="relative">
+                  <Mail aria-hidden="true" className={leadingIcon} />
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    aria-invalid={invalid}
+                    className={cn(glassInput, "pl-9")}
+                  />
+                </div>
               </div>
+
               <div className="space-y-1.5">
                 <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  required
-                  minLength={8}
-                  autoComplete="current-password"
-                  className={glassInput}
-                />
+                <div className="relative">
+                  <Lock aria-hidden="true" className={leadingIcon} />
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    minLength={8}
+                    autoComplete="current-password"
+                    placeholder="Your password"
+                    aria-invalid={invalid}
+                    className={cn(glassInput, "pl-9 pr-11 sm:pr-9")}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-pressed={showPassword}
+                    className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-lg text-muted-foreground transition-colors duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 sm:w-9"
+                  >
+                    {showPassword ? (
+                      <EyeOff aria-hidden="true" className="size-4" />
+                    ) : (
+                      <Eye aria-hidden="true" className="size-4" />
+                    )}
+                  </button>
+                </div>
               </div>
 
               {state.error ? (
@@ -111,6 +164,7 @@ export default function LoginPage() {
                   variant="destructive"
                   className="border-white/50 bg-white/60 backdrop-blur-md"
                 >
+                  <TriangleAlert aria-hidden="true" />
                   <AlertDescription>{state.error}</AlertDescription>
                 </Alert>
               ) : null}
@@ -119,23 +173,38 @@ export default function LoginPage() {
                 type="submit"
                 size="lg"
                 disabled={pending}
-                className="h-11 w-full rounded-full transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-16px_rgba(43,107,255,0.5)]"
+                className="h-11 w-full gap-2 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] text-white shadow-[0_10px_30px_-12px_rgba(43,107,255,0.6)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[position:100%_center] hover:shadow-[0_18px_44px_-16px_rgba(43,107,255,0.6)] motion-reduce:transition-none motion-reduce:hover:translate-y-0"
               >
-                {pending ? "Logging in…" : "Log in"}
+                {pending ? (
+                  <>
+                    <Loader2
+                      aria-hidden="true"
+                      className="size-4 animate-spin"
+                    />
+                    Logging in…
+                  </>
+                ) : (
+                  "Log in"
+                )}
               </Button>
             </form>
 
-            <p className="mt-4 text-center text-sm text-muted-foreground">
-              No account?{" "}
+            <p className="mt-5 text-center text-sm text-muted-foreground">
+              New to Americell?{" "}
               <Link
                 href="/signup"
-                className="font-medium text-brand transition-colors duration-300 hover:text-brand-2"
+                className="font-medium text-brand underline-offset-4 transition-colors duration-300 hover:text-brand-2 hover:underline"
               >
-                Create one
+                Create an account
               </Link>
             </p>
           </CardContent>
         </Card>
+
+        <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
+          <ShieldCheck aria-hidden="true" className="size-3.5 shrink-0" />
+          Encrypted, private sign-in
+        </p>
       </Reveal>
     </main>
   );

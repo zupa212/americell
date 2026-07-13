@@ -247,7 +247,7 @@ export default function DashboardBuyPanel({
           aria-label="Rental duration"
           className="w-full sm:w-auto"
         >
-          <TabsList className="h-10 w-full rounded-full border border-white/50 bg-white/60 p-1 ring-1 ring-white/40 backdrop-blur-md sm:w-auto">
+          <TabsList className="h-11 w-full rounded-full border border-white/50 bg-white/60 p-1 ring-1 ring-white/40 backdrop-blur-md sm:h-10 sm:w-auto">
             {durations.map((d) => (
               <TabsTrigger
                 key={d.period}
@@ -436,7 +436,7 @@ export default function DashboardBuyPanel({
           if (!open && !cryptoBusy) setCryptoPhone(null);
         }}
       >
-        <DialogContent className="max-w-md rounded-3xl border-white/50 bg-white/80 backdrop-blur-xl">
+        <DialogContent className="max-w-[calc(100%-2rem)] rounded-3xl border-white/50 bg-white/80 backdrop-blur-xl sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-xl font-extrabold tracking-tight">
               Pay with crypto

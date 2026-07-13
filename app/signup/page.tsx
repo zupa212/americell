@@ -90,6 +90,10 @@ export default function SignupPage() {
                   type="email"
                   required
                   autoComplete="email"
+                  inputMode="email"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   className={glassInput}
                 />
               </div>
@@ -102,9 +106,10 @@ export default function SignupPage() {
                   required
                   minLength={8}
                   autoComplete="new-password"
+                  aria-describedby="password-hint"
                   className={glassInput}
                 />
-                <p className="text-xs text-muted-foreground">
+                <p id="password-hint" className="text-xs text-muted-foreground">
                   At least 8 characters.
                 </p>
               </div>

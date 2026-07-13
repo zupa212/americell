@@ -439,7 +439,7 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
               <button
                 type="button"
                 onClick={copyPin}
-                className="group flex items-center gap-2 rounded-2xl border border-white/50 bg-white/50 px-3 py-2 text-left text-sm backdrop-blur-md transition-colors hover:bg-white/70"
+                className="group flex min-h-11 items-center gap-2 rounded-2xl border border-white/50 bg-white/50 px-3 py-2 text-left text-sm backdrop-blur-md transition-colors hover:bg-white/70 sm:min-h-10"
               >
                 <KeyRound
                   className="h-4 w-4 shrink-0 text-brand"
@@ -570,13 +570,14 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={cancelLoading}>
+            <AlertDialogCancel disabled={cancelLoading} className="h-11 sm:h-8">
               No, keep it
             </AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               disabled={cancelLoading}
               onClick={cancel}
+              className="h-11 sm:h-8"
             >
               {cancelLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />

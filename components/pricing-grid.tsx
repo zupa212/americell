@@ -385,7 +385,7 @@ export default function PricingGrid({
           if (!open && !cryptoBusy) setCryptoPhone(null);
         }}
       >
-        <DialogContent className="max-w-md rounded-3xl border-white/50 bg-white/80 backdrop-blur-xl">
+        <DialogContent className="max-w-[calc(100%-2rem)] rounded-3xl border-white/50 bg-white/80 backdrop-blur-xl sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-xl font-extrabold tracking-tight">
               Pay with crypto
