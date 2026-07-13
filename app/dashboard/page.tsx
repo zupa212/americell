@@ -18,17 +18,8 @@ import DashboardBuyPanel from "@/components/dashboard-buy-panel";
 import CheckoutSuccess from "@/components/checkout-success";
 import { type CryptoProvider } from "@/components/pricing-grid";
 import { AuroraText } from "@/components/ui/aurora-text";
-import { BorderBeam } from "@/components/ui/border-beam";
 import Reveal from "@/components/ui/reveal";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 // → "Americell · Dashboard" via the brand-first title template.
@@ -37,8 +28,6 @@ export const metadata = { title: "Dashboard" };
 // Frosted-glass surface recipe — floats over the global aurora (SiteBackground).
 const glassCard =
   "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
-const glassHover =
-  "transition-all duration-300 hover:bg-white/70 hover:-translate-y-1 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)]";
 
 // Statuses that entitle a live rental (§5.4: `pooled` is active-equivalent).
 const ACTIVE_STATUSES = new Set(["active", "pooled"]);
@@ -224,44 +213,28 @@ export default async function DashboardPage() {
           </Reveal>
         ) : !hasAny ? (
           <Reveal delay={0.05}>
-            <Card
-              className={cn(
-                "relative items-center py-12 text-center",
-                glassCard,
-                glassHover,
-              )}
-            >
-              <BorderBeam
-                size={90}
-                duration={8}
-                colorFrom="var(--color-brand)"
-                colorTo="var(--color-brand-2)"
-              />
-              <CardHeader className="items-center gap-3">
+            <div className={cn("relative overflow-hidden text-center", glassCard)}>
+              <div className="mx-auto flex w-full max-w-sm flex-col items-center gap-3 px-6 py-12 sm:py-14">
                 <span
                   aria-hidden="true"
-                  className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/50 bg-white/60 text-brand backdrop-blur-md"
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/50 bg-white/70 text-brand backdrop-blur-md"
                 >
                   <Smartphone className="h-6 w-6" />
                 </span>
-                <CardTitle className="text-lg">
-                  No rentals yet.
-                </CardTitle>
-                <CardDescription>
-                  Pick a real US phone and start controlling it live in minutes.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button
-                  size="lg"
-                  className="h-11 w-full rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft px-5 text-white shadow-sm shadow-brand/25 transition-all duration-300 hover:-translate-y-0.5 hover:opacity-95 hover:shadow-[0_16px_40px_-16px_rgba(43,107,255,0.5)] sm:w-auto"
-                  render={<Link href="/#pricing" />}
-                  nativeButton={false}
-                >
-                  Browse devices
-                </Button>
-              </CardContent>
-            </Card>
+                <div className="space-y-1.5">
+                  <h2 className="text-lg font-semibold tracking-tight text-foreground">
+                    No rentals yet
+                  </h2>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    Your rented phones show up here. Pick one from{" "}
+                    <span className="font-medium text-foreground">
+                      Rent a phone
+                    </span>{" "}
+                    above to get started.
+                  </p>
+                </div>
+              </div>
+            </div>
           </Reveal>
         ) : (
           <div className="flex flex-col gap-8">
