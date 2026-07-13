@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Database, Smartphone } from "lucide-react";
@@ -14,6 +15,7 @@ import { isBtcpayConfigured } from "@/lib/btcpay";
 import RentalCard, { type RentalCardData } from "@/components/rental-card";
 import DashboardUserMenu from "@/components/dashboard-user-menu";
 import DashboardBuyPanel from "@/components/dashboard-buy-panel";
+import CheckoutSuccess from "@/components/checkout-success";
 import { type CryptoProvider } from "@/components/pricing-grid";
 import { AuroraText } from "@/components/ui/aurora-text";
 import { BorderBeam } from "@/components/ui/border-beam";
@@ -149,6 +151,13 @@ export default async function DashboardPage() {
       </header>
 
       <main className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12">
+        {/* Post-payment confirmation — reads ?checkout=success / ?crypto=success,
+            auto-refreshes until the webhook-activated rental appears. Renders
+            nothing on a normal visit. Suspense wraps the useSearchParams read. */}
+        <Suspense fallback={null}>
+          <CheckoutSuccess activeCount={active.length} />
+        </Suspense>
+
         <Reveal>
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
             Your rentals
