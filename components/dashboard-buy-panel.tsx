@@ -13,7 +13,17 @@ import { toast } from "sonner";
 import Reveal from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -31,11 +41,62 @@ import type { BillingPeriod, PublicRetailPhone } from "@/lib/pricing";
 // from the reference grid so the two flows never drift.
 import type { CryptoProvider } from "@/components/pricing-grid";
 
-// Calmer frosted-glass recipe than the landing grid — same surface, gentler lift.
-const GLASS =
-  "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
-const GLASS_HOVER =
-  "transition-all duration-300 hover:bg-white/70 hover:-translate-y-0.5 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)]";
+// ---------------------------------------------------------------------------
+// Shared card system (single source of truth — mirrors the rental card verbatim
+// so both customer surfaces read as one system). Values are kept byte-identical
+// to the rental card's tokens; consolidating to a re-export is a no-op refactor.
+// ---------------------------------------------------------------------------
+
+/** Frosted-glass surface — applied ONLY on `<Card>`; sets the 20px slot rhythm. */
+const GLASS_SURFACE =
+  "relative h-full rounded-3xl border border-white/50 bg-white/65 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)] [--card-spacing:--spacing(5)]";
+
+/** Hover affordance (reduced-motion-safe) layered on top of the surface. */
+const GLASS_LIFT =
+  "transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/75 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none";
+
+/**
+ * The ONLY status palette — dark-paired for AA over the frost.
+ *   green = available/live · amber = in-flight · rose = unavailable · muted = off
+ */
+const STATUS_STYLES = {
+  green: {
+    chip: "border-emerald-300/70 bg-emerald-50 text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-500/10 dark:text-emerald-300",
+    rail: "bg-emerald-500",
+    dot: "bg-emerald-500",
+  },
+  amber: {
+    chip: "border-amber-300/70 bg-amber-50 text-amber-800 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-300",
+    rail: "bg-amber-500",
+    dot: "bg-amber-500",
+  },
+  rose: {
+    chip: "border-rose-300/70 bg-rose-50 text-rose-700 dark:border-rose-400/30 dark:bg-rose-500/10 dark:text-rose-300",
+    rail: "bg-rose-500",
+    dot: "bg-rose-500",
+  },
+  muted: {
+    chip: "border-border bg-muted text-muted-foreground",
+    rail: "bg-muted-foreground/30",
+    dot: "bg-muted-foreground/40",
+  },
+} as const;
+
+/** The ONE gradient — spent once per card on a stock `<Button>`. */
+const CTA_GRADIENT =
+  "bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white shadow-glow border-white/30 ring-1 ring-white/20 hover:opacity-95";
+
+/** Per-platform pill tint (iPhone = brand blue, Android = brand violet). */
+function platformPillClass(platform: string): string {
+  return platform === "iphone"
+    ? "border-transparent bg-brand/10 text-brand"
+    : "border-transparent bg-brand-2/10 text-brand-2";
+}
+
+/** Per-platform glyph tint, matching the pill. */
+function platformGlyphClass(platform: string): string {
+  return platform === "iphone" ? "text-brand" : "text-brand-2";
+}
 
 /** One selectable rental duration — mirrors `DURATIONS` from `@/lib/pricing`. */
 type DurationOption = {
@@ -205,7 +266,7 @@ export default function DashboardBuyPanel({
 
       {phones.length === 0 ? (
         // catalog.ok but empty — keep the header, show one calm centered panel.
-        <div className={cn(GLASS, "mt-5 p-8 text-center")}>
+        <div className="mt-5 rounded-3xl border border-white/50 bg-white/60 p-8 text-center backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]">
           <p className="text-sm text-muted-foreground">
             No devices available right now — inventory changes constantly.
           </p>
@@ -217,83 +278,87 @@ export default function DashboardBuyPanel({
             const price = fmtMoney(phone.retail[period], phone.currency);
             const platformLabel =
               phone.platform === "iphone" ? "iPhone" : "Android";
+            // Rail = green when buyable, muted otherwise; availability chip
+            // carries the meaning in TEXT (green live / rose in-use), never hue.
+            const railTone = phone.available ? "green" : "muted";
+            const availTone = phone.available ? "green" : "rose";
 
             return (
               <Reveal
                 as="article"
                 key={phone.phoneId}
                 delay={0.05 * Math.min(index, 6)}
+                className="h-full"
               >
-                <div
+                <Card
                   className={cn(
-                    "relative flex h-full flex-col rounded-3xl p-5 sm:p-6",
-                    GLASS,
-                    phone.available ? GLASS_HOVER : "opacity-70",
+                    GLASS_SURFACE,
+                    phone.available ? GLASS_LIFT : "opacity-70",
                     isPending && "pointer-events-none",
                   )}
                 >
-                  {/* Header: glass glyph tile (platform-tinted) + model + platform pill */}
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex min-w-0 items-center gap-3">
+                  {/* Full-height status rail — clipped to the rounded corners. */}
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "pointer-events-none absolute inset-y-0 left-0 w-1 rounded-l-3xl",
+                      STATUS_STYLES[railTone].rail,
+                    )}
+                  />
+
+                  <CardHeader>
+                    <CardTitle className="flex min-w-0 items-center gap-2">
                       <span
                         aria-hidden="true"
-                        className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-white/50 bg-white/50 backdrop-blur-md"
+                        className="grid h-8 w-8 shrink-0 place-items-center rounded-2xl border border-white/50 bg-white/50 backdrop-blur-md"
                       >
                         <Smartphone
                           className={cn(
-                            "h-5 w-5",
-                            phone.platform === "iphone"
-                              ? "text-brand"
-                              : "text-brand-2",
+                            "h-4 w-4",
+                            platformGlyphClass(phone.platform),
                           )}
+                          aria-hidden="true"
                         />
                       </span>
-                      <h3 className="truncate text-base font-semibold tracking-tight text-foreground">
+                      <span className="truncate" title={phone.model}>
                         {phone.model}
-                      </h3>
-                    </div>
-                    <Badge
-                      variant="secondary"
-                      className="shrink-0 border-transparent bg-brand-2/10 text-brand-2"
-                    >
-                      {platformLabel}
-                    </Badge>
-                  </div>
-
-                  {/* Status line — carried by TEXT, never color alone — + trust mark */}
-                  <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-                    <span className="flex items-center gap-2">
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          "inline-flex h-2 w-2 rounded-full",
-                          phone.available
-                            ? "bg-emerald-500"
-                            : "bg-muted-foreground/40",
-                        )}
-                      />
-                      <span
-                        className={cn(
-                          "text-sm font-medium",
-                          phone.available
-                            ? "text-emerald-600"
-                            : "text-muted-foreground",
-                        )}
-                      >
-                        {phone.available ? "Available now" : "In use"}
                       </span>
-                    </span>
-                    <Badge
-                      title="Real US device, verified by Americell"
-                      className="border-brand/20 bg-brand/10 text-brand"
-                    >
-                      <BadgeCheck aria-hidden="true" />
-                      Real US device
-                    </Badge>
-                  </div>
+                    </CardTitle>
+                    <CardAction>
+                      <Badge
+                        variant="outline"
+                        className={platformPillClass(phone.platform)}
+                      >
+                        {platformLabel}
+                      </Badge>
+                    </CardAction>
+                    <CardDescription className="flex flex-wrap items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className={STATUS_STYLES[availTone].chip}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            "h-1.5 w-1.5 shrink-0 rounded-full",
+                            STATUS_STYLES[availTone].dot,
+                          )}
+                        />
+                        {phone.available ? "Available now" : "In use"}
+                      </Badge>
+                      <Badge
+                        title="Real US device, verified by Americell"
+                        className="border-brand/20 bg-brand/10 text-brand"
+                      >
+                        <BadgeCheck aria-hidden="true" />
+                        Real US device
+                      </Badge>
+                    </CardDescription>
+                  </CardHeader>
 
-                  {/* Hairline divider + price for the selected duration */}
-                  <div className="mt-5 border-t border-white/50 pt-5">
+                  <CardContent className="flex flex-1 flex-col gap-3">
+                    <Separator className="bg-white/50" />
+                    {/* Price for the selected duration (amount + suffix grouped). */}
                     <div className="flex items-baseline gap-1.5">
                       <span className="text-3xl font-bold tracking-tight tabular-nums text-foreground">
                         {price}
@@ -302,20 +367,19 @@ export default function DashboardBuyPanel({
                         / {activeLabel}
                       </span>
                     </div>
-                  </div>
+                  </CardContent>
 
-                  {/* Action stack pinned to the bottom for equal-height rows. */}
-                  <div className="mt-auto pt-6">
+                  <CardFooter className="flex flex-col items-stretch gap-2 border-t border-white/40 bg-transparent">
                     <Button
                       type="button"
                       onClick={() => handleCheckout(phone)}
                       disabled={isPending || !phone.available}
                       aria-label={`Rent ${phone.model}`}
                       className={cn(
-                        "group/cta h-12 w-full rounded-full px-6 text-sm font-semibold transition-all duration-300",
+                        "group/cta min-h-11 w-full rounded-full font-semibold",
                         phone.available
-                          ? "bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white shadow-glow hover:opacity-95"
-                          : "bg-foreground/70 text-background",
+                          ? CTA_GRADIENT
+                          : "bg-muted text-muted-foreground",
                       )}
                     >
                       {isPending ? (
@@ -330,7 +394,7 @@ export default function DashboardBuyPanel({
                         <>
                           Rent this phone
                           <ArrowRight
-                            className="h-4 w-4 transition-transform group-hover/cta:translate-x-0.5"
+                            className="h-4 w-4 transition-transform group-hover/cta:translate-x-0.5 motion-reduce:transform-none"
                             aria-hidden="true"
                           />
                         </>
@@ -342,22 +406,23 @@ export default function DashboardBuyPanel({
                     {/* Payment methods hint + quiet crypto secondary (buyable only). */}
                     {phone.available && (
                       <>
-                        <p className="mt-2 text-center text-[0.7rem] text-muted-foreground">
+                        <p className="w-full text-center text-[0.7rem] text-muted-foreground">
                           Card · Apple&nbsp;Pay · Google&nbsp;Pay &amp; more
                         </p>
-                        <button
+                        <Button
                           type="button"
+                          variant="outline"
                           onClick={() => setCryptoPhone(phone)}
                           aria-label={`Pay for ${phone.model} with crypto`}
-                          className="mt-3 flex min-h-11 w-full items-center justify-center gap-1.5 rounded-full border border-white/50 bg-white/40 px-4 py-2 text-xs font-semibold text-muted-foreground backdrop-blur-md transition-all duration-300 hover:bg-white/70 hover:text-foreground"
+                          className="min-h-11 w-full gap-1.5 rounded-full font-semibold"
                         >
                           <Coins className="h-3.5 w-3.5" aria-hidden="true" />
                           Pay with crypto
-                        </button>
+                        </Button>
                       </>
                     )}
-                  </div>
-                </div>
+                  </CardFooter>
+                </Card>
               </Reveal>
             );
           })}
@@ -450,7 +515,7 @@ export default function DashboardBuyPanel({
             })}
           </div>
 
-          <p className="mt-1 text-center text-[0.7rem] leading-relaxed text-muted-foreground">
+          <p className="mx-auto mt-1 max-w-[46ch] text-center text-[0.7rem] leading-relaxed text-pretty text-muted-foreground">
             Prices are set in USD and settle in crypto. Payment is processed by
             the provider you choose.
           </p>

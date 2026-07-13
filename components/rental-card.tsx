@@ -23,6 +23,7 @@ import {
   Card,
   CardAction,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -62,11 +63,80 @@ export type RentalCardData = {
   createdAt: string; // ISO
 };
 
-// Frosted-glass surface recipe — floats over the global aurora (SiteBackground).
-const glassCard =
-  "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
-const glassHover =
-  "transition-all duration-300 hover:bg-white/70 hover:-translate-y-1 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)]";
+/* ────────────────────────────────────────────────────────────────────────────
+ * This card's design tokens — the frosted surface, hover lift, the one semantic
+ * status palette, the single CTA gradient, and the per-platform tint. The device
+ * card in dashboard-buy-panel.tsx mirrors this exact palette (same spec) so the
+ * two customer cards read as one system.
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * (a) The frosted-glass surface — applied ONLY to `<Card>`, verbatim on both
+ * cards. `relative` anchors the status rail; the Card primitive already ships
+ * `overflow-hidden` (which clips the rail to the rounded-3xl corners) so we do
+ * NOT re-declare overflow. `rounded-3xl`/`bg-white/65`/`ring-white/40` override
+ * the primitive's defaults via tailwind-merge. `[--card-spacing:--spacing(5)]`
+ * is the one roomifier token: 20px padding on every slot + 20px inter-slot gap.
+ */
+const GLASS_SURFACE =
+  "relative h-full rounded-3xl border border-white/50 bg-white/65 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)] [--card-spacing:--spacing(5)]";
+
+/** (b) The hover affordance — the shared interaction accent, reduced-motion-safe. */
+const GLASS_LIFT =
+  "transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/75 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none";
+
+/**
+ * (c) The ONLY status palette, dark-paired for WCAG AA over the white/65 frost.
+ * Three keys per tone: `chip` (Badge outline classes), `rail` (the full-height
+ * left status rail), `dot` (the availability dot on the device card).
+ *   green = active/available/paid-live · amber = in-flight/on-hold
+ *   rose  = refunded/failed/unavailable · muted = expired/finished
+ */
+const STATUS_STYLES = {
+  green: {
+    chip: "border-emerald-300/70 bg-emerald-50 text-emerald-700 dark:border-emerald-400/30 dark:bg-emerald-500/10 dark:text-emerald-300",
+    rail: "bg-emerald-500",
+    dot: "bg-emerald-500",
+  },
+  amber: {
+    chip: "border-amber-300/70 bg-amber-50 text-amber-800 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-300",
+    rail: "bg-amber-500",
+    dot: "bg-amber-500",
+  },
+  rose: {
+    chip: "border-rose-300/70 bg-rose-50 text-rose-700 dark:border-rose-400/30 dark:bg-rose-500/10 dark:text-rose-300",
+    rail: "bg-rose-500",
+    dot: "bg-rose-500",
+  },
+  muted: {
+    chip: "border-border bg-muted text-muted-foreground",
+    rail: "bg-muted-foreground/30",
+    dot: "bg-muted-foreground/40",
+  },
+} as const;
+
+/** (d) The ONE gradient — spent once per card on a stock Button. text-white clears AA. */
+const CTA_GRADIENT =
+  "bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white shadow-glow border-white/30 ring-1 ring-white/20 hover:opacity-95";
+
+/**
+ * Per-platform tint helper (correct blue for iPhone, violet for Android). Shared
+ * with the device card so the platform pill + glyph read identically on both.
+ */
+function platformStyles(platform: string): {
+  label: string;
+  pill: string;
+  icon: string;
+} {
+  const isIphone = platform === "iphone";
+  return {
+    label: isIphone ? "iPhone" : "Android",
+    pill: isIphone
+      ? "border-transparent bg-brand/10 text-brand"
+      : "border-transparent bg-brand-2/10 text-brand-2",
+    icon: isIphone ? "text-brand" : "text-brand-2",
+  };
+}
 
 const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
 
@@ -88,44 +158,35 @@ function periodLabel(period: string): string {
 }
 
 /**
- * Status-chip palette — one intent per colour, reusing the same emerald/amber/
- * rose hues as the freshness chip so the whole card reads as a single palette.
- *   green = live · amber = in-flight · red = refunded · muted = finished
+ * Status → { tone, label }, driven only by `rental.status`. The tone selects the
+ * shared STATUS_STYLES palette (chip/rail/dot); the label strings are unchanged.
+ * green for a live rental, amber while it's still in-flight, rose for a refund,
+ * muted once it's finished.
  */
-const statusChip = {
-  green: "border-emerald-300/60 bg-emerald-50/70 text-emerald-700",
-  amber: "border-amber-300/60 bg-amber-50/70 text-amber-700",
-  red: "border-rose-300/60 bg-rose-50/70 text-rose-700",
-  muted: "border-white/60 bg-white/50 text-muted-foreground",
-} as const;
-
-/**
- * Status → status-chip className + label, driven only by `rental.status`.
- * One explicit map (no reuse of the generic grey Badge variants): green for a
- * live rental, amber while it's still in-flight, red for a refund, muted once
- * it's finished. The label strings are unchanged.
- */
-function statusBadge(status: string): { className: string; label: string } {
+function statusBadge(status: string): {
+  tone: keyof typeof STATUS_STYLES;
+  label: string;
+} {
   switch (status) {
     case "active":
     case "pooled":
-      return { className: statusChip.green, label: "active" };
+      return { tone: "green", label: "active" };
     case "pending_payment":
-      return { className: statusChip.amber, label: "payment pending" };
+      return { tone: "amber", label: "payment pending" };
     case "paid":
-      return { className: statusChip.amber, label: "processing" };
+      return { tone: "amber", label: "processing" };
     case "activating":
-      return { className: statusChip.amber, label: "activating…" };
+      return { tone: "amber", label: "activating…" };
     case "activation_pending_credit":
-      return { className: statusChip.amber, label: "on hold" };
+      return { tone: "amber", label: "on hold" };
     case "refunded":
-      return { className: statusChip.red, label: "refunded" };
+      return { tone: "rose", label: "refunded" };
     case "expired":
-      return { className: statusChip.muted, label: "expired" };
+      return { tone: "muted", label: "expired" };
     case "deactivated":
-      return { className: statusChip.muted, label: "canceled" };
+      return { tone: "muted", label: "canceled" };
     default:
-      return { className: statusChip.muted, label: status };
+      return { tone: "muted", label: status };
   }
 }
 
@@ -146,7 +207,7 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
   const router = useRouter();
 
   const isActive = ACTIVE_STATUSES.has(rental.status);
-  const isIphone = rental.platform === "iphone";
+  const platform = platformStyles(rental.platform);
 
   // Live clock — stays `null` on the server and first client paint (so the
   // time-dependent text can't cause a hydration mismatch), then starts ticking
@@ -292,33 +353,50 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
   }
 
   return (
-    <Card className={cn("relative h-full", glassCard, glassHover)}>
+    <Card className={cn(GLASS_SURFACE, GLASS_LIFT)}>
+      {/* Full-height status rail — static; tone tracks the rental status. */}
+      <span
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute inset-y-0 left-0 w-1 rounded-l-3xl",
+          STATUS_STYLES[badge.tone].rail,
+        )}
+      />
+
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Smartphone className="h-4 w-4 text-brand" aria-hidden="true" />
-          {rental.model}
+        <CardTitle className="flex min-w-0 items-center gap-2">
+          <Smartphone
+            className="h-4 w-4 shrink-0 text-brand"
+            aria-hidden="true"
+          />
+          <span className="min-w-0 truncate" title={rental.model}>
+            {rental.model}
+          </span>
         </CardTitle>
         <CardAction>
-          <Badge variant="outline" className={badge.className}>
+          <Badge variant="outline" className={STATUS_STYLES[badge.tone].chip}>
             {badge.label}
           </Badge>
         </CardAction>
-        <div className="mt-1 flex flex-wrap items-center gap-2">
-          <Badge variant="outline" className="gap-1">
-            {isIphone ? "iPhone" : "Android"}
+        <CardDescription className="flex flex-wrap items-center gap-2">
+          <Badge variant="outline" className={platform.pill}>
+            {platform.label}
           </Badge>
-          <span className="text-xs text-muted-foreground">
+          <span className="whitespace-nowrap text-xs text-muted-foreground">
             {periodLabel(rental.billingPeriod)} · {fmtMoney(rental.retailCents)}
           </span>
-        </div>
+        </CardDescription>
       </CardHeader>
 
-      <CardContent className="flex flex-col gap-3">
+      <CardContent className="flex flex-1 flex-col gap-3">
         {isActive ? (
           <>
             {/* Live expiry countdown */}
             <div className="flex items-center gap-2 rounded-2xl border border-white/50 bg-white/50 px-3 py-2 text-sm backdrop-blur-md">
-              <Clock className="h-4 w-4 text-brand" aria-hidden="true" />
+              <Clock
+                className="h-4 w-4 shrink-0 text-brand"
+                aria-hidden="true"
+              />
               <span className="text-muted-foreground">Expires in</span>
               <span className="ml-auto font-semibold tabular-nums text-foreground">
                 {countdown}
@@ -333,14 +411,20 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
                 className={cn(
                   "flex items-center gap-2 rounded-2xl border px-3 py-2 text-xs backdrop-blur-md",
                   tokenFresh
-                    ? "border-emerald-300/60 bg-emerald-50/60 text-emerald-700"
-                    : "border-amber-300/60 bg-amber-50/60 text-amber-700",
+                    ? STATUS_STYLES.green.chip
+                    : STATUS_STYLES.amber.chip,
                 )}
               >
                 {tokenFresh ? (
-                  <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                  <ShieldCheck
+                    className="h-3.5 w-3.5 shrink-0"
+                    aria-hidden="true"
+                  />
                 ) : (
-                  <TriangleAlert className="h-3.5 w-3.5" aria-hidden="true" />
+                  <TriangleAlert
+                    className="h-3.5 w-3.5 shrink-0"
+                    aria-hidden="true"
+                  />
                 )}
                 {tokenFresh ? (
                   <span>Live link — open directly.</span>
@@ -357,8 +441,11 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
                 onClick={copyPin}
                 className="group flex items-center gap-2 rounded-2xl border border-white/50 bg-white/50 px-3 py-2 text-left text-sm backdrop-blur-md transition-colors hover:bg-white/70"
               >
-                <KeyRound className="h-4 w-4 text-brand" aria-hidden="true" />
-                <span className="font-mono text-base font-semibold tracking-[0.3em] text-foreground">
+                <KeyRound
+                  className="h-4 w-4 shrink-0 text-brand"
+                  aria-hidden="true"
+                />
+                <span className="font-mono text-base font-semibold tracking-[0.3em] tabular-nums text-foreground">
                   {pin}
                 </span>
                 <span className="ml-auto inline-flex items-center gap-1 text-xs text-muted-foreground">
@@ -393,21 +480,36 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
             )}
           </>
         ) : rental.status === "refunded" ? (
-          <p className="rounded-2xl border border-white/50 bg-white/50 px-3 py-2 text-sm text-muted-foreground backdrop-blur-md">
+          <p
+            className={cn(
+              "rounded-2xl border px-3 py-2 text-sm backdrop-blur-md",
+              STATUS_STYLES.rose.chip,
+            )}
+          >
             Refunded — try again.
           </p>
         ) : rental.status === "activation_pending_credit" ? (
-          <p className="rounded-2xl border border-amber-300/60 bg-amber-50/60 px-3 py-2 text-sm text-amber-700 backdrop-blur-md">
+          <p
+            className={cn(
+              "rounded-2xl border px-3 py-2 text-sm backdrop-blur-md",
+              STATUS_STYLES.amber.chip,
+            )}
+          >
             Activation is delayed — it&rsquo;ll finish soon.
           </p>
         ) : (
-          <p className="rounded-2xl border border-white/50 bg-white/50 px-3 py-2 text-sm text-muted-foreground backdrop-blur-md">
+          <p
+            className={cn(
+              "rounded-2xl border px-3 py-2 text-sm backdrop-blur-md",
+              STATUS_STYLES.muted.chip,
+            )}
+          >
             {periodLabel(rental.billingPeriod)} · {fmtMoney(rental.retailCents)}
           </p>
         )}
       </CardContent>
 
-      <CardFooter className="flex flex-col gap-2 border-t border-white/40 bg-transparent">
+      <CardFooter className="flex flex-col items-stretch gap-2 border-t border-white/40 bg-transparent">
         {isActive ? (
           <>
             <RemoteControlButton rentalId={rental.id} />
@@ -443,22 +545,16 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
             onClick={renew}
             disabled={renewLoading}
             className={cn(
-              "group relative h-11 w-full gap-2 overflow-hidden rounded-full",
-              "bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-sm font-semibold text-white",
-              "border border-white/30 ring-1 ring-white/20 backdrop-blur-xl",
-              "shadow-[0_10px_40px_-12px_rgba(43,107,255,0.45)]",
-              "transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.55)]",
-              "disabled:translate-y-0 disabled:opacity-80",
+              CTA_GRADIENT,
+              "min-h-11 w-full gap-2 rounded-full font-semibold",
             )}
           >
-            <span className="relative z-10 inline-flex items-center gap-2">
-              {renewLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-              ) : (
-                <RefreshCw className="h-4 w-4" aria-hidden="true" />
-              )}
-              {renewLoading ? "Connecting…" : "Rent again"}
-            </span>
+            {renewLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            ) : (
+              <RefreshCw className="h-4 w-4" aria-hidden="true" />
+            )}
+            {renewLoading ? "Connecting…" : "Rent again"}
           </Button>
         )}
       </CardFooter>
