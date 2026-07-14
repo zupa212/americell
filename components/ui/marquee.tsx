@@ -60,8 +60,14 @@ export function Marquee({
           <div
             key={i}
             className={cn("flex shrink-0 justify-around gap-(--gap)", {
-              "animate-marquee flex-row": !vertical,
-              "animate-marquee-vertical flex-col": vertical,
+              // Flex direction always applies (layout). The pan itself is a
+              // GPU-composited transform, so it stays enabled on every device
+              // (gracefully kept, never removed) — but it's gated behind
+              // `motion-safe:` so reduced-motion users get a single static
+              // frame with no animation instantiated at all. Zero JS keeps
+              // this a Server Component with no hydration cost.
+              "flex-row motion-safe:animate-marquee": !vertical,
+              "flex-col motion-safe:animate-marquee-vertical": vertical,
               "group-hover:[animation-play-state:paused]": pauseOnHover,
               "[animation-direction:reverse]": reverse,
             })}

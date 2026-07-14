@@ -96,19 +96,67 @@ export const Particles: React.FC<ParticlesProps> = ({
   const mousePosition = MousePosition()
   const mouse = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
   const canvasSize = useRef<{ w: number; h: number }>({ w: 0, h: 0 })
-  const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1
   const rafID = useRef<number | null>(null)
   const resizeTimeout = useRef<NodeJS.Timeout | null>(null)
   const initCanvasRef = useRef<() => void>(() => {})
   const onMouseMoveRef = useRef<() => void>(() => {})
   const animateRef = useRef<() => void>(() => {})
+  const startAnimationRef = useRef<() => void>(() => {})
+  const stopAnimationRef = useRef<() => void>(() => {})
+
+  // Pause / reduce contract. Defaults keep the FULL desktop experience during
+  // SSR and first paint (no hydration mismatch); the effects below downgrade on
+  // phones, off-screen, hidden tab, or reduced-motion.
+  const isInViewRef = useRef(true)
+  const isTabVisibleRef = useRef(true)
+  const prefersReducedMotionRef = useRef(false)
+
+  // Mobile gate + reduced-motion state. State (not just refs) so a change
+  // re-runs setup with fewer particles / capped dpr / a static frame.
+  const [isMobile, setIsMobile] = useState(false)
+  const [reducedMotion, setReducedMotion] = useState(false)
+
+  // Cap devicePixelRatio on phones so the offscreen canvas buffer stays small
+  // on mid/low-end GPUs; keep the native dpr on desktop for a crisp look.
+  const rawDpr =
+    typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1
+  const dpr = isMobile ? Math.min(rawDpr, 1.5) : rawDpr
+
+  // Fewer particles on mobile — gracefully reduced, never removed entirely.
+  const effectiveQuantity = isMobile
+    ? Math.max(1, Math.round(quantity * 0.4))
+    : quantity
+
+  // Detect mobile + reduced-motion once (and react to changes), SSR-safe.
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) {
+      return
+    }
+    const mobileMq = window.matchMedia("(max-width: 640px), (pointer: coarse)")
+    const motionMq = window.matchMedia("(prefers-reduced-motion: reduce)")
+
+    const applyMobile = () => setIsMobile(mobileMq.matches)
+    const applyMotion = () => {
+      prefersReducedMotionRef.current = motionMq.matches
+      setReducedMotion(motionMq.matches)
+    }
+    applyMobile()
+    applyMotion()
+
+    mobileMq.addEventListener("change", applyMobile)
+    motionMq.addEventListener("change", applyMotion)
+    return () => {
+      mobileMq.removeEventListener("change", applyMobile)
+      motionMq.removeEventListener("change", applyMotion)
+    }
+  }, [])
 
   useEffect(() => {
     if (canvasRef.current) {
       context.current = canvasRef.current.getContext("2d")
     }
     initCanvasRef.current()
-    animateRef.current()
+    startAnimationRef.current()
 
     const handleResize = () => {
       if (resizeTimeout.current) {
@@ -116,21 +164,64 @@ export const Particles: React.FC<ParticlesProps> = ({
       }
       resizeTimeout.current = setTimeout(() => {
         initCanvasRef.current()
+        startAnimationRef.current()
       }, 200)
     }
 
     window.addEventListener("resize", handleResize)
 
     return () => {
-      if (rafID.current != null) {
-        window.cancelAnimationFrame(rafID.current)
-      }
+      stopAnimationRef.current()
       if (resizeTimeout.current) {
         clearTimeout(resizeTimeout.current)
       }
       window.removeEventListener("resize", handleResize)
     }
-  }, [color])
+    // Re-init when the color, the mobile gate, or the motion preference change
+    // so particle count / dpr / static-frame all stay in sync.
+  }, [color, isMobile, reducedMotion])
+
+  // Pause when scrolled off-screen — the biggest single win for a canvas that
+  // otherwise keeps a rAF loop running behind the fold.
+  useEffect(() => {
+    const el = canvasContainerRef.current
+    if (!el || typeof IntersectionObserver === "undefined") {
+      return
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0]
+        if (!entry) return
+        isInViewRef.current = entry.isIntersecting
+        if (entry.isIntersecting) {
+          startAnimationRef.current()
+        } else {
+          stopAnimationRef.current()
+        }
+      },
+      { rootMargin: "200px" }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  // Pause when the tab is hidden.
+  useEffect(() => {
+    if (typeof document === "undefined") {
+      return
+    }
+    const handleVisibility = () => {
+      isTabVisibleRef.current = document.visibilityState === "visible"
+      if (isTabVisibleRef.current) {
+        startAnimationRef.current()
+      } else {
+        stopAnimationRef.current()
+      }
+    }
+    document.addEventListener("visibilitychange", handleVisibility)
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibility)
+  }, [])
 
   useEffect(() => {
     onMouseMoveRef.current()
@@ -138,6 +229,7 @@ export const Particles: React.FC<ParticlesProps> = ({
 
   useEffect(() => {
     initCanvasRef.current()
+    startAnimationRef.current()
   }, [refresh])
 
   const initCanvas = () => {
@@ -172,7 +264,7 @@ export const Particles: React.FC<ParticlesProps> = ({
 
       // Clear existing particles and create new ones with exact quantity
       circles.current = []
-      for (let i = 0; i < quantity; i++) {
+      for (let i = 0; i < effectiveQuantity; i++) {
         const circle = circleParams()
         drawCircle(circle)
       }
@@ -235,11 +327,21 @@ export const Particles: React.FC<ParticlesProps> = ({
 
   const drawParticles = () => {
     clearContext()
-    const particleCount = quantity
+    const particleCount = effectiveQuantity
     for (let i = 0; i < particleCount; i++) {
       const circle = circleParams()
       drawCircle(circle)
     }
+  }
+
+  // Single static frame for prefers-reduced-motion: show the particles at rest
+  // (their target alpha) without ever entering the rAF loop.
+  const drawStaticFrame = () => {
+    clearContext()
+    circles.current.forEach((circle) => {
+      circle.alpha = circle.targetAlpha
+      drawCircle(circle, true)
+    })
   }
 
   const remapValue = (
@@ -301,12 +403,46 @@ export const Particles: React.FC<ParticlesProps> = ({
         drawCircle(newCircle)
       }
     })
+
+    // Stop scheduling frames when reduced-motion, off-screen, or tab-hidden so
+    // no work happens behind the fold; the guards restart the loop on return.
+    if (
+      prefersReducedMotionRef.current ||
+      !isInViewRef.current ||
+      !isTabVisibleRef.current
+    ) {
+      rafID.current = null
+      return
+    }
     rafID.current = window.requestAnimationFrame(animateRef.current)
+  }
+
+  const startAnimation = () => {
+    if (prefersReducedMotionRef.current) {
+      drawStaticFrame()
+      return
+    }
+    if (!isInViewRef.current || !isTabVisibleRef.current) {
+      return
+    }
+    if (rafID.current != null) {
+      return
+    }
+    rafID.current = window.requestAnimationFrame(animateRef.current)
+  }
+
+  const stopAnimation = () => {
+    if (rafID.current != null) {
+      window.cancelAnimationFrame(rafID.current)
+      rafID.current = null
+    }
   }
 
   initCanvasRef.current = initCanvas
   onMouseMoveRef.current = onMouseMove
   animateRef.current = animate
+  startAnimationRef.current = startAnimation
+  stopAnimationRef.current = stopAnimation
 
   return (
     <div

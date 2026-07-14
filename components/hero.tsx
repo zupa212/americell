@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentType, SVGProps } from "react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   motion,
@@ -232,8 +232,11 @@ function FloatingTile({ tile }: { tile: FloatingTile }) {
           className="absolute inset-0 -z-10 rounded-2xl opacity-70 blur-xl transition-opacity duration-500 group-hover:opacity-100"
           style={{ background: gradient }}
         />
-        {/* frosted glass shell hosting the brand-colored chip */}
-        <div className="rounded-[1.15rem] border border-white/50 bg-white/40 p-1 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.28)] ring-1 ring-white/40 backdrop-blur-md transition-transform duration-300 group-hover:scale-105">
+        {/* frosted glass shell hosting the brand-colored chip.
+            The shell both animates (animate-float) AND uses backdrop-blur, the
+            costliest combo during a mobile scroll, so the blur is lightened on
+            phones (<=640px) while the desktop look is preserved at sm+. */}
+        <div className="rounded-[1.15rem] border border-white/50 bg-white/40 p-1 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.28)] ring-1 ring-white/40 backdrop-blur-md max-sm:backdrop-blur-sm transition-transform duration-300 group-hover:scale-105">
           <div
             className="flex h-12 w-12 items-center justify-center rounded-2xl shadow-lg shadow-black/20 ring-1 ring-white/30 sm:h-14 sm:w-14"
             style={{ background: gradient }}
@@ -270,7 +273,7 @@ function FloatingTile({ tile }: { tile: FloatingTile }) {
  *
  * The animated ShineBorder + dual BorderBeam still trace the metal edge.
  */
-function PhoneMockup() {
+function PhoneMockup({ singleBeam = false }: { singleBeam?: boolean }) {
   // Brushed titanium rail — a cross-band gradient reads as a rounded metal
   // edge catching light on both sides with a darker core.
   const titanium =
@@ -509,14 +512,19 @@ function PhoneMockup() {
               colorFrom="var(--color-brand, #2b6bff)"
               colorTo="var(--color-brand-2, #7c3aed)"
             />
-            <BorderBeam
-              size={150}
-              duration={7}
-              delay={3.5}
-              reverse
-              colorFrom="var(--color-brand-2, #7c3aed)"
-              colorTo="var(--color-brand, #2b6bff)"
-            />
+            {/* Second, counter-rotating beam is desktop-only: on phones we run
+                a single beam to halve the always-on motion/paint work while
+                keeping the animated edge. */}
+            {!singleBeam && (
+              <BorderBeam
+                size={150}
+                duration={7}
+                delay={3.5}
+                reverse
+                colorFrom="var(--color-brand-2, #7c3aed)"
+                colorTo="var(--color-brand, #2b6bff)"
+              />
+            )}
           </div>
         </div>
       </div>
@@ -527,8 +535,75 @@ function PhoneMockup() {
 // Honest, one-word product highlights for the trust row.
 const TRUST_POINTS = ["No emulators", "US datacenters", "Live in your browser"];
 
+/**
+ * SSR-safe mobile gate. Defaults to the full desktop experience during SSR and
+ * first paint (preserving the desktop identity and keeping hydration in sync),
+ * then downgrades on phones / coarse-pointer devices after mount. Used here to
+ * thin out the ambient particles, drop the second border beam, and freeze the
+ * scroll-linked bloom parallax on mobile.
+ */
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      typeof window.matchMedia !== "function"
+    )
+      return;
+    const mq = window.matchMedia("(max-width: 640px), (pointer: coarse)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return isMobile;
+}
+
+/**
+ * Pause decorative CSS animations when their container scrolls out of view or
+ * the tab is hidden. Defaults to running so the above-the-fold visual animates
+ * on mount with no hydration mismatch; flips off (via IntersectionObserver +
+ * visibilitychange) so the floating tiles / status glow don't keep repainting
+ * behind the fold or in a backgrounded tab.
+ */
+function useInViewActive<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  const [active, setActive] = useState(true);
+  useEffect(() => {
+    const el = ref.current;
+    if (typeof window === "undefined" || !el) return;
+    let inView = true;
+    let visible =
+      typeof document === "undefined" || document.visibilityState !== "hidden";
+    const sync = () => setActive(inView && visible);
+    const io =
+      typeof IntersectionObserver !== "undefined"
+        ? new IntersectionObserver(
+            (entries) => {
+              inView = entries[0]?.isIntersecting ?? true;
+              sync();
+            },
+            { rootMargin: "200px" },
+          )
+        : null;
+    io?.observe(el);
+    const onVisibility = () => {
+      visible = document.visibilityState !== "hidden";
+      sync();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      io?.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, []);
+  return [ref, active] as const;
+}
+
 export default function Hero() {
   const prefersReducedMotion = useReducedMotion();
+  const isMobile = useIsMobile();
+  const [visualRef, visualActive] = useInViewActive<HTMLDivElement>();
 
   // Small scroll-linked parallax for the headline's brand bloom (transform
   // only). The phone gets its own parallax inside <HeroPhoneParallax>.
@@ -563,7 +638,7 @@ export default function Hero() {
       <motion.div
         aria-hidden="true"
         style={
-          prefersReducedMotion
+          prefersReducedMotion || isMobile
             ? undefined
             : { y: bloomY, willChange: "transform" }
         }
@@ -680,18 +755,30 @@ export default function Hero() {
           {...item}
           className="relative mt-20 flex justify-center sm:mt-28"
         >
-          <div className="relative origin-top scale-[0.8] -mb-24 sm:mb-0 sm:scale-100">
+          <div
+            ref={visualRef}
+            className={cn(
+              "relative origin-top scale-[0.8] -mb-24 sm:mb-0 sm:scale-100",
+              // Freeze the tile bob + status glow when the visual leaves the
+              // viewport or the tab is hidden (transform/opacity only — no
+              // layout thrash). BorderBeam/ShineBorder pause in their own files.
+              !visualActive &&
+                "[&_.animate-float]:[animation-play-state:paused] [&_.animate-float-slow]:[animation-play-state:paused] [&_.animate-glow]:[animation-play-state:paused]",
+            )}
+          >
             {/* subtle dot grid behind the device, softly masked to the center */}
+            {/* Decorative dot grid — desktop only; the motion.circle grid is
+                skipped on mobile where paint budget is tight. */}
             <DotPattern
               width={24}
               height={24}
               cr={1.1}
-              className="pointer-events-none -z-20 text-brand/20 [mask-image:radial-gradient(280px_circle_at_50%_45%,white,transparent_72%)]"
+              className="pointer-events-none -z-20 hidden text-brand/20 [mask-image:radial-gradient(280px_circle_at_50%_45%,white,transparent_72%)] sm:block"
             />
             {/* ambient particles drifting behind the phone for depth */}
             <Particles
               className="pointer-events-none absolute -inset-24 -z-10"
-              quantity={70}
+              quantity={isMobile ? 24 : 70}
               ease={80}
               color="#2b6bff"
               staticity={40}
@@ -701,7 +788,7 @@ export default function Hero() {
             ))}
             {/* subtle scroll parallax + idle float (reduced-motion safe) */}
             <HeroPhoneParallax>
-              <PhoneMockup />
+              <PhoneMockup singleBeam={isMobile} />
             </HeroPhoneParallax>
           </div>
         </motion.div>
