@@ -55,12 +55,15 @@ export default async function ControlPage({
             Back
           </Link>
           <div className="flex items-center gap-2 text-sm font-semibold">
-            <span
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/americell-mark.png"
+              alt=""
               aria-hidden="true"
-              className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-xs font-bold text-white ring-1 ring-white/40"
-            >
-              A
-            </span>
+              width={464}
+              height={260}
+              className="h-7 w-auto shrink-0"
+            />
             <span className="tracking-tight">
               <AuroraText>Americell</AuroraText>
               <span className="hidden text-muted-foreground sm:inline">
