@@ -52,11 +52,11 @@ export default function SignupPage() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/americell-logo.jpg"
+            src="/americell-logo.png"
             alt="Americell"
-            width={1280}
-            height={698}
-            className="h-20 w-auto rounded-2xl shadow-sm ring-1 ring-white/50"
+            width={945}
+            height={496}
+            className="h-16 w-auto sm:h-20"
           />
         </Link>
 

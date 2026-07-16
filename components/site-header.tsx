@@ -144,13 +144,15 @@ export default function SiteHeader() {
             className="group flex items-center gap-2.5 rounded-full outline-none transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             aria-label={`${SITE.name} — Home`}
           >
-            <span
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/americell-mark.png"
+              alt=""
               aria-hidden="true"
-              className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] text-base font-bold text-white shadow-sm shadow-brand/20 ring-1 ring-white/40 transition-transform duration-300 group-hover:scale-105 group-hover:animate-gradient"
-            >
-              <span className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/25 to-white/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              <span className="relative">A</span>
-            </span>
+              width={464}
+              height={260}
+              className="h-8 w-auto shrink-0 transition-transform duration-300 group-hover:scale-105"
+            />
             <span className="text-base font-bold tracking-tighter sm:text-lg">
               <AuroraText>{SITE.name}</AuroraText>
             </span>
@@ -279,12 +281,15 @@ export default function SiteHeader() {
               >
                 <SheetHeader>
                   <SheetTitle className="flex items-center gap-2.5">
-                    <span
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/americell-mark.png"
+                      alt=""
                       aria-hidden="true"
-                      className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-base font-bold text-white shadow-sm shadow-brand/20 ring-1 ring-white/40"
-                    >
-                      A
-                    </span>
+                      width={464}
+                      height={260}
+                      className="h-8 w-auto shrink-0"
+                    />
                     <span className="text-lg font-bold tracking-tighter">
                       <AuroraText>{SITE.name}</AuroraText>
                     </span>

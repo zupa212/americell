@@ -112,12 +112,15 @@ function Brand() {
       href="/admin"
       className="group flex items-center gap-2.5 rounded-2xl px-1 outline-none transition-all duration-300 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
-      <span
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/americell-mark.png"
+        alt=""
         aria-hidden="true"
-        className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-base font-bold text-white shadow-sm shadow-brand/25 ring-1 ring-white/40"
-      >
-        A
-      </span>
+        width={464}
+        height={260}
+        className="h-8 w-auto shrink-0"
+      />
       <span className="text-lg font-bold tracking-tight text-foreground">
         <AuroraText>Americell</AuroraText>
       </span>

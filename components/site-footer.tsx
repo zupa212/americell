@@ -124,23 +124,15 @@ export default function SiteFooter() {
               aria-label={`${SITE.name} — back to top`}
             >
               {/* Brand mark */}
-              <span
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/americell-mark.png"
+                alt=""
                 aria-hidden="true"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] text-white shadow-md shadow-brand/25 ring-1 ring-white/40 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:animate-gradient group-hover:shadow-lg group-hover:shadow-brand/40"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  className="h-4.5 w-4.5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect x="7" y="2.5" width="10" height="19" rx="2.5" />
-                  <path d="M11 18.5h2" />
-                </svg>
-              </span>
+                width={464}
+                height={260}
+                className="h-9 w-auto shrink-0 transition-transform duration-300 group-hover:-translate-y-0.5"
+              />
               {/* Wordmark */}
               <span className="text-2xl font-bold tracking-tight">
                 <AuroraText>{SITE.name}</AuroraText>
