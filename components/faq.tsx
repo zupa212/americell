@@ -29,8 +29,9 @@ export default function Faq() {
             <AuroraText>Answered.</AuroraText>
           </h2>
           <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-            Everything about running real US phones with Americell. Still
-            curious? Reach out — we&apos;re quick.
+            Everything about deploying a real device fleet on Americell —
+            hardware, latency, security, and billing. Need specifics? Talk to
+            our team.
           </p>
         </Reveal>
 

@@ -62,13 +62,18 @@ export default function HowItWorks() {
               id="how-heading"
               className="mt-4 text-balance text-4xl font-bold tracking-tighter text-foreground sm:text-5xl lg:text-6xl"
             >
-              Real US phone to{" "}
-              <AuroraText>live control</AuroraText>
-              <span className="text-muted-foreground"> in three steps.</span>
+              From provisioning to{" "}
+              <AuroraText>full remote control</AuroraText>
+              <span className="text-muted-foreground">
+                {" "}
+                in minutes, not procurement cycles.
+              </span>
             </h2>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              No cables. No local hardware. No shipping. Spin up a genuine
-              device and start driving it straight from your browser.
+              No office hardware, no cables, no babysitting. Provision real
+              iPhones and Android devices in minutes, drive the fleet from one
+              dashboard, and keep every session under role-based access,
+              recording, and full logs.
             </p>
           </header>
         </Reveal>

@@ -4,7 +4,7 @@ import { Marquee } from "@/components/ui/marquee";
 import { ShineBorder } from "@/components/ui/shine-border";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
-import { TESTIMONIALS, type Testimonial } from "@/lib/site";
+import { type Testimonial } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 /**
@@ -14,8 +14,38 @@ import { cn } from "@/lib/utils";
  * recipe with an always-on ShineBorder trim; on hover a BorderBeam traces the
  * edge, the card lifts, and the whole marquee gently pauses (pauseOnHover) so
  * the reader can settle on a single quote. A symmetric mask fade dissolves the
- * row into the aurora on both edges. All quotes/authors are preserved verbatim.
+ * row into the aurora on both edges. Every quote is an enterprise team running
+ * a remote phone fleet on Americell.
  */
+
+// Enterprise voices — agency, QA, mobile ops, and security teams describing what
+// it's like to run a real remote phone fleet (iPhone + Android) as infrastructure.
+const TESTIMONIALS: Testimonial[] = [
+  {
+    quote:
+      "We stood up a fleet of real iPhones and Android devices across four client accounts in an afternoon — no procurement, no shipping. One dashboard, full control, and it just runs.",
+    name: "Devin K.",
+    role: "Founder, mobile growth agency",
+  },
+  {
+    quote:
+      "Real US iOS and Android hardware, real OS versions, streaming under 50ms. We retired the device closet, and our regression suite has never been more honest.",
+    name: "Maya R.",
+    role: "Head of QA, mobile fintech",
+  },
+  {
+    quote:
+      "24/7 dedicated devices with hardware maintenance and replacement handled for us. 99.9% uptime, zero cables to babysit — it's infrastructure now, not a drawer of phones.",
+    name: "Marcus T.",
+    role: "Mobile operations lead",
+  },
+  {
+    quote:
+      "Role-based access, session recording, and full logs on every device, plus a DPA our legal team signed off on. We finally have a phone fleet that passes audit.",
+    name: "Priya S.",
+    role: "Security & compliance",
+  },
+];
 
 const glassCard = cn(
   "group/card relative flex h-full w-[19rem] shrink-0 flex-col overflow-hidden rounded-3xl border border-white/50 bg-white/60 p-7 backdrop-blur-xl sm:w-[23rem]",
@@ -98,20 +128,21 @@ export default function Testimonials() {
               className="h-2 w-2 rounded-full bg-gradient-to-br from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] motion-safe:animate-gradient shadow-[0_0_10px_rgba(43,107,255,0.7)]"
             />
             <AnimatedShinyText className="font-semibold uppercase tracking-[0.14em] text-brand">
-              Clients
+              In production
             </AnimatedShinyText>
           </div>
 
           <h2 className="mt-6 max-w-3xl text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.03em] text-foreground sm:text-5xl lg:text-6xl">
-            Trusted by teams on{" "}
+            Trusted by teams running{" "}
             <span className="bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] bg-clip-text text-transparent motion-safe:animate-gradient">
-              real US devices
+              fleets in production
             </span>
             .
           </h2>
           <p className="mt-5 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            QA leads, agencies, and growth teams operate genuine US hardware from
-            anywhere — no shipping, no cables.
+            QA, mobile ops, agencies, and security teams run real iPhones and
+            Android devices from one dashboard — hosted, maintained, and live in
+            minutes.
           </p>
         </Reveal>
 

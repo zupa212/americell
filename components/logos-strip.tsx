@@ -35,7 +35,7 @@ const edgeFade = {
 export default function LogosStrip() {
   return (
     <section
-      aria-label="Teams that trust real US devices"
+      aria-label="Teams that run on real device infrastructure"
       className="relative overflow-hidden"
     >
       <div
@@ -47,7 +47,7 @@ export default function LogosStrip() {
         <div className="relative mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
           <Reveal>
             <p className="text-center text-base font-bold tracking-tight text-foreground sm:text-lg">
-              Real <span className={gradientWord}>US devices</span>
+              Real <span className={gradientWord}>physical devices</span>
               <span aria-hidden="true" className="mx-2.5 text-border">
                 &middot;
               </span>
@@ -55,13 +55,13 @@ export default function LogosStrip() {
               <span aria-hidden="true" className="mx-2.5 text-border">
                 &middot;
               </span>
-              live <span className={gradientWord}>browser control</span>
+              global <span className={gradientWord}>edge control</span>
             </p>
           </Reveal>
 
           <Reveal delay={0.1}>
             <p className="mt-3 text-center text-[11px] font-semibold uppercase tracking-[0.28em] text-muted-foreground/70">
-              Trusted by
+              Trusted by teams at
             </p>
           </Reveal>
 

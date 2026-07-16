@@ -107,24 +107,24 @@ export default async function Pricing() {
                 aria-hidden="true"
                 className="h-3 w-px bg-brand-2/30"
               />
-              Pricing
+              Fleet Pricing
             </span>
           </div>
           <h2
             id="pricing-heading"
             className="mt-5 text-balance break-words text-4xl font-black leading-[0.98] tracking-tighter text-foreground sm:text-6xl sm:leading-[0.95] lg:text-7xl"
           >
-            One real phone.{" "}
+            Build your fleet.{" "}
             <span className="animate-gradient bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] bg-clip-text text-transparent">
-              One flat price.
+              Priced per device.
             </span>
           </h2>
           <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-            Pick a real US phone from{" "}
+            Deploy real iPhones and Android devices from{" "}
             <span className="font-semibold text-brand-2">Americell</span>&apos;s
-            live inventory, drive it straight from your browser, and pay once for
-            exactly the time you need. No emulators. No hidden fees. Just real
-            hardware.
+            live inventory and run the whole fleet from one dashboard. Transparent
+            per-device pricing — hosting, maintenance and hardware replacement
+            included. No setup fees. Cancel anytime. Live in minutes.
           </p>
         </Reveal>
 

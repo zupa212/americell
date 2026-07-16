@@ -85,7 +85,7 @@ export default function Features() {
               className="h-2 w-2 rounded-full bg-gradient-to-br from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] motion-safe:animate-gradient shadow-[0_0_10px_rgba(43,107,255,0.7)]"
             />
             <AnimatedShinyText className="font-semibold uppercase tracking-[0.14em] text-brand">
-              Why Americell
+              Managed fleet infrastructure
             </AnimatedShinyText>
           </div>
 
@@ -93,15 +93,17 @@ export default function Features() {
             id="features-heading"
             className="mt-6 max-w-3xl text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.03em] text-foreground sm:text-5xl lg:text-6xl"
           >
-            Real US devices,{" "}
+            Real iPhones and Androids,{" "}
             <span className="bg-gradient-to-r from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] bg-clip-text text-transparent motion-safe:animate-gradient">
-              fully in your control
+              managed like infrastructure
             </span>
             .
           </h2>
           <p className="mt-5 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            Everything you need to test, automate, and operate real US phones
-            from anywhere — built for agencies, app testers, and growth teams.
+            We host, power, connect, and maintain a fleet of real US phones — you
+            get full control from one dashboard, role-based access, session
+            recording, and global edge streaming under 50ms. No office hardware,
+            no cables, no babysitting.
           </p>
         </Reveal>
 

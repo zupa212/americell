@@ -227,7 +227,7 @@ export default function SiteHeader() {
                 accessible link (link owns focus + name; shimmer is decorative). */}
             <a
               href="/signup"
-              aria-label="Get started"
+              aria-label="Deploy your fleet"
               className="group/cta relative inline-flex rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               <ShimmerButton
@@ -239,7 +239,7 @@ export default function SiteHeader() {
                 borderRadius="9999px"
                 className="h-11 min-h-11 px-4 py-0 text-sm font-semibold shadow-sm shadow-brand/25 ring-1 ring-white/25 transition-transform duration-300 group-hover/cta:-translate-y-0.5 sm:h-9 sm:min-h-0 sm:px-3.5"
               >
-                Get started
+                Deploy your fleet
               </ShimmerButton>
             </a>
 
@@ -345,7 +345,7 @@ export default function SiteHeader() {
                   </Button>
                   <a
                     href="/signup"
-                    aria-label="Get started"
+                    aria-label="Deploy your fleet"
                     onClick={() => setMenuOpen(false)}
                     className="group/cta relative inline-flex w-full rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   >
@@ -358,7 +358,7 @@ export default function SiteHeader() {
                       borderRadius="9999px"
                       className="h-11 w-full px-4 py-0 text-sm font-semibold shadow-sm shadow-brand/25 ring-1 ring-white/25"
                     >
-                      Get started
+                      Deploy your fleet
                     </ShimmerButton>
                   </a>
                 </motion.div>

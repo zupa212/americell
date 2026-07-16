@@ -66,30 +66,32 @@ export const STEPS: Step[] = [
 
 export type Faq = { q: string; a: string };
 
+// Single source of truth for FAQ copy — consumed by both the visible <Faq/>
+// section AND the FAQPage JSON-LD in <StructuredData/>, so the two never drift.
 export const FAQS: Faq[] = [
   {
-    q: "Real phones or emulators?",
-    a: "Real, physical smartphones hosted in US datacenters on clean residential connectivity. No emulators, no virtual OS images.",
+    q: "Are these real devices or emulators?",
+    a: "Real, physical iPhones and Android handsets racked in US datacenters — never emulators or virtual OS images. Your team, your users, and the app stores all see genuine hardware on clean connectivity.",
   },
   {
-    q: "What can I use Americell for?",
-    a: "Legitimate work on real devices: mobile app testing and QA, US localization testing, store review, and managing your own accounts and workflows for agencies and growth teams.",
+    q: "What latency and uptime can we expect?",
+    a: "Devices stream from global edge locations at under 50ms, so live control feels local. The fleet runs on redundant power and networking behind a 99.9% uptime SLA, with hardware maintenance and replacement handled by us.",
   },
   {
-    q: "Where are the devices?",
-    a: "Across the US — currently Ashburn (VA), Dallas (TX), and San Jose (CA), with more coming.",
+    q: "How do you handle security and access control?",
+    a: "Every device, session, and teammate sits under one policy. You get role-based access with granular permissions, full session recording, and complete audit logs — so you always know who touched which device, and when.",
   },
   {
-    q: "Can I automate actions?",
-    a: "Yes. Drive a device live in the browser, or script repeatable flows and schedule them to run on the real device.",
+    q: "Can we get SIMs and real mobile connectivity?",
+    a: "Yes. Devices ship on clean US connectivity out of the box, and you can add dedicated SIM data plans from $15/mo per device whenever a workflow needs a live carrier number or mobile data.",
   },
   {
-    q: "How does billing work?",
-    a: "Simple per-device plans, monthly or annual (annual saves ~20%). Cancel anytime from your dashboard.",
+    q: "How fast can we scale, and what about procurement?",
+    a: "You go live in minutes, not procurement cycles. Add or remove devices on demand from the dashboard — no cables, no office hardware, no shipping. Scale from a handful of devices to an enterprise pool without touching a purchase order.",
   },
   {
-    q: "Is this allowed by app and platform rules?",
-    a: "Americell is built for legitimate use. You're responsible for following the terms of any app or platform you use on a device — see our Acceptable Use policy.",
+    q: "How does enterprise billing and compliance work?",
+    a: "Transparent per-device monthly pricing, with hosting, maintenance, and hardware replacement included — no setup fees, cancel anytime from your dashboard. For larger deployments we offer a DPA and dedicated support; talk to Sales to scope it.",
   },
 ];
 

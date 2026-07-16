@@ -53,40 +53,40 @@ type Benefit = {
 const BENEFITS: readonly Benefit[] = [
   {
     num: "01",
-    title: "Real US hardware.",
-    body: "Operate real iPhones and Androids physically located in the United States — no emulators, no virtual machines. Built for app testing, QA, and market research under authentic conditions.",
+    title: "No hardware in the office.",
+    body: "Real iPhones and Android devices — hosted, powered, connected, and maintained in our facility. No desks of phones, no tangle of cables and chargers, no fleet to babysit. The hardware lives with us; control stays with your team.",
     Icon: Smartphone,
     shine: ["#2b6bff", "#7aa2ff", "#c7d7ff"],
     beam: { from: "#2b6bff", to: "#7c3aed" },
   },
   {
     num: "02",
-    title: "Live control, in your browser.",
-    body: "Watch the screen in real time and tap, type, and swipe as if the device were in your hand. Nothing to install — just your browser and low latency.",
+    title: "Full control from one dashboard.",
+    body: "Every device in the fleet is live in your browser — tap, type, swipe, install, and test as if it were in your hand. One dashboard for the whole team, nothing to plug in, provision, or set up.",
     Icon: MonitorSmartphone,
     shine: ["#7c3aed", "#9E7AFF", "#d9c7ff"],
     beam: { from: "#7c3aed", to: "#2b6bff" },
   },
   {
     num: "03",
-    title: "Clean US residential IPs.",
-    body: "Every device runs on a genuine US home connection, so you see content, pricing, and experiences like a local — for legitimate localization, growth, and ad-review testing.",
+    title: "Global edge, under 50ms.",
+    body: "Devices stream from the edge over genuine US connections, so remote feels local. Sub-50ms latency keeps QA, app validation, and mobile operations fast for teammates anywhere in the world.",
     Icon: Globe2,
     shine: ["#2b6bff", "#5aa2ff", "#c7d7ff"],
     beam: { from: "#5aa2ff", to: "#7c3aed" },
   },
   {
     num: "04",
-    title: "Secure, PIN-locked, isolated.",
-    body: "Every rental is yours alone: PIN protection, an encrypted connection, and a clean device between sessions. You control access — we keep the data safe.",
+    title: "Governance and audit, built in.",
+    body: "Role-based access, session recording, and full logs on every device — so you always know who did what, and when. A clean audit trail for security and compliance, with a DPA available for enterprise.",
     Icon: ShieldCheck,
     shine: ["#7c3aed", "#2b6bff", "#c7d7ff"],
     beam: { from: "#2b6bff", to: "#5aa2ff" },
   },
   {
     num: "05",
-    title: "Ready in seconds.",
-    body: "Pick a device, start the rental, and take control almost instantly. No shipping, no logistics waits — just press play.",
+    title: "Live in minutes, not procurement cycles.",
+    body: "Scale the fleet from the dashboard — add or retire devices on demand, with hosting, maintenance, and hardware replacement included and 99.9% uptime behind them. No shipping, no logistics, cancel anytime.",
     Icon: Rocket,
     shine: ["#2b6bff", "#7c3aed", "#5aa2ff"],
     beam: { from: "#7c3aed", to: "#2b6bff" },
@@ -177,7 +177,7 @@ export default function BenefitsStack() {
                 className="h-2 w-2 rounded-full bg-gradient-to-br from-brand via-brand-2 to-brand-soft bg-[length:200%_auto] motion-safe:animate-gradient shadow-[0_0_10px_rgba(43,107,255,0.7)]"
               />
               <AnimatedShinyText className="font-semibold uppercase tracking-[0.14em] text-brand">
-                Why Americell
+                Why go remote
               </AnimatedShinyText>
             </div>
 
@@ -185,12 +185,13 @@ export default function BenefitsStack() {
               id="why-heading"
               className="mt-6 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl"
             >
-              Five reasons to trust{" "}
+              You moved your servers to the cloud. Your phone fleet runs on{" "}
               <AuroraText colors={BRAND_AURORA}>Americell</AuroraText>
             </h2>
             <p className="mt-5 max-w-md text-lg leading-relaxed text-muted-foreground">
-              Real US devices, live remote control, and clean residential IPs —
-              built for teams that test, verify, and grow in the open.
+              The same move that put your servers in the cloud now fits your
+              devices: no hardware in the office, a fully managed fleet, and
+              every phone a click away in the dashboard.
             </p>
           </Reveal>
 
