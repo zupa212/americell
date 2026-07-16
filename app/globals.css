@@ -317,12 +317,12 @@ body {
 }
 
 /* ── Dark admin cockpit ───────────────────────────────────────────────────────
-   Scoped to /admin only (its root carries `dark admin-dark`); marketing pages
+   Scoped to /admin only (its root carries `dark dark-surface`); marketing pages
    never do, so they stay light. shadcn tokens flip via `.dark`; here we (a) keep
    the AMERICELL brand blue for primary/rings, (b) tint every surface a deep
    blue-black, and (c) remap the literal frosted-WHITE glass utilities the cockpit
    uses into frosted-DARK, so panels read dark instead of bright. */
-.admin-dark {
+.dark-surface {
   --background: oklch(0.17 0.028 264);
   --foreground: oklch(0.98 0.005 264);
   --card: oklch(0.21 0.03 264);
@@ -345,26 +345,26 @@ body {
 /* Frosted-WHITE panel surfaces (opacity 40–75) → frosted-DARK. The /10–/30 and
    /90 whites (gradient-button icon tiles, active-pill dot) are intentionally NOT
    matched, so they stay light on the vivid brand gradients. */
-.admin-dark [class*="bg-white/4"],
-.admin-dark [class*="bg-white/5"],
-.admin-dark [class*="bg-white/6"],
-.admin-dark [class*="bg-white/7"] {
+.dark-surface [class*="bg-white/4"],
+.dark-surface [class*="bg-white/5"],
+.dark-surface [class*="bg-white/6"],
+.dark-surface [class*="bg-white/7"] {
   background-color: rgb(228 235 255 / 0.055) !important;
 }
-.admin-dark [class*="hover:bg-white/6"]:hover,
-.admin-dark [class*="hover:bg-white/7"]:hover,
-.admin-dark [class*="hover:bg-white/9"]:hover {
+.dark-surface [class*="hover:bg-white/6"]:hover,
+.dark-surface [class*="hover:bg-white/7"]:hover,
+.dark-surface [class*="hover:bg-white/9"]:hover {
   background-color: rgb(228 235 255 / 0.12) !important;
 }
 /* Glass hairline borders + rings → subtle light-on-dark. */
-.admin-dark [class*="border-white/3"],
-.admin-dark [class*="border-white/4"],
-.admin-dark [class*="border-white/5"] {
+.dark-surface [class*="border-white/3"],
+.dark-surface [class*="border-white/4"],
+.dark-surface [class*="border-white/5"] {
   border-color: rgb(255 255 255 / 0.1) !important;
 }
-.admin-dark [class*="ring-white/3"],
-.admin-dark [class*="ring-white/4"],
-.admin-dark [class*="ring-white/5"] {
+.dark-surface [class*="ring-white/3"],
+.dark-surface [class*="ring-white/4"],
+.dark-surface [class*="ring-white/5"] {
   --tw-ring-color: rgb(255 255 255 / 0.08) !important;
 }
 

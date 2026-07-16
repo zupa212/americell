@@ -31,7 +31,7 @@ export default async function AdminLayout({
   const { email } = await requireAdminPage();
 
   return (
-    <div className="dark admin-dark relative min-h-screen text-foreground">
+    <div className="dark dark-surface relative min-h-screen text-foreground">
       {/* Dark cockpit backdrop — covers the global light aurora for /admin only. */}
       <div
         aria-hidden="true"
