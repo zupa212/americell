@@ -1,7 +1,5 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Database, Smartphone } from "lucide-react";
 
 import { auth } from "@/auth";
 import { isDbConfigured } from "@/lib/db";
@@ -12,22 +10,16 @@ import { isMoonpayConfigured } from "@/lib/moonpay";
 import { isNowpaymentsConfigured } from "@/lib/nowpayments";
 import { isCoinbaseConfigured } from "@/lib/coinbase";
 import { isBtcpayConfigured } from "@/lib/btcpay";
-import RentalCard, { type RentalCardData } from "@/components/rental-card";
-import DashboardUserMenu from "@/components/dashboard-user-menu";
-import DashboardBuyPanel from "@/components/dashboard-buy-panel";
-import CheckoutSuccess from "@/components/checkout-success";
-import { type CryptoProvider } from "@/components/pricing-grid";
-import { AuroraText } from "@/components/ui/aurora-text";
-import Reveal from "@/components/ui/reveal";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { cn } from "@/lib/utils";
+import type { RentalCardData } from "@/components/rental-card";
+import type { CryptoProvider } from "@/components/pricing-grid";
+// The single client island. Its prop + row types are the shared contract — page
+// and shell are compiler-locked to the same shape by importing them from here.
+import DashboardShell, {
+  type BillingRow,
+} from "@/components/dashboard-shell";
 
 // → "Americell · Dashboard" via the brand-first title template.
 export const metadata = { title: "Dashboard" };
-
-// Frosted-glass surface recipe — floats over the global aurora (SiteBackground).
-const glassCard =
-  "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
 
 // Statuses that entitle a live rental (§5.4: `pooled` is active-equivalent).
 const ACTIVE_STATUSES = new Set(["active", "pooled"]);
@@ -72,6 +64,30 @@ function toCardData(r: Rental): RentalCardData {
   };
 }
 
+/**
+ * Project a full `Rental` into a billing/receipt row for the Billing & Account
+ * section. Payments are one-time Stripe (mode:payment), so each rental IS its
+ * own receipt — we do NOT call the Stripe Invoices API.
+ *
+ * Mirrors `toCardData`'s secret-stripping: only client-safe fields cross the
+ * boundary, and the amount is `retailCents` (what the customer paid) — the
+ * reseller margin (`wholesaleQuotedCents` / `chargedCents`) NEVER reaches the
+ * client. Applied to the FULL rental list so it stays independent of the
+ * active/history split and inherits `listRentalsForUser`'s newest-first order.
+ */
+function toBillingRow(r: Rental): BillingRow {
+  return {
+    id: r.id,
+    model: r.model,
+    platform: r.platform,
+    billingPeriod: r.billingPeriod,
+    amountCents: r.retailCents,
+    currency: "usd",
+    status: r.status,
+    createdAt: r.createdAt.toISOString(),
+  };
+}
+
 export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user?.id) {
@@ -102,178 +118,46 @@ export default async function DashboardPage() {
     }
   }
 
-  // Partition into Active (entitled) vs History (everything else).
+  // Partition into Active (entitled) vs History (everything else). `rows` is
+  // already ordered desc(createdAt), so both lists come out newest-first.
   const active: RentalCardData[] = [];
   const history: RentalCardData[] = [];
   for (const r of rows) {
     (ACTIVE_STATUSES.has(r.status) ? active : history).push(toCardData(r));
   }
 
+  // Purchase history (receipts) — projected from the FULL list, newest-first.
+  const billing = rows.map(toBillingRow);
+
   const email = session.user.email ?? "";
-  const hasAny = active.length > 0 || history.length > 0;
+  const dbConnected = isDbConfigured && !dbError;
 
   // Live retail catalog for the in-dashboard rent panel. Fails closed on the
   // server (never fetched on the client) so the page stays a pure Server
-  // Component with the panel as its single client island.
+  // Component with the shell as its single client island.
   const catalog = await getRetailCatalog();
 
+  // One Suspense boundary covers BOTH the shell's `?tab` sync read and the
+  // nested <CheckoutSuccess/> — both call useSearchParams.
   return (
-    <div className="relative min-h-screen">
-      <header className="sticky top-0 z-40 border-b border-white/40 bg-white/50 backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 rounded-lg outline-none transition-all duration-300 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-          >
-            <span
-              aria-hidden="true"
-              className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-base font-bold text-white shadow-sm shadow-brand/20"
-            >
-              A
-            </span>
-            <span className="text-lg font-bold tracking-tight text-foreground">
-              <AuroraText>Americell</AuroraText>
-            </span>
-          </Link>
-          <DashboardUserMenu email={email} />
-        </div>
-      </header>
-
-      <main className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12">
-        {/* Post-payment confirmation — reads ?checkout=success / ?crypto=success,
-            auto-refreshes until the webhook-activated rental appears. Renders
-            nothing on a normal visit. Suspense wraps the useSearchParams read. */}
-        <Suspense fallback={null}>
-          <CheckoutSuccess activeCount={active.length} />
-        </Suspense>
-
-        <Reveal>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            Your rentals
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Manage the real US phones you&rsquo;ve rented — PIN, remote control,
-            and time remaining.
-          </p>
-        </Reveal>
-
-        {/* Rent-a-phone shelf — greets zero-rental & db-unconfigured users first,
-            renders independently of the rentals DB, rides the existing gap-8. */}
-        {catalog.ok ? (
-          <DashboardBuyPanel
-            phones={catalog.phones}
-            durations={DURATIONS}
-            cryptoProviders={cryptoProviders()}
-          />
-        ) : (
-          <Reveal delay={0.05}>
-            <div className={cn(glassCard, "p-6")}>
-              {catalog.reason === "unconfigured" ? (
-                <>
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-2">
-                    Demo mode
-                  </p>
-                  <h2 className="mt-2 text-base font-semibold tracking-tight text-foreground">
-                    Live inventory isn&rsquo;t wired up yet
-                  </h2>
-                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                    The device provider isn&rsquo;t configured in this
-                    environment, so we can&rsquo;t show live pricing right now.
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-2">
-                    Temporary hiccup
-                  </p>
-                  <h2 className="mt-2 text-base font-semibold tracking-tight text-foreground">
-                    Inventory didn&rsquo;t load
-                  </h2>
-                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                    We couldn&rsquo;t load available devices just now. Refresh in
-                    a moment to see live pricing.
-                  </p>
-                </>
-              )}
-            </div>
-          </Reveal>
-        )}
-
-        {!isDbConfigured || dbError ? (
-          <Reveal delay={0.05}>
-            <Alert className={cn("border-white/50 bg-white/60 backdrop-blur-md")}>
-              <Database className="h-4 w-4" aria-hidden="true" />
-              <AlertTitle>The database isn&rsquo;t connected yet.</AlertTitle>
-              <AlertDescription>
-                Add <code>DATABASE_URL</code> (see{" "}
-                <code>.env.example</code>) and run the migrations to see your
-                rentals here.
-              </AlertDescription>
-            </Alert>
-          </Reveal>
-        ) : !hasAny ? (
-          <Reveal delay={0.05}>
-            <div className={cn("relative overflow-hidden text-center", glassCard)}>
-              <div className="mx-auto flex w-full max-w-sm flex-col items-center gap-3 px-6 py-12 sm:py-14">
-                <span
-                  aria-hidden="true"
-                  className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/50 bg-white/70 text-brand backdrop-blur-md"
-                >
-                  <Smartphone className="h-6 w-6" />
-                </span>
-                <div className="space-y-1.5">
-                  <h2 className="text-lg font-semibold tracking-tight text-foreground">
-                    No rentals yet
-                  </h2>
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    Your rented phones show up here. Pick one from{" "}
-                    <span className="font-medium text-foreground">
-                      Rent a phone
-                    </span>{" "}
-                    above to get started.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </Reveal>
-        ) : (
-          <div className="flex flex-col gap-8">
-            {active.length > 0 ? (
-              <section>
-                <Reveal>
-                  <h2 className="text-lg font-semibold tracking-tight text-foreground">
-                    Active
-                  </h2>
-                </Reveal>
-                <ul className="mt-4 grid gap-4 sm:grid-cols-2">
-                  {active.map((rental, i) => (
-                    <Reveal as="li" key={rental.id} delay={Math.min(i, 3) * 0.05}>
-                      <RentalCard rental={rental} />
-                    </Reveal>
-                  ))}
-                </ul>
-              </section>
-            ) : null}
-
-            {history.length > 0 ? (
-              <section>
-                <Reveal>
-                  <h2 className="text-lg font-semibold tracking-tight text-foreground">
-                    History
-                  </h2>
-                </Reveal>
-                <ul className="mt-4 grid gap-4 sm:grid-cols-2">
-                  {history.map((rental, i) => (
-                    <Reveal as="li" key={rental.id} delay={Math.min(i, 3) * 0.05}>
-                      <RentalCard rental={rental} />
-                    </Reveal>
-                  ))}
-                </ul>
-              </section>
-            ) : null}
-          </div>
-        )}
-      </main>
-    </div>
+    <Suspense fallback={null}>
+      <DashboardShell
+        email={email}
+        activeCount={active.length}
+        rentals={{ active, history }}
+        store={
+          catalog.ok
+            ? {
+                ok: true,
+                phones: catalog.phones,
+                durations: DURATIONS,
+                cryptoProviders: cryptoProviders(),
+              }
+            : { ok: false, reason: catalog.reason }
+        }
+        billing={billing}
+        dbConnected={dbConnected}
+      />
+    </Suspense>
   );
 }
