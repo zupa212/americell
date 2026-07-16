@@ -13,6 +13,7 @@ import {
 } from "@/lib/rentals";
 import { activateRental } from "@/lib/activation";
 import { logEvent } from "@/lib/logs";
+import { sendOpsAlert } from "@/lib/alerts";
 
 /**
  * AMERICELL Stripe webhook — exactly-once rental activation (RESELLER_PLAN §5.5C, §7.2).
@@ -145,6 +146,10 @@ export async function POST(req: Request) {
               console.error(
                 `[ALERT] insufficient CellGods credit — rental queued session=${session.id}: ${err.message}`,
               );
+              await sendOpsAlert(
+                "Low CellGods credit — activation on hold",
+                `A card payment (${owned.model}, rental ${owned.id}) is paid but couldn't activate: insufficient CellGods credit. Top up and it will activate.`,
+              );
               // Audit (best-effort): queued awaiting reseller credit top-up.
               await logEvent({
                 actorType: "system",
@@ -161,6 +166,10 @@ export async function POST(req: Request) {
               await markRefunded(session.id);
               console.error(
                 `[ALERT] terminal activation failure — refunded session=${session.id} status=${status}: ${err.message}`,
+              );
+              await sendOpsAlert(
+                "Card payment auto-refunded — activation failed",
+                `A card payment (${owned.model}, rental ${owned.id}) failed to activate terminally (status ${status}) and was AUTO-REFUNDED on Stripe. No action needed unless it recurs.`,
               );
               // Audit (best-effort): terminal failure, refunded on AMERICELL Stripe.
               await logEvent({

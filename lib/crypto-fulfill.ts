@@ -12,6 +12,7 @@ import {
 import { activateRental } from "@/lib/activation";
 import { alreadyProcessed, markEventProcessed } from "@/lib/subscriptions";
 import { logEvent } from "@/lib/logs";
+import { sendOpsAlert } from "@/lib/alerts";
 
 export type FulfillResult = { httpStatus: number; body: Record<string, unknown> };
 
@@ -66,10 +67,18 @@ export async function fulfillCryptoRental(opts: {
           await markActivationPendingCredit(sid, err.message);
           await logEvent({ actorType: "system", action: "rental.pending_credit", targetType: "rental", targetId: rental.id, metadata: { method } });
           console.error(`[ALERT] ${method}: insufficient CellGods credit rental=${rental.id}`);
+          await sendOpsAlert(
+            "Low CellGods credit — activation on hold",
+            `A ${method} payment for rental ${rental.id} (${rental.model}) is paid but couldn't activate: insufficient CellGods credit. Top up, then it will activate.`,
+          );
         } else {
           await markRefunded(sid);
           await logEvent({ actorType: "system", action: "rental.refunded", targetType: "rental", targetId: rental.id, metadata: { method, status: st, manual: true } });
           console.error(`[ALERT] ${method}: terminal activation failure rental=${rental.id} status=${st} — MANUAL crypto refund required`);
+          await sendOpsAlert(
+            "MANUAL crypto refund required",
+            `A ${method} payment for rental ${rental.id} (${rental.model}) was PAID but activation failed terminally (status ${st}). Crypto is not auto-refundable — issue a manual refund.`,
+          );
         }
       } else {
         console.error(`[ALERT] ${method}: post-activation persistence failure rental=${rental.id} — reconcile required`);
