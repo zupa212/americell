@@ -4,7 +4,7 @@ import { isDbConfigured } from "@/lib/db";
 import { getBalance, getInventory, isCellgodsConfigured } from "@/lib/cellgods";
 import {
   DURATIONS,
-  getMarginOpts,
+  getMarginOptsForPhone,
   toPublicRetailPhone,
   wholesaleFor,
 } from "@/lib/pricing";
@@ -70,9 +70,10 @@ export async function POST(req: Request) {
   if (!duration) return Response.json({ error: "Invalid period." }, { status: 400 });
 
   const wholesale = wholesaleFor(item, duration.period);
-  const retailCents = toPublicRetailPhone(item, await getMarginOpts()).retail[
-    duration.period
-  ];
+  const retailCents = toPublicRetailPhone(
+    item,
+    await getMarginOptsForPhone(item.phone_id),
+  ).retail[duration.period];
   if (retailCents < wholesale) {
     return Response.json({ error: "Temporarily unavailable." }, { status: 503 });
   }

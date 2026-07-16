@@ -4,7 +4,7 @@ import { isDbConfigured } from "@/lib/db";
 import { getBalance, getInventory, isCellgodsConfigured } from "@/lib/cellgods";
 import {
   DURATIONS,
-  getMarginOpts,
+  getMarginOptsForPhone,
   toPublicRetailPhone,
   wholesaleFor,
 } from "@/lib/pricing";
@@ -84,7 +84,10 @@ export async function POST(req: Request) {
   const durationDays = duration.days;
 
   const wholesale = wholesaleFor(item, period);
-  const retailCents = toPublicRetailPhone(item, await getMarginOpts()).retail[period];
+  const retailCents = toPublicRetailPhone(
+    item,
+    await getMarginOptsForPhone(item.phone_id),
+  ).retail[period];
   if (retailCents < wholesale) {
     // Defensive money-safety guard — must never sell below cost.
     console.error(

@@ -9,7 +9,7 @@ import {
 } from "@/lib/cellgods";
 import { retailCentsFor, type PriceRounding } from "@/lib/money";
 import { db, isDbConfigured } from "@/lib/db";
-import { resellerSettings } from "@/db/schema";
+import { devicePriceOverrides, resellerSettings } from "@/db/schema";
 
 /**
  * Retail catalog + pricing — SERVER ONLY.
@@ -132,6 +132,65 @@ export async function updateMarginSettings(
     });
 }
 
+/** Global opts with the device's markup swapped in when it has an override. */
+export function resolveMarginOpts(
+  global: MarginOpts,
+  overridePct?: number,
+): MarginOpts {
+  return overridePct == null ? global : { ...global, pct: overridePct };
+}
+
+/** All per-device markup overrides as `{ [phoneId]: marginPct }`. Empty on any failure. */
+export async function getDeviceOverrides(): Promise<Record<string, number>> {
+  if (!isDbConfigured) return {};
+  try {
+    const rows = await db.select().from(devicePriceOverrides);
+    return Object.fromEntries(rows.map((r) => [r.phoneId, r.marginPct]));
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * The LIVE margin for ONE device — the global markup, overridden by that phone's
+ * per-device markup when set. Used at checkout so a single device is priced the
+ * same way it's shown.
+ */
+export async function getMarginOptsForPhone(phoneId: string): Promise<MarginOpts> {
+  const global = await getMarginOpts();
+  if (!isDbConfigured) return global;
+  try {
+    const [row] = await db
+      .select()
+      .from(devicePriceOverrides)
+      .where(eq(devicePriceOverrides.phoneId, phoneId))
+      .limit(1);
+    return resolveMarginOpts(global, row?.marginPct);
+  } catch {
+    return global;
+  }
+}
+
+/** Upsert a per-device markup override. Server/admin only. */
+export async function setDeviceOverride(
+  phoneId: string,
+  marginPct: number,
+  updatedBy?: string,
+): Promise<void> {
+  await db
+    .insert(devicePriceOverrides)
+    .values({ phoneId, marginPct, updatedBy: updatedBy ?? null })
+    .onConflictDoUpdate({
+      target: devicePriceOverrides.phoneId,
+      set: { marginPct, updatedAt: new Date(), updatedBy: updatedBy ?? null },
+    });
+}
+
+/** Remove a per-device override (the device falls back to the global markup). */
+export async function clearDeviceOverride(phoneId: string): Promise<void> {
+  await db.delete(devicePriceOverrides).where(eq(devicePriceOverrides.phoneId, phoneId));
+}
+
 /** Provider-suggested retail (cents) for a tier, or null when not supplied. */
 function suggestedFor(item: InventoryPhone, period: BillingPeriod): number | null {
   const s = item.suggested_retail;
@@ -188,11 +247,17 @@ export async function getRetailCatalog(): Promise<
   try {
     // Cached browse read — the public catalog tolerates ~45s staleness in
     // exchange for an instant homepage. Checkout re-checks live availability.
-    const [inventory, opts] = await Promise.all([
+    const [inventory, opts, overrides] = await Promise.all([
       getInventoryForBrowse(),
       getMarginOpts(),
+      getDeviceOverrides(),
     ]);
-    return { ok: true, phones: inventory.map((i) => toPublicRetailPhone(i, opts)) };
+    return {
+      ok: true,
+      phones: inventory.map((i) =>
+        toPublicRetailPhone(i, resolveMarginOpts(opts, overrides[i.phone_id])),
+      ),
+    };
   } catch {
     return { ok: false, reason: "error" };
   }

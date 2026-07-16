@@ -17,7 +17,7 @@ import {
   type LedgerEntry,
 } from "@/lib/cellgods";
 import { fmtMoney } from "@/lib/money";
-import { getMarginOpts } from "@/lib/pricing";
+import { getDeviceOverrides, getMarginOpts } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
 import Reveal from "@/components/ui/reveal";
@@ -39,6 +39,7 @@ import LedgerTable from "@/components/admin/ledger-table";
 import TopupDialog from "@/components/admin/topup-dialog";
 import AutoTopupForm from "@/components/admin/auto-topup-form";
 import PricingSettingsForm from "@/components/admin/pricing-settings-form";
+import DeviceOverridesManager from "@/components/admin/device-overrides-manager";
 import BillingToast from "@/components/admin/billing-toast";
 
 // Frosted-glass surface recipe — matches the dashboard, floats over the aurora.
@@ -96,6 +97,9 @@ export default async function AdminBillingPage({
 
   // Live resale margin (DB-backed, env fallback) — powers the pricing control.
   const marginOpts = await getMarginOpts();
+  const deviceOverrides = Object.entries(await getDeviceOverrides()).map(
+    ([phoneId, pct]) => ({ phoneId, pct }),
+  );
 
   // The /admin layout already provides the wide `max-w-7xl` glass main container
   // and ambient particles, so this page renders edge-to-edge content inside it.
@@ -338,6 +342,21 @@ export default async function AdminBillingPage({
                     </p>
                     <div className="mt-4">
                       <PricingSettingsForm current={marginOpts} />
+                    </div>
+                  </div>
+
+                  <Separator className="bg-white/50" />
+
+                  <div>
+                    <h2 className="text-base font-semibold text-foreground">
+                      Per-device overrides
+                    </h2>
+                    <p className="mt-1 max-w-lg text-sm text-muted-foreground">
+                      Give a specific device its own markup instead of the global
+                      one. Copy the phone ID from the Inventory page.
+                    </p>
+                    <div className="mt-4">
+                      <DeviceOverridesManager overrides={deviceOverrides} />
                     </div>
                   </div>
                 </div>

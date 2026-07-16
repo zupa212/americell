@@ -131,3 +131,20 @@ export const resellerSettings = pgTable("reseller_settings", {
 });
 
 export type ResellerSettings = typeof resellerSettings.$inferSelect;
+
+/**
+ * Per-device markup override. When a row exists for a `phone_id`, that device
+ * uses `margin_pct` instead of the global `reseller_settings` markup — for both
+ * browse and checkout (same `resolveMarginOpts` path), so shown = charged. The
+ * global minimum + rounding still apply. No row → the device uses the global markup.
+ */
+export const devicePriceOverrides = pgTable("device_price_overrides", {
+  phoneId: text("phone_id").primaryKey(), // CellGods phone_id
+  marginPct: integer("margin_pct").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedBy: text("updated_by"),
+});
+
+export type DevicePriceOverride = typeof devicePriceOverrides.$inferSelect;

@@ -8,7 +8,9 @@ import {
 } from "@/lib/cellgods";
 import {
   DURATIONS,
+  getDeviceOverrides,
   getMarginOpts,
+  resolveMarginOpts,
   toPublicRetailPhone,
   type MarginOpts,
 } from "@/lib/pricing";
@@ -66,11 +68,14 @@ export default async function AdminInventoryPage() {
     state = "unconfigured";
   } else {
     try {
-      const [inventory, opts] = await Promise.all([
+      const [inventory, opts, overrides] = await Promise.all([
         getInventory(),
         getMarginOpts(),
+        getDeviceOverrides(),
       ]);
-      rows = inventory.map((p) => toRow(p, opts));
+      rows = inventory.map((p) =>
+        toRow(p, resolveMarginOpts(opts, overrides[p.phone_id])),
+      );
     } catch {
       state = "error";
     }
