@@ -148,3 +148,19 @@ export const devicePriceOverrides = pgTable("device_price_overrides", {
 });
 
 export type DevicePriceOverride = typeof devicePriceOverrides.$inferSelect;
+
+/**
+ * Marketing leads captured by the homepage popup (email + desired fleet size).
+ * Deduped by email (upsert). Surfaced in the admin panel as the "Leads" list.
+ */
+export const leads = pgTable("leads", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: text("email").notNull().unique(),
+  fleetSize: text("fleet_size"), // e.g. "2-5", "26-100"
+  source: text("source").notNull().default("homepage_popup"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
+export type Lead = typeof leads.$inferSelect;

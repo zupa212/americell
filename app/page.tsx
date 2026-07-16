@@ -11,6 +11,7 @@ import Testimonials from "@/components/testimonials";
 import Faq from "@/components/faq";
 import CallToAction from "@/components/cta";
 import SiteFooter from "@/components/site-footer";
+import LeadPopup from "@/components/lead-popup";
 
 export default function Page() {
   return (
@@ -41,6 +42,7 @@ export default function Page() {
         <CallToAction />
       </main>
       <SiteFooter />
+      <LeadPopup />
     </div>
   );
 }

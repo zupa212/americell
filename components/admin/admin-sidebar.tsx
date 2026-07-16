@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
   Boxes,
+  Megaphone,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -76,6 +77,12 @@ const LINKS: readonly NavLink[] = [
     label: "Customers",
     description: "Accounts & balances",
     icon: Users,
+  },
+  {
+    href: "/admin/leads",
+    label: "Leads",
+    description: "Homepage popup captures",
+    icon: Megaphone,
   },
   {
     href: "/admin/billing",
