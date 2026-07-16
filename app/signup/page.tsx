@@ -5,7 +5,6 @@ import Link from "next/link";
 import { signup, type AuthState } from "@/app/actions/auth";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { ShineBorder } from "@/components/ui/shine-border";
-import { AuroraText } from "@/components/ui/aurora-text";
 import { Particles } from "@/components/ui/particles";
 import Reveal from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
@@ -48,9 +47,17 @@ export default function SignupPage() {
       <Reveal className="flex w-full flex-col items-center">
         <Link
           href="/"
-          className="mb-8 text-lg font-bold tracking-tight text-foreground"
+          aria-label="Americell — Home"
+          className="mb-8 block rounded-2xl outline-none transition-transform duration-300 hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
-          <AuroraText>Americell</AuroraText>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/americell-logo.jpg"
+            alt="Americell"
+            width={1280}
+            height={698}
+            className="h-20 w-auto rounded-2xl shadow-sm ring-1 ring-white/50"
+          />
         </Link>
 
         <Card
