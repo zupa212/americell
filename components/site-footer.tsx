@@ -16,10 +16,9 @@ const COLUMNS: FooterColumn[] = [
   {
     heading: "Product",
     links: [
-      // Platform / Why Cloud / Use Cases ship in Phase 2 — parked on "#" for now.
-      { label: "Platform", href: "#" },
-      { label: "Why Cloud", href: "#" },
-      { label: "Use Cases", href: "#" },
+      { label: "Platform", href: "/platform" },
+      { label: "Why Cloud", href: "/why-cloud" },
+      { label: "Use Cases", href: "/use-cases" },
       { label: "Pricing", href: "/#pricing" },
     ],
   },
@@ -37,8 +36,7 @@ const COLUMNS: FooterColumn[] = [
     links: [
       { label: "Privacy Policy", href: "/privacy" },
       { label: "Terms of Service", href: "/terms" },
-      // Refund Policy page ships in Phase 2 — parked on "#" for now.
-      { label: "Refund Policy", href: "#" },
+      { label: "Refund Policy", href: "/refund" },
     ],
   },
 ];

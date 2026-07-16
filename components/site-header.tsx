@@ -62,6 +62,22 @@ const LANGUAGES = ["English"] as const;
 const BRAND_GRADIENT =
   "linear-gradient(110deg, #2b6bff 0%, #7c3aed 45%, #5aa2ff 100%)";
 
+// The three enterprise product pages, surfaced in the primary nav.
+const PRODUCT_LINKS: { label: string; href: string }[] = [
+  { label: "Platform", href: "/platform" },
+  { label: "Why Cloud", href: "/why-cloud" },
+  { label: "Use Cases", href: "/use-cases" },
+];
+
+// Primary nav = existing site links with the product pages inserted right
+// after Home, so the product story leads and the anchor + blog links follow.
+// Derived from NAV_LINKS so it never drifts from lib/site.
+const PRIMARY_NAV: { label: string; href: string }[] = [
+  ...NAV_LINKS.slice(0, 1),
+  ...PRODUCT_LINKS,
+  ...NAV_LINKS.slice(1),
+];
+
 const mobileList: Variants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.06, delayChildren: 0.08 } },
@@ -96,14 +112,14 @@ export default function SiteHeader() {
   // Exact-match active section (Home on "/", Blog on "/blog"); the shared pill
   // rests here whenever nothing is hovered.
   const activeHref =
-    NAV_LINKS.find((link) => link.href === pathname)?.href ?? null;
+    PRIMARY_NAV.find((link) => link.href === pathname)?.href ?? null;
   const highlighted = hovered ?? activeHref;
   const shouldHide = hidden && !menuOpen && !prefersReducedMotion;
 
   return (
     <header className="sticky top-0 z-50">
       <motion.div
-        className="mx-auto w-full max-w-5xl px-4 pt-3 sm:pt-4"
+        className="mx-auto w-full max-w-6xl px-4 pt-3 sm:pt-4"
         initial={prefersReducedMotion ? false : { y: -80, opacity: 0 }}
         animate={{ y: shouldHide ? -120 : 0, opacity: 1 }}
         transition={
@@ -141,12 +157,12 @@ export default function SiteHeader() {
           </a>
 
           {/* Center nav (md+) — shared magnetic pill glides between items */}
-          <NavigationMenu className="hidden md:flex" aria-label="Navigation">
+          <NavigationMenu className="hidden lg:flex" aria-label="Navigation">
             <NavigationMenuList
               className="gap-0.5"
               onMouseLeave={() => setHovered(null)}
             >
-              {NAV_LINKS.map((link) => {
+              {PRIMARY_NAV.map((link) => {
                 const isHot = highlighted === link.href;
                 return (
                   <NavigationMenuItem
@@ -157,7 +173,7 @@ export default function SiteHeader() {
                       href={link.href}
                       onFocus={() => setHovered(link.href)}
                       className={cn(
-                        "relative rounded-full px-3 py-2 text-sm font-medium text-muted-foreground",
+                        "relative rounded-full px-2.5 py-2 text-sm font-medium text-muted-foreground",
                         "transition-colors duration-300 hover:bg-transparent hover:text-foreground focus:bg-transparent",
                         isHot && "text-foreground",
                       )}
@@ -194,7 +210,7 @@ export default function SiteHeader() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="hidden rounded-full text-muted-foreground transition-all duration-300 hover:bg-white/70 hover:text-foreground lg:inline-flex"
+                    className="hidden rounded-full text-muted-foreground transition-all duration-300 hover:bg-white/70 hover:text-foreground xl:inline-flex"
                     aria-label="Select language, current English"
                   />
                 }
@@ -250,7 +266,7 @@ export default function SiteHeader() {
                   <Button
                     variant="ghost"
                     size="icon-sm"
-                    className="min-h-11 min-w-11 rounded-full text-foreground transition-all duration-300 hover:bg-white/70 md:hidden"
+                    className="min-h-11 min-w-11 rounded-full text-foreground transition-all duration-300 hover:bg-white/70 lg:hidden"
                     aria-label="Open menu"
                   />
                 }
@@ -294,7 +310,7 @@ export default function SiteHeader() {
                     initial={prefersReducedMotion ? false : "hidden"}
                     animate="show"
                   >
-                    {NAV_LINKS.map((link) => (
+                    {PRIMARY_NAV.map((link) => (
                       <motion.div
                         key={link.href}
                         variants={prefersReducedMotion ? undefined : mobileItem}
@@ -328,7 +344,7 @@ export default function SiteHeader() {
                       : {
                           duration: 0.4,
                           ease: EASE,
-                          delay: 0.08 + 0.06 * NAV_LINKS.length,
+                          delay: 0.08 + 0.06 * PRIMARY_NAV.length,
                         }
                   }
                 >
