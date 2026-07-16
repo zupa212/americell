@@ -16,15 +16,18 @@ const COLUMNS: FooterColumn[] = [
   {
     heading: "Product",
     links: [
-      { label: "How it works", href: "/#how" },
+      // Platform / Why Cloud / Use Cases ship in Phase 2 — parked on "#" for now.
+      { label: "Platform", href: "#" },
+      { label: "Why Cloud", href: "#" },
+      { label: "Use Cases", href: "#" },
       { label: "Pricing", href: "/#pricing" },
-      { label: "Clients", href: "/#clients" },
     ],
   },
   {
     heading: "Company",
     links: [
       { label: "About", href: "/about" },
+      { label: "FAQ", href: "/#faq" },
       { label: "Blog", href: "/blog" },
       { label: "Contact", href: "/contact" },
     ],
@@ -32,9 +35,10 @@ const COLUMNS: FooterColumn[] = [
   {
     heading: "Legal",
     links: [
-      { label: "Terms", href: "/terms" },
-      { label: "Privacy", href: "/privacy" },
-      { label: "Acceptable use", href: "/acceptable-use" },
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms of Service", href: "/terms" },
+      // Refund Policy page ships in Phase 2 — parked on "#" for now.
+      { label: "Refund Policy", href: "#" },
     ],
   },
 ];
@@ -147,10 +151,13 @@ export default function SiteFooter() {
 
             {/* Bold one-line statement */}
             <p className="mt-5 max-w-sm text-balance text-xl leading-tight font-semibold tracking-tight text-foreground">
-              {SITE.tagline}
+              Enterprise-grade remote phone infrastructure for secure mobile
+              operations.
             </p>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              {SITE.subtagline}
+              Cloud access to real, physical iPhones and Android devices — not
+              emulators. We host, power, connect and maintain the fleet; you keep
+              full control from one dashboard.
             </p>
           </motion.div>
 
@@ -215,8 +222,9 @@ export default function SiteFooter() {
             </span>
             <span>
               <span className="font-semibold text-foreground">{SITE.name}</span>{" "}
-              is for legitimate real-device use. You are responsible for
-              complying with the terms of any app or platform you use.
+              is remote phone infrastructure for legitimate mobile operations.
+              Your team is responsible for complying with the terms of any app or
+              platform you run on the fleet.
             </span>
           </p>
         </motion.div>
@@ -238,7 +246,7 @@ export default function SiteFooter() {
             &copy; {year} {SITE.name}.
           </p>
           <p className="text-sm font-medium text-muted-foreground">
-            Real US devices for agencies, QA &amp; growth teams.
+            Remote phone infrastructure for agencies, QA &amp; enterprise teams.
           </p>
         </motion.div>
       </div>

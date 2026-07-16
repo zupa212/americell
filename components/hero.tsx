@@ -50,12 +50,13 @@ import { cn } from "@/lib/utils";
  *     <HeroPhoneParallax> client child (so it moves relative to the app tiles)
  *   • the floating app tiles bob on the CSS float keyframes from globals.css
  *
- * Flashy · minimal · BOLD (US-English): a huge, few-words headline with an
- * animated blue→violet→cyan AuroraText keyword, one short subline, a
- * ShimmerButton "Get started" (/signup) + a subtle glass "See pricing"
- * (#pricing), an honest trust row, and a noticeably BIGGER, premium phone
- * mockup drawn in its native 286×580 coordinate system then scaled up so the
- * floating tiles stay anchored.
+ * Flashy · minimal · BOLD (US-English): a huge headline built on the
+ * "your servers moved to the cloud, your phone fleet is next" thesis with an
+ * animated blue→violet→cyan AuroraText keyword, the enterprise one-liner as
+ * subcopy, a ShimmerButton "Deploy your fleet" (/signup) + a subtle glass
+ * "Talk to Sales" (/contact), an honest trust row, and a noticeably BIGGER,
+ * premium phone mockup drawn in its native 286×580 coordinate system then
+ * scaled up so the floating tiles stay anchored.
  *
  * GLASSMORPHISM: the <section> is fully transparent so the persistent global
  * <SiteBackground/> (light wash + drifting aurora + dot grid, fixed behind
@@ -532,8 +533,13 @@ function PhoneMockup({ singleBeam = false }: { singleBeam?: boolean }) {
   );
 }
 
-// Honest, one-word product highlights for the trust row.
-const TRUST_POINTS = ["No emulators", "US datacenters", "Live in your browser"];
+// Trust line — honest, no-commitment highlights for the trust row.
+const TRUST_POINTS = [
+  "No setup fees",
+  "Cancel anytime",
+  "Live in minutes",
+  "Transparent per-device pricing",
+];
 
 /**
  * SSR-safe mobile gate. Defaults to the full desktop experience during SSR and
@@ -674,7 +680,7 @@ export default function Hero() {
             </span>
             <span aria-hidden="true" className="h-3.5 w-px bg-foreground/15" />
             <AnimatedShinyText className="inline-flex items-center justify-center text-brand">
-              Real US devices, fully remote
+              Remote phone infrastructure
             </AnimatedShinyText>
           </motion.div>
         </motion.div>
@@ -684,13 +690,13 @@ export default function Hero() {
           {...item}
           className="mx-auto mt-8 max-w-5xl text-balance break-words text-center text-4xl font-bold leading-[0.95] tracking-[-0.045em] text-foreground sm:text-7xl sm:leading-[0.92] lg:text-[6.5rem]"
         >
-          Real US phones.{" "}
+          You moved your servers to the cloud.{" "}
           <br className="hidden sm:block" />
-          In your{" "}
+          Your phone{" "}
           <AuroraText colors={["#2b6bff", "#7c3aed", "#22d3ee"]} speed={1.2}>
-            browser
-          </AuroraText>
-          .
+            fleet
+          </AuroraText>{" "}
+          is next.
         </motion.h1>
 
         {/* subhead */}
@@ -698,8 +704,11 @@ export default function Hero() {
           {...item}
           className="mx-auto mt-7 max-w-2xl text-pretty text-center text-lg leading-relaxed text-muted-foreground sm:text-xl"
         >
-          Live iPhones and Androids in US datacenters. Tap, type, install, and
-          automate — from anywhere.
+          {SITE.name} is remote phone infrastructure for teams that need cloud
+          access to real, physical iPhones and Android devices — not emulators
+          or simulated devices. We host, power, connect and maintain the fleet.
+          You keep full control from one dashboard — no office hardware, no
+          cables, no babysitting.
         </motion.p>
 
         {/* CTAs */}
@@ -708,12 +717,16 @@ export default function Hero() {
           className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5"
         >
           <motion.div {...press} className="inline-flex">
-            <Link href="/signup" className="inline-flex" aria-label="Get started">
+            <Link
+              href="/signup"
+              className="inline-flex"
+              aria-label="Deploy your fleet"
+            >
               <ShimmerButton
                 background="var(--foreground)"
                 className="h-12 px-7 text-sm font-medium shadow-soft"
               >
-                Get started
+                Deploy your fleet
               </ShimmerButton>
             </Link>
           </motion.div>
@@ -722,10 +735,10 @@ export default function Hero() {
               variant="ghost"
               size="lg"
               className="h-12 rounded-full px-6 text-sm font-medium text-muted-foreground"
-              render={<a href="#pricing" />}
+              render={<a href="/contact" />}
               nativeButton={false}
             >
-              See pricing
+              Talk to Sales
             </Button>
           </motion.div>
         </motion.div>

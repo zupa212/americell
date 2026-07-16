@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
-import { MoveRight } from "lucide-react";
+import { Check, MoveRight } from "lucide-react";
 
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
 import { AuroraText } from "@/components/ui/aurora-text";
@@ -22,11 +22,12 @@ import { cn } from "@/lib/utils";
  * wash, framed by dual counter-rotating <BorderBeam/>s + a <ShineBorder/>, with
  * slow-drifting aurora orbs and ambient <Particles/> behind the glass (all
  * suppressed under prefers-reduced-motion). Holds the English, Apple-grade
- * headline ("Put a real US phone to work today.") with a flashy blue→violet→cyan
- * <AuroraText> keyword, a one-line subhead, a <ShimmerButton> primary CTA to
- * /signup and a glass secondary linking to #pricing. Honest positioning — real
- * US devices you drive live from the browser for testing, QA, localization, and
- * growth teams.
+ * headline ("Ready to get the phones out of the office?") with a flashy
+ * blue→violet→cyan <AuroraText> keyword, a two-line subhead, an assurance row of
+ * four bullets, a <ShimmerButton> primary CTA to /signup ("Deploy your fleet")
+ * and a glass secondary to /contact ("Talk to Sales"). Enterprise positioning —
+ * AMERICELL is remote phone infrastructure: real, physical iPhone and Android
+ * devices we host, power, connect and maintain, driven from one dashboard.
  */
 export default function CallToAction() {
   const prefersReducedMotion = useReducedMotion();
@@ -115,7 +116,7 @@ export default function CallToAction() {
                 )}
               >
                 <AnimatedShinyText className="inline-flex items-center justify-center text-brand">
-                  Live in minutes · no installs
+                  Remote phone infrastructure
                 </AnimatedShinyText>
               </div>
             </div>
@@ -124,15 +125,16 @@ export default function CallToAction() {
               id="cta-heading"
               className="mt-6 text-balance break-words text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-6xl sm:leading-[1.02] lg:text-7xl"
             >
-              Put a real{" "}
+              Ready to get the phones{" "}
               <AuroraText colors={["#2b6bff", "#7c3aed", "#22d3ee"]}>
-                US phone
-              </AuroraText>{" "}
-              to work today.
+                out of the office
+              </AuroraText>
+              ?
             </h2>
             <p className="mx-auto mt-5 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-              Real iPhone &amp; Android hardware in the US, driven live from your
-              browser — built for app testing, QA, localization, and growth teams.
+              Your servers don&apos;t live in a closet anymore. Your phone fleet
+              shouldn&apos;t either. Start with a single device or scale to
+              hundreds — we handle the hardware, you keep the control.
             </p>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -145,12 +147,12 @@ export default function CallToAction() {
                   shimmerColor="#ffffff"
                   className="px-8 py-3 text-base font-medium text-white shadow-lg shadow-brand/20"
                 >
-                  Get started
+                  Deploy your fleet
                 </ShimmerButton>
               </Link>
 
               <Link
-                href="#pricing"
+                href="/contact"
                 className={cn(
                   "group/secondary inline-flex items-center gap-2 rounded-full px-7 py-3 text-base font-medium text-foreground",
                   "border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40",
@@ -159,13 +161,49 @@ export default function CallToAction() {
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2",
                 )}
               >
-                See pricing
+                Talk to Sales
                 <MoveRight
                   aria-hidden="true"
                   className="size-4 text-brand transition-transform duration-300 group-hover/secondary:translate-x-1"
                 />
               </Link>
             </div>
+
+            {/* Assurance row — enterprise reassurance bullets */}
+            <ul className="mx-auto mt-8 flex max-w-2xl flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-muted-foreground">
+              <li className="inline-flex items-center gap-2">
+                <Check
+                  aria-hidden="true"
+                  className="size-4 shrink-0 text-brand"
+                />
+                <span className="text-pretty">
+                  Live in minutes, not procurement cycles
+                </span>
+              </li>
+              <li className="inline-flex items-center gap-2">
+                <Check
+                  aria-hidden="true"
+                  className="size-4 shrink-0 text-brand"
+                />
+                <span className="text-pretty">No setup fees, cancel anytime</span>
+              </li>
+              <li className="inline-flex items-center gap-2">
+                <Check
+                  aria-hidden="true"
+                  className="size-4 shrink-0 text-brand"
+                />
+                <span className="text-pretty">
+                  Hardware maintenance and replacement included
+                </span>
+              </li>
+              <li className="inline-flex items-center gap-2">
+                <Check
+                  aria-hidden="true"
+                  className="size-4 shrink-0 text-brand"
+                />
+                <span className="text-pretty">DPA available for enterprise</span>
+              </li>
+            </ul>
           </div>
         </Reveal>
       </div>

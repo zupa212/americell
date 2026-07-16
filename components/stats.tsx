@@ -9,22 +9,30 @@ import Reveal from "@/components/ui/reveal";
 import { cn } from "@/lib/utils";
 
 /**
- * Honest, non-inflated Americell stats. The `value` is the numeric part that
- * counts up; `prefix`/`suffix` frame it (e.g. "<", "+", "%", "/7") so the whole
- * thing still reads as the real headline figure.
+ * Americell platform stats. Numeric stats (`value`, framed by an optional
+ * `prefix`/`suffix` like "<", "ms", "/7") count up on scroll. Text stats
+ * (`text`) render statically so non-numeric headline figures such as "99.9%"
+ * or "Minutes" read correctly without breaking the count-up.
  */
-type Stat = {
+type StatNumeric = {
   prefix?: string;
   value: number;
   suffix?: string;
   label: string;
 };
 
+type StatText = {
+  text: string;
+  label: string;
+};
+
+type Stat = StatNumeric | StatText;
+
 const STATS: readonly Stat[] = [
-  { value: 3, suffix: "+", label: "US locations" },
-  { value: 100, suffix: "%", label: "real hardware" },
-  { prefix: "<", value: 10, suffix: "s", label: "to connect" },
-  { value: 24, suffix: "/7", label: "browser access" },
+  { prefix: "<", value: 50, suffix: "ms", label: "Average latency" },
+  { text: "99.9%", label: "Platform uptime" },
+  { value: 24, suffix: "/7", label: "Dedicated devices" },
+  { text: "Minutes", label: "To deploy a fleet" },
 ];
 
 // Shared frosted-glass recipe used across the site.
@@ -123,8 +131,9 @@ export default function Stats() {
               <AuroraText>Americell</AuroraText>, by the numbers
             </h2>
             <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-              No hype. Real US devices — iPhone and Android — ready to drive
-              live from your browser.
+              No inflated claims. Real, physical iPhone and Android devices —
+              hosted, powered and connected by us — ready to control from a
+              single dashboard.
             </p>
           </header>
         </Reveal>
@@ -134,9 +143,10 @@ export default function Stats() {
           className="mt-14 grid grid-cols-2 gap-4 sm:mt-16 sm:gap-6 lg:grid-cols-4"
         >
           {STATS.map((stat, i) => {
-            const display = `${stat.prefix ?? ""}${stat.value}${
-              stat.suffix ?? ""
-            }`;
+            const display =
+              "text" in stat
+                ? stat.text
+                : `${stat.prefix ?? ""}${stat.value}${stat.suffix ?? ""}`;
 
             return (
               <Reveal key={stat.label} as="div" delay={i * 0.08}>
@@ -187,12 +197,18 @@ export default function Stats() {
                         gradientText
                       )}
                     >
-                      <CountUp
-                        prefix={stat.prefix}
-                        value={stat.value}
-                        suffix={stat.suffix}
-                        active={inView}
-                      />
+                      {"text" in stat ? (
+                        <span aria-hidden="true" className="tabular-nums">
+                          {stat.text}
+                        </span>
+                      ) : (
+                        <CountUp
+                          prefix={stat.prefix}
+                          value={stat.value}
+                          suffix={stat.suffix}
+                          active={inView}
+                        />
+                      )}
                     </div>
                     <p className="mt-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                       {stat.label}
@@ -219,7 +235,7 @@ export default function Stats() {
           <p className="text-xs font-medium tracking-wide text-muted-foreground">
             Measured, not marketed — that&apos;s how{" "}
             <span className={cn("font-semibold", gradientText)}>Americell</span>{" "}
-            works.
+            runs the fleet.
           </p>
         </Reveal>
       </div>
