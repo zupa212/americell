@@ -2,7 +2,12 @@ import { randomUUID } from "node:crypto";
 import { auth } from "@/auth";
 import { isDbConfigured } from "@/lib/db";
 import { getBalance, getInventory, isCellgodsConfigured } from "@/lib/cellgods";
-import { DURATIONS, toPublicRetailPhone, wholesaleFor } from "@/lib/pricing";
+import {
+  DURATIONS,
+  getMarginOpts,
+  toPublicRetailPhone,
+  wholesaleFor,
+} from "@/lib/pricing";
 import { attachSession, createPendingRental } from "@/lib/rentals";
 import { logEvent } from "@/lib/logs";
 import { buildMoonpayUrl, isMoonpayConfigured } from "@/lib/moonpay";
@@ -65,7 +70,9 @@ export async function POST(req: Request) {
   if (!duration) return Response.json({ error: "Invalid period." }, { status: 400 });
 
   const wholesale = wholesaleFor(item, duration.period);
-  const retailCents = toPublicRetailPhone(item).retail[duration.period];
+  const retailCents = toPublicRetailPhone(item, await getMarginOpts()).retail[
+    duration.period
+  ];
   if (retailCents < wholesale) {
     return Response.json({ error: "Temporarily unavailable." }, { status: 503 });
   }

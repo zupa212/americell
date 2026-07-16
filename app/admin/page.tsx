@@ -27,7 +27,7 @@ import {
   type InventoryPhone,
   type Order,
 } from "@/lib/cellgods";
-import { toPublicRetailPhone } from "@/lib/pricing";
+import { getMarginOpts, toPublicRetailPhone } from "@/lib/pricing";
 import { fmtMoney } from "@/lib/money";
 import {
   adminKpis,
@@ -332,10 +332,11 @@ export default async function AdminOverviewPage() {
     // wholesale = price_monthly; margin = Σretail − Σwholesale. Unmatched skip.
     let retailSum = 0;
     let wholesaleSum = 0;
+    const marginOpts = await getMarginOpts();
     for (const order of activeOrders) {
       const item = byPhoneId.get(order.phone_id);
       if (!item) continue;
-      retailSum += toPublicRetailPhone(item).retail.monthly;
+      retailSum += toPublicRetailPhone(item, marginOpts).retail.monthly;
       wholesaleSum += item.price_monthly ?? 0;
     }
     marginCents = retailSum - wholesaleSum;

@@ -1,5 +1,6 @@
 import "server-only";
 
+import { eq } from "drizzle-orm";
 import {
   getInventoryForBrowse,
   isCellgodsConfigured,
@@ -7,6 +8,8 @@ import {
   type Platform,
 } from "@/lib/cellgods";
 import { retailCentsFor, type PriceRounding } from "@/lib/money";
+import { db, isDbConfigured } from "@/lib/db";
+import { resellerSettings } from "@/db/schema";
 
 /**
  * Retail catalog + pricing — SERVER ONLY.
@@ -57,22 +60,76 @@ export function wholesaleFor(item: InventoryPhone, period: BillingPeriod): numbe
   return cents ?? 0;
 }
 
-type MarginOpts = { pct: number; minCents: number; rounding: PriceRounding };
+export type MarginOpts = { pct: number; minCents: number; rounding: PriceRounding };
 
-/** Server-only margin knobs, read from env with fail-safe defaults (0 markup → sells at cost, never below). */
-function marginOpts(): MarginOpts {
+const SETTINGS_ID = "singleton";
+
+function coerceRounding(raw: unknown): PriceRounding {
+  return raw === "psychological" || raw === "none" || raw === "whole"
+    ? raw
+    : "whole";
+}
+
+/** Env-derived margin knobs — the fail-safe defaults (0 markup → sells at cost, never below). */
+function envMarginOpts(): MarginOpts {
   const pct = Number(process.env.RESELLER_MARGIN_PCT);
   const minCents = Number(process.env.RESELLER_MARGIN_MIN_CENTS);
-  const roundingRaw = process.env.RESELLER_PRICE_ROUNDING;
-  const rounding: PriceRounding =
-    roundingRaw === "psychological" || roundingRaw === "none" || roundingRaw === "whole"
-      ? roundingRaw
-      : "whole";
   return {
     pct: Number.isFinite(pct) ? pct : 0,
     minCents: Number.isFinite(minCents) ? minCents : 0,
-    rounding,
+    rounding: coerceRounding(process.env.RESELLER_PRICE_ROUNDING),
   };
+}
+
+/**
+ * The LIVE margin knobs — the single source of truth for resale pricing, read by
+ * BOTH the browse catalog and checkout so the shown price always equals the
+ * charged price. Reads the admin-editable `reseller_settings` row; falls back to
+ * the RESELLER_* env vars when the DB is unconfigured or the row is absent.
+ */
+export async function getMarginOpts(): Promise<MarginOpts> {
+  if (!isDbConfigured) return envMarginOpts();
+  try {
+    const [row] = await db
+      .select()
+      .from(resellerSettings)
+      .where(eq(resellerSettings.id, SETTINGS_ID))
+      .limit(1);
+    if (!row) return envMarginOpts();
+    return {
+      pct: row.marginPct,
+      minCents: row.marginMinCents,
+      rounding: coerceRounding(row.priceRounding),
+    };
+  } catch {
+    return envMarginOpts();
+  }
+}
+
+/** Persist the admin-set margin (upsert the singleton row). Server/admin only. */
+export async function updateMarginSettings(
+  input: { pct: number; minCents: number; rounding: PriceRounding },
+  updatedBy?: string,
+): Promise<void> {
+  await db
+    .insert(resellerSettings)
+    .values({
+      id: SETTINGS_ID,
+      marginPct: input.pct,
+      marginMinCents: input.minCents,
+      priceRounding: input.rounding,
+      updatedBy: updatedBy ?? null,
+    })
+    .onConflictDoUpdate({
+      target: resellerSettings.id,
+      set: {
+        marginPct: input.pct,
+        marginMinCents: input.minCents,
+        priceRounding: input.rounding,
+        updatedAt: new Date(),
+        updatedBy: updatedBy ?? null,
+      },
+    });
 }
 
 /** Provider-suggested retail (cents) for a tier, or null when not supplied. */
@@ -94,9 +151,15 @@ function retailForTier(item: InventoryPhone, period: BillingPeriod, opts: Margin
   return retailCentsFor(wholesale, opts);
 }
 
-/** Map one inventory phone to its client-safe retail shape (strips all wholesale). */
-export function toPublicRetailPhone(item: InventoryPhone): PublicRetailPhone {
-  const opts = marginOpts();
+/**
+ * Map one inventory phone to its client-safe retail shape (strips all wholesale).
+ * `opts` is the LIVE margin (from `getMarginOpts()`) — pass the SAME opts to the
+ * browse map and to checkout so the shown price equals the charged price.
+ */
+export function toPublicRetailPhone(
+  item: InventoryPhone,
+  opts: MarginOpts,
+): PublicRetailPhone {
   const retail = {
     daily: retailForTier(item, "daily", opts),
     weekly: retailForTier(item, "weekly", opts),
@@ -125,8 +188,11 @@ export async function getRetailCatalog(): Promise<
   try {
     // Cached browse read — the public catalog tolerates ~45s staleness in
     // exchange for an instant homepage. Checkout re-checks live availability.
-    const inventory = await getInventoryForBrowse();
-    return { ok: true, phones: inventory.map(toPublicRetailPhone) };
+    const [inventory, opts] = await Promise.all([
+      getInventoryForBrowse(),
+      getMarginOpts(),
+    ]);
+    return { ok: true, phones: inventory.map((i) => toPublicRetailPhone(i, opts)) };
   } catch {
     return { ok: false, reason: "error" };
   }

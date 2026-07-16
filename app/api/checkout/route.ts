@@ -2,7 +2,12 @@ import { auth } from "@/auth";
 import { isStripeConfigured, stripe } from "@/lib/stripe";
 import { isDbConfigured } from "@/lib/db";
 import { getBalance, getInventory, isCellgodsConfigured } from "@/lib/cellgods";
-import { DURATIONS, toPublicRetailPhone, wholesaleFor } from "@/lib/pricing";
+import {
+  DURATIONS,
+  getMarginOpts,
+  toPublicRetailPhone,
+  wholesaleFor,
+} from "@/lib/pricing";
 import { attachSession, createPendingRental } from "@/lib/rentals";
 import { logEvent } from "@/lib/logs";
 
@@ -79,7 +84,7 @@ export async function POST(req: Request) {
   const durationDays = duration.days;
 
   const wholesale = wholesaleFor(item, period);
-  const retailCents = toPublicRetailPhone(item).retail[period];
+  const retailCents = toPublicRetailPhone(item, await getMarginOpts()).retail[period];
   if (retailCents < wholesale) {
     // Defensive money-safety guard — must never sell below cost.
     console.error(

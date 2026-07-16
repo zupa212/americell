@@ -17,6 +17,7 @@ import {
   type LedgerEntry,
 } from "@/lib/cellgods";
 import { fmtMoney } from "@/lib/money";
+import { getMarginOpts } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
 import Reveal from "@/components/ui/reveal";
@@ -37,6 +38,7 @@ import LottiePlayer from "@/components/ui/lottie";
 import LedgerTable from "@/components/admin/ledger-table";
 import TopupDialog from "@/components/admin/topup-dialog";
 import AutoTopupForm from "@/components/admin/auto-topup-form";
+import PricingSettingsForm from "@/components/admin/pricing-settings-form";
 import BillingToast from "@/components/admin/billing-toast";
 
 // Frosted-glass surface recipe — matches the dashboard, floats over the aurora.
@@ -91,6 +93,9 @@ export default async function AdminBillingPage({
     balance != null && balance.credit_balance_cents < LOW_BALANCE_CENTS;
   const stats = summarizeLedger(ledger);
   const autoOn = balance?.auto_topup.enabled ?? false;
+
+  // Live resale margin (DB-backed, env fallback) — powers the pricing control.
+  const marginOpts = await getMarginOpts();
 
   // The /admin layout already provides the wide `max-w-7xl` glass main container
   // and ambient particles, so this page renders edge-to-edge content inside it.
@@ -319,6 +324,22 @@ export default async function AdminBillingPage({
                   <Separator className="bg-white/50" />
 
                   <AutoTopupForm autoTopup={balance.auto_topup} />
+
+                  <Separator className="bg-white/50" />
+
+                  <div>
+                    <h2 className="text-base font-semibold text-foreground">
+                      Resale pricing
+                    </h2>
+                    <p className="mt-1 max-w-lg text-sm text-muted-foreground">
+                      Set your markup over CellGods wholesale. Applies to every
+                      device instantly — the price customers browse and the price
+                      they&apos;re charged both read this.
+                    </p>
+                    <div className="mt-4">
+                      <PricingSettingsForm current={marginOpts} />
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>

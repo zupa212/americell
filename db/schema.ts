@@ -111,3 +111,23 @@ export const activityLogs = pgTable(
 
 export type ActivityLog = typeof activityLogs.$inferSelect;
 export type NewActivityLog = typeof activityLogs.$inferInsert;
+
+/**
+ * Reseller pricing settings — a single-row ("singleton") config so the owner can
+ * tune the resale margin from the admin panel at runtime (no redeploy). Read by
+ * BOTH the browse catalog AND checkout via `getMarginOpts()`, so the price a
+ * customer sees always equals the price they're charged. Falls back to the
+ * RESELLER_* env vars when the row is absent.
+ */
+export const resellerSettings = pgTable("reseller_settings", {
+  id: text("id").primaryKey(), // always "singleton"
+  marginPct: integer("margin_pct").notNull(),
+  marginMinCents: integer("margin_min_cents").notNull(),
+  priceRounding: text("price_rounding").notNull().default("whole"),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedBy: text("updated_by"),
+});
+
+export type ResellerSettings = typeof resellerSettings.$inferSelect;

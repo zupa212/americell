@@ -6,7 +6,12 @@ import {
   isCellgodsConfigured,
   type InventoryPhone,
 } from "@/lib/cellgods";
-import { DURATIONS, toPublicRetailPhone } from "@/lib/pricing";
+import {
+  DURATIONS,
+  getMarginOpts,
+  toPublicRetailPhone,
+  type MarginOpts,
+} from "@/lib/pricing";
 import InventoryTable, {
   type InventoryRow,
 } from "@/components/admin/inventory-table";
@@ -34,7 +39,7 @@ const glassCard =
   "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
 
 /** Project a raw inventory phone to the admin table row (retail estimate = checkout math). */
-function toRow(p: InventoryPhone): InventoryRow {
+function toRow(p: InventoryPhone, opts: MarginOpts): InventoryRow {
   const hasMonthly = p.price_monthly != null;
   return {
     phoneId: p.phone_id,
@@ -46,7 +51,7 @@ function toRow(p: InventoryPhone): InventoryRow {
     priceMonthlyCents: p.price_monthly,
     // Only estimate retail when there's a wholesale monthly price to mark up.
     retailMonthlyCents: hasMonthly
-      ? toPublicRetailPhone(p).retail.monthly
+      ? toPublicRetailPhone(p, opts).retail.monthly
       : null,
   };
 }
@@ -61,8 +66,11 @@ export default async function AdminInventoryPage() {
     state = "unconfigured";
   } else {
     try {
-      const inventory = await getInventory();
-      rows = inventory.map(toRow);
+      const [inventory, opts] = await Promise.all([
+        getInventory(),
+        getMarginOpts(),
+      ]);
+      rows = inventory.map((p) => toRow(p, opts));
     } catch {
       state = "error";
     }
