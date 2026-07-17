@@ -11,6 +11,7 @@ import { logEvent } from "@/lib/logs";
 const BodySchema = z.object({
   email: z.email(),
   fleetSize: z.string().max(40).optional(),
+  source: z.enum(["homepage_popup", "waitlist_page"]).optional(),
 });
 
 export async function POST(req: Request) {
@@ -31,16 +32,18 @@ export async function POST(req: Request) {
   }
 
   try {
+    const source = parsed.data.source ?? "homepage_popup";
     await createLead({
       email: parsed.data.email,
       fleetSize: parsed.data.fleetSize ?? null,
+      source,
     });
     await logEvent({
       actorType: "customer",
       actorEmail: parsed.data.email,
       action: "lead.captured",
       targetType: "lead",
-      metadata: { fleetSize: parsed.data.fleetSize ?? null, source: "homepage_popup" },
+      metadata: { fleetSize: parsed.data.fleetSize ?? null, source },
     });
     return Response.json({ ok: true });
   } catch (err) {
