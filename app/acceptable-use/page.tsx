@@ -28,7 +28,7 @@ export default function AcceptableUsePage() {
         <p className="mt-4 leading-relaxed text-muted-foreground">
           This Acceptable Use Policy (the “Policy”) sets the rules for using the
           Americell service, which provides access to real, physical smartphones
-          located in datacenters in the United States. Our goal is legitimate,
+          located in the United States. Our goal is legitimate,
           transparent, and responsible use of the devices. By using the service,
           you accept the terms of this Policy.
         </p>

@@ -135,7 +135,7 @@ export default function ContactPage() {
           Tell us about your fleet
         </h1>
         <p className="mt-4 max-w-2xl leading-relaxed text-muted-foreground">
-          Deploy real, physical iPhones and Android devices in US datacenters —
+          Deploy real, physical iPhones and Android devices in the US —
           hosted, powered, connected, and maintained, all controlled from one
           dashboard. Share your device count, timeline, and use case, and our
           team will design a fleet that fits your operation.
@@ -303,8 +303,8 @@ export default function ContactPage() {
               Pricing & data plans
             </h3>
             <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-              Volume pricing, 24/7 dedicated support, 99.9% uptime, and optional
-              SIM data plans from $15/mo.
+              Volume pricing, 24/7 dedicated support, 99.9% uptime, and real US
+              SIM connectivity included on every device.
             </p>
           </div>
         </div>

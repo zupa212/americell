@@ -5,7 +5,7 @@ export const SITE = {
   domain: "americell.example",
   tagline: "Real US phones. Controlled from your browser.",
   subtagline:
-    "Live iPhones and Androids in US datacenters. Tap, type, and install — from your laptop or phone, anywhere.",
+    "Live US iPhones and Androids you control right from your phone. Tap, type, and install — from anywhere.",
 };
 
 export const NAV_LINKS: { label: string; href: string }[] = [
@@ -60,7 +60,7 @@ export type Step = { n: number; title: string; body: string };
 
 export const STEPS: Step[] = [
   { n: 1, title: "Pick a device", body: "Choose a real US phone and location from our fleet — Pixel, Galaxy, or iPhone." },
-  { n: 2, title: "Connect instantly", body: "Your device boots in a US datacenter and streams to your browser in seconds." },
+  { n: 2, title: "Connect instantly", body: "Your US device comes online and streams straight to your phone or browser in seconds." },
   { n: 3, title: "Take control", body: "Drive the real device live from your browser — tap, type, install, sign in. No cables, no local hardware." },
 ];
 
@@ -71,7 +71,7 @@ export type Faq = { q: string; a: string };
 export const FAQS: Faq[] = [
   {
     q: "Are these real devices or emulators?",
-    a: "Real, physical iPhones and Android handsets racked in US datacenters — never emulators or virtual OS images. Your team, your users, and the app stores all see genuine hardware on clean connectivity.",
+    a: "Real, physical iPhones and Android handsets hosted in the US — never emulators or virtual OS images. Your team, your users, and the app stores all see genuine hardware on clean US connectivity.",
   },
   {
     q: "What latency and uptime can we expect?",
@@ -83,7 +83,7 @@ export const FAQS: Faq[] = [
   },
   {
     q: "Can we get SIMs and real mobile connectivity?",
-    a: "Yes. Devices ship on clean US connectivity out of the box, and you can add dedicated SIM data plans from $15/mo per device whenever a workflow needs a live carrier number or mobile data.",
+    a: "Yes — and it's included in the price. Every device comes with a real US SIM, a live carrier number, and mobile data at no extra cost. Genuine carrier connectivity, not Wi-Fi only, so your workflows see exactly what a real US phone sees.",
   },
   {
     q: "How fast can we scale, and what about procurement?",

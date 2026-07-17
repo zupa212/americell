@@ -64,7 +64,7 @@ const AUDIENCES: readonly Audience[] = [
     icon: Boxes,
     title: "Enterprise device pools",
     scenario:
-      "Retire the drawer of aging test phones for a managed, always-on fleet in US datacenters. We handle power, connectivity, maintenance, and hardware replacement while your engineers keep one dashboard of control.",
+      "Retire the drawer of aging test phones for a managed, always-on fleet in the US. We handle power, connectivity, maintenance, and hardware replacement while your engineers keep one dashboard of control.",
   },
 ];
 
@@ -102,7 +102,7 @@ export default function UseCasesPage() {
             <p className="mt-5 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
               You moved your servers to the cloud. Your phone fleet is next.
               Americell hosts, powers, connects, and maintains real iPhone and
-              Android devices in US datacenters — here is who runs them, and
+              Android devices in the US — here is who runs them, and
               what they run them for.
             </p>
           </Reveal>

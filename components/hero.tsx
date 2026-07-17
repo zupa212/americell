@@ -704,9 +704,8 @@ export default function Hero() {
           {...item}
           className="mx-auto mt-7 max-w-2xl text-pretty text-center text-lg leading-relaxed text-muted-foreground sm:text-xl"
         >
-          Real, physical US iPhones &amp; Android, live in US datacenters — not
-          emulators. Genuine US numbers and connectivity. We host the fleet; you
-          control it from your laptop or phone.
+          Real, physical US iPhones &amp; Android — not emulators. Genuine US
+          numbers and connectivity. Control them live, right from your phone.
         </motion.p>
 
         {/* CTAs */}

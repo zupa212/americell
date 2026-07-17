@@ -92,7 +92,7 @@ const PILLARS: readonly Pillar[] = [
   {
     icon: ShieldCheck,
     title: "Security by default",
-    body: "Access is authenticated, scoped, and observable. Devices run in US datacenters, sessions are governed, and enterprise teams get a DPA to satisfy compliance.",
+    body: "Access is authenticated, scoped, and observable. Devices run in the US, sessions are governed, and enterprise teams get a DPA to satisfy compliance.",
     points: [
       "Isolated, US-hosted devices",
       "Least-privilege access controls",
@@ -138,7 +138,7 @@ const FLOW: readonly FlowStep[] = [
     icon: Rocket,
     n: "01",
     title: "Provision",
-    body: "Choose a device and it comes online in a US datacenter — hosted, powered, and networked.",
+    body: "Choose a device and it comes online in the US — hosted, powered, and networked.",
   },
   {
     icon: Network,
@@ -162,7 +162,7 @@ const FLOW: readonly FlowStep[] = [
 
 /** Security guarantees, called out separately because compliance teams ask. */
 const SECURITY_POINTS: readonly string[] = [
-  "Real devices isolated in US datacenters",
+  "Real devices fully isolated in the US",
   "Least-privilege, role-based access controls",
   "Full session recording for every connection",
   "Complete, timestamped, searchable audit logs",
@@ -192,8 +192,8 @@ export default function PlatformPage() {
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
               You moved your servers to the cloud. Your phone fleet is next.
-              Americell hosts real iPhones and Android devices in US
-              datacenters and gives you a single system to provision, control,
+              Americell hosts real iPhones and Android devices in the US
+              and gives you a single system to provision, control,
               and govern them — with the access controls, recording, and logs
               your team already expects from its infrastructure.
             </p>

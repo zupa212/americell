@@ -48,7 +48,7 @@ const ROWS: readonly Row[] = [
   {
     category: "Connectivity",
     inHouse: "Carrier contracts and SIMs to source and manage",
-    americell: "Optional SIM data plans from $15/mo",
+    americell: "Real US SIM & data — included",
   },
   {
     category: "Maintenance & replacement",

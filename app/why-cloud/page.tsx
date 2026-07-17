@@ -112,7 +112,7 @@ const REASONS: ReadonlyArray<{
   {
     icon: Boxes,
     title: "No office hardware",
-    body: "No drawers of devices, chargers, SIM trays, or powered USB hubs. The phones live in US datacenters — your office goes back to being an office.",
+    body: "No drawers of devices, chargers, SIM trays, or powered USB hubs. The phones live in the US — your office goes back to being an office.",
   },
   {
     icon: Wrench,
@@ -151,7 +151,7 @@ const OLD_WAY: readonly string[] = [
 ];
 
 const NEW_WAY: readonly string[] = [
-  "Real iPhone and Android devices hosted in US datacenters",
+  "Real iPhone and Android devices hosted in the US",
   "Hardware maintenance and replacement handled for you",
   "Capacity scales up or down from one dashboard",
   "Access from any browser, anywhere, over the global edge",
@@ -194,7 +194,7 @@ export default function WhyCloudPage() {
 
             <p className="mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
               Real, physical iPhone and Android devices — hosted, powered,
-              connected, and maintained in US datacenters, and driven from a
+              connected, and maintained in the US, and driven from a
               single dashboard. No emulators. No drawers of phones. No
               procurement cycles. The same move you already made for compute,
               applied to your mobile hardware.

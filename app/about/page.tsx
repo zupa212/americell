@@ -22,7 +22,7 @@ export default function AboutPage() {
         </h1>
         <p className="mt-4 leading-relaxed text-muted-foreground">
           Americell is a platform that gives you access to real, physical
-          smartphones placed in US datacenters — and lets you operate them live,
+          smartphones hosted in the US — and lets you operate them live,
           straight from your browser, from anywhere in the world.
         </p>
 

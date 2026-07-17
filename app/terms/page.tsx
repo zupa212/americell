@@ -52,7 +52,7 @@ export default function TermsPage() {
           <h2 className="mt-10 text-xl font-semibold">1. Introduction</h2>
           <p className="mt-4 leading-relaxed text-muted-foreground">
             {SITE.name} provides remote access to real, physical smartphones
-            hosted in US datacenters. The Service is intended for legitimate
+            hosted in the US. The Service is intended for legitimate
             use: mobile app testing and QA, US-localized testing, app store
             review, and managing your own accounts and workflows.
           </p>

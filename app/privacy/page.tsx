@@ -34,7 +34,7 @@ export default function PrivacyPage() {
           This Privacy Policy describes how Americell (“we,” “us,” or “the
           Company”) collects, uses, stores, and protects your personal data when
           you use our service to legitimately access and control real, physical
-          smartphones located in datacenters in the United States. We are
+          smartphones located in the United States. We are
           committed to transparency and to respecting your rights under the
           General Data Protection Regulation (GDPR) and applicable law.
         </p>
@@ -131,7 +131,7 @@ export default function PrivacyPage() {
               Hosting and infrastructure providers:
             </span>{" "}
             for hosting the platform, storing data, and operating the
-            datacenters in which the devices are located.
+            facilities in which the devices are located.
           </li>
         </ul>
         <p className="mt-4 leading-relaxed text-muted-foreground">

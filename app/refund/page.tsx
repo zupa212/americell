@@ -93,9 +93,8 @@ export default function RefundPage() {
               <span className="font-medium text-foreground">
                 Optional add-ons:
               </span>{" "}
-              extras such as dedicated SIM data plans are billed on the same
-              per-device monthly cycle and are shown clearly before you enable
-              them.
+              any optional extras are billed on the same per-device monthly
+              cycle and are shown clearly before you enable them.
             </li>
             <li>
               Prices are exclusive of taxes unless stated otherwise. Any price
