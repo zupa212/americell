@@ -35,8 +35,8 @@ export type Feature = { title: string; body: string; icon: string };
 
 export const FEATURES: Feature[] = [
   {
-    title: "Real hardware. No emulators.",
-    body: "Genuine iPhones and Androids on clean US residential connectivity — exactly what your users and the app stores see.",
+    title: "Real US hardware. No emulators.",
+    body: "Genuine American iPhones and Androids on clean US residential connectivity — exactly what your users and the US app stores see.",
     icon: "device",
   },
   {

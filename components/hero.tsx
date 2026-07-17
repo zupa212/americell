@@ -535,10 +535,10 @@ function PhoneMockup({ singleBeam = false }: { singleBeam?: boolean }) {
 
 // Trust line — honest, no-commitment highlights for the trust row.
 const TRUST_POINTS = [
+  "🇺🇸 Real US devices",
+  "Genuine US connectivity",
   "No setup fees",
   "Cancel anytime",
-  "Live in minutes",
-  "Transparent per-device pricing",
 ];
 
 /**
@@ -680,7 +680,7 @@ export default function Hero() {
             </span>
             <span aria-hidden="true" className="h-3.5 w-px bg-foreground/15" />
             <AnimatedShinyText className="inline-flex items-center justify-center text-brand">
-              Remote phone infrastructure
+              Real US iPhones &amp; Android
             </AnimatedShinyText>
           </motion.div>
         </motion.div>
@@ -704,9 +704,9 @@ export default function Hero() {
           {...item}
           className="mx-auto mt-7 max-w-2xl text-pretty text-center text-lg leading-relaxed text-muted-foreground sm:text-xl"
         >
-          Real, physical US iPhones &amp; Android in the cloud — not emulators.
-          We host and maintain the fleet; you control it from your laptop or
-          phone.
+          Real, physical US iPhones &amp; Android, live in US datacenters — not
+          emulators. Genuine US numbers and connectivity. We host the fleet; you
+          control it from your laptop or phone.
         </motion.p>
 
         {/* CTAs */}
