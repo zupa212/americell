@@ -465,7 +465,7 @@ function PhoneMockup({ singleBeam = false }: { singleBeam?: boolean }) {
 
                 {/* bottom "Get started" pill + send glyph */}
                 <div className="absolute inset-x-5 bottom-7 flex items-center gap-2">
-                  <span className="flex h-9 flex-1 items-center justify-center rounded-full bg-white text-xs font-semibold text-foreground shadow-[0_6px_16px_-6px_rgba(0,0,0,0.5)]">
+                  <span className="flex h-9 flex-1 items-center justify-center rounded-full bg-white text-xs font-semibold text-[#0b1020] shadow-[0_6px_16px_-6px_rgba(0,0,0,0.5)]">
                     Get started
                   </span>
                   <span
