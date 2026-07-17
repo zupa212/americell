@@ -3,9 +3,7 @@ import Hero from "@/components/hero";
 import LogosStrip from "@/components/logos-strip";
 import Stats from "@/components/stats";
 import Features from "@/components/features";
-import BenefitsStack from "@/components/benefits-stack";
 import HowItWorks from "@/components/how-it-works";
-import Economics from "@/components/economics";
 import Pricing from "@/components/pricing";
 import Testimonials from "@/components/testimonials";
 import Faq from "@/components/faq";
@@ -32,9 +30,7 @@ export default function Page() {
         <LogosStrip />
         <Stats />
         <Features />
-        <BenefitsStack />
         <HowItWorks />
-        <Economics />
         <Pricing />
         <Testimonials />
         <Faq />

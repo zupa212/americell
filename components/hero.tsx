@@ -704,11 +704,9 @@ export default function Hero() {
           {...item}
           className="mx-auto mt-7 max-w-2xl text-pretty text-center text-lg leading-relaxed text-muted-foreground sm:text-xl"
         >
-          {SITE.name} is remote phone infrastructure for teams that need real,
-          physical iPhones and Androids in the cloud — not emulators. We host,
-          power, and maintain the fleet. You keep full control from one
-          dashboard, on your laptop or phone — no office hardware, no cables,
-          no babysitting.
+          Real, physical US iPhones &amp; Android in the cloud — not emulators.
+          We host and maintain the fleet; you control it from your laptop or
+          phone.
         </motion.p>
 
         {/* CTAs */}
