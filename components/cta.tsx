@@ -154,10 +154,9 @@ export default function CallToAction() {
               <Link
                 href="/contact"
                 className={cn(
-                  "group/secondary inline-flex items-center gap-2 rounded-full px-7 py-3 text-base font-medium text-foreground",
-                  "border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40",
-                  "shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]",
-                  "transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/80",
+                  "group/secondary inline-flex items-center gap-2 rounded-full px-7 py-3 text-base font-medium text-white/85",
+                  "border border-white/20 bg-white/10 backdrop-blur-xl ring-1 ring-white/15",
+                  "transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/15 hover:text-white",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2",
                 )}
               >

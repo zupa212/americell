@@ -723,8 +723,9 @@ export default function Hero() {
               aria-label="Deploy your fleet"
             >
               <ShimmerButton
-                background="var(--foreground)"
-                className="h-12 px-7 text-sm font-medium shadow-soft"
+                background="linear-gradient(110deg, #2b6bff 0%, #7c3aed 45%, #5aa2ff 100%)"
+                shimmerColor="#ffffff"
+                className="h-12 px-7 text-sm font-semibold text-white shadow-soft ring-1 ring-white/25"
               >
                 Deploy your fleet
               </ShimmerButton>
@@ -734,7 +735,7 @@ export default function Hero() {
             <Button
               variant="ghost"
               size="lg"
-              className="h-12 rounded-full px-6 text-sm font-medium text-muted-foreground"
+              className="h-12 rounded-full border border-white/20 px-6 text-sm font-medium text-white/85 hover:bg-white/10 hover:text-white"
               render={<a href="/contact" />}
               nativeButton={false}
             >
