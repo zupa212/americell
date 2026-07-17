@@ -38,20 +38,21 @@ function formatRemaining(ms: number): string {
  * framing, but the default experience never leaves americell.*.
  */
 export default function StreamViewer({
-  streamUrl,
   rentalId,
   model,
   platform,
   expiresAt,
   streamMintedAt,
 }: {
-  streamUrl: string;
   rentalId: string;
   model: string;
   platform: string;
   expiresAt: string | null;
   streamMintedAt: string | null;
 }) {
+  // Same-origin URL: a server-side redirect resolves the upstream stream, so the
+  // provider's domain never appears in the src, the link or the page source.
+  const streamSrc = `/api/rentals/${rentalId}/stream`;
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [pin, setPin] = useState<string | null>(null);
   const [pinLoading, setPinLoading] = useState(false);
@@ -214,7 +215,7 @@ export default function StreamViewer({
         <iframe
           key={reloadKey}
           ref={frameRef}
-          src={streamUrl}
+          src={streamSrc}
           title={`Americell — remote control ${model}`}
           className="h-[68dvh] max-h-[820px] min-h-[420px] w-full border-0 bg-black sm:h-[72vh]"
           allow="autoplay; fullscreen; clipboard-read; clipboard-write; accelerometer; gyroscope"
@@ -226,7 +227,7 @@ export default function StreamViewer({
       <p className="text-center text-xs text-muted-foreground">
         Live view not loading?{" "}
         <a
-          href={streamUrl}
+          href={streamSrc}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 font-medium text-brand hover:text-brand-2"

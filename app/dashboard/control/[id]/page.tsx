@@ -81,7 +81,6 @@ export default async function ControlPage({
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">
         {live && rental.streamUrl ? (
           <StreamViewer
-            streamUrl={rental.streamUrl}
             rentalId={rental.id}
             model={rental.model}
             platform={rental.platform}
