@@ -124,6 +124,16 @@ export const resellerSettings = pgTable("reseller_settings", {
   marginPct: integer("margin_pct").notNull(),
   marginMinCents: integer("margin_min_cents").notNull(),
   priceRounding: text("price_rounding").notNull().default("whole"),
+  // Pricing mode: "flat" = fixed price per platform (below); "margin" = the
+  // wholesale+margin model above. Defaults to flat (€150 Android / €250 iPhone).
+  pricingMode: text("pricing_mode").notNull().default("flat"),
+  flatCurrency: text("flat_currency").notNull().default("eur"),
+  flatAndroidMonthlyCents: integer("flat_android_monthly_cents")
+    .notNull()
+    .default(15000),
+  flatIphoneMonthlyCents: integer("flat_iphone_monthly_cents")
+    .notNull()
+    .default(25000),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .defaultNow()
     .notNull(),

@@ -4,6 +4,8 @@ import { isDbConfigured } from "@/lib/db";
 import { getBalance, getInventory, isCellgodsConfigured } from "@/lib/cellgods";
 import {
   DURATIONS,
+  flatRetailPhone,
+  getFlatPricing,
   getMarginOptsForPhone,
   toPublicRetailPhone,
   wholesaleFor,
@@ -84,10 +86,14 @@ export async function POST(req: Request) {
   const durationDays = duration.days;
 
   const wholesale = wholesaleFor(item, period);
-  const retailCents = toPublicRetailPhone(
-    item,
-    await getMarginOptsForPhone(item.phone_id),
-  ).retail[period];
+  // Flat mode: fixed price per platform (EUR). Margin mode: wholesale+margin.
+  // Same computation the browse catalog uses, so shown price == charged price.
+  const flat = await getFlatPricing();
+  const pub = flat
+    ? flatRetailPhone(item, flat)
+    : toPublicRetailPhone(item, await getMarginOptsForPhone(item.phone_id));
+  const retailCents = pub.retail[period];
+  const currency = pub.currency.toLowerCase();
   if (retailCents < wholesale) {
     // Defensive money-safety guard — must never sell below cost.
     console.error(
@@ -159,7 +165,7 @@ export async function POST(req: Request) {
       {
         quantity: 1,
         price_data: {
-          currency: "usd",
+          currency,
           product_data: {
             name: `Americell — ${item.model} (${duration.label})`,
           },

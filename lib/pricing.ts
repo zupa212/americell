@@ -106,6 +106,137 @@ export async function getMarginOpts(): Promise<MarginOpts> {
   }
 }
 
+// ---- Flat per-platform pricing (fixed retail by device type) --------------
+
+export type FlatPricing = {
+  currency: string;
+  monthly: Record<Platform, number>; // integer cents / month, by platform
+};
+
+/** Business default when no settings row exists: €150/mo Android, €250/mo iPhone. */
+const DEFAULT_FLAT: FlatPricing = {
+  currency: "eur",
+  monthly: { android: 15000, iphone: 25000 },
+};
+
+/**
+ * Derive daily/weekly/monthly tiers (integer cents) from a monthly price at a
+ * constant per-day rate: daily = monthly/30 rounded to the nearest 50c,
+ * weekly = 7 × daily, monthly as-is.
+ */
+export function deriveFlatTiers(monthlyCents: number): Record<BillingPeriod, number> {
+  const daily = Math.max(0, Math.round(monthlyCents / 30 / 50) * 50);
+  return { daily, weekly: daily * 7, monthly: Math.max(0, Math.round(monthlyCents)) };
+}
+
+/**
+ * The LIVE flat-pricing config, or null when the reseller is in margin mode.
+ * Read by BOTH browse and checkout so the shown price equals the charged price.
+ * Defaults to flat (DEFAULT_FLAT) when the row is absent — fixed per-platform
+ * pricing is the current business model.
+ */
+export async function getFlatPricing(): Promise<FlatPricing | null> {
+  if (!isDbConfigured) return DEFAULT_FLAT;
+  try {
+    const [row] = await db
+      .select()
+      .from(resellerSettings)
+      .where(eq(resellerSettings.id, SETTINGS_ID))
+      .limit(1);
+    if (!row) return DEFAULT_FLAT;
+    if (row.pricingMode !== "flat") return null;
+    return {
+      currency: (row.flatCurrency || "eur").toLowerCase(),
+      monthly: {
+        android: row.flatAndroidMonthlyCents,
+        iphone: row.flatIphoneMonthlyCents,
+      },
+    };
+  } catch {
+    return DEFAULT_FLAT;
+  }
+}
+
+/** Raw flat-pricing settings for the admin UI (returns values even in margin mode). */
+export async function getFlatPricingSettings(): Promise<{
+  mode: "flat" | "margin";
+  currency: string;
+  androidMonthlyCents: number;
+  iphoneMonthlyCents: number;
+}> {
+  const fallback = {
+    mode: "flat" as const,
+    currency: "eur",
+    androidMonthlyCents: DEFAULT_FLAT.monthly.android,
+    iphoneMonthlyCents: DEFAULT_FLAT.monthly.iphone,
+  };
+  if (!isDbConfigured) return fallback;
+  try {
+    const [row] = await db
+      .select()
+      .from(resellerSettings)
+      .where(eq(resellerSettings.id, SETTINGS_ID))
+      .limit(1);
+    if (!row) return fallback;
+    return {
+      mode: row.pricingMode === "margin" ? "margin" : "flat",
+      currency: row.flatCurrency || "eur",
+      androidMonthlyCents: row.flatAndroidMonthlyCents,
+      iphoneMonthlyCents: row.flatIphoneMonthlyCents,
+    };
+  } catch {
+    return fallback;
+  }
+}
+
+/** Client-safe retail for a phone under flat pricing (fixed by platform). */
+export function flatRetailPhone(item: InventoryPhone, flat: FlatPricing): PublicRetailPhone {
+  const monthly = flat.monthly[item.type] ?? DEFAULT_FLAT.monthly[item.type];
+  return {
+    phoneId: item.phone_id,
+    model: item.model,
+    platform: item.type,
+    available: item.status === "available",
+    currency: flat.currency,
+    retail: deriveFlatTiers(monthly),
+  };
+}
+
+/** Persist the flat-pricing config / mode (admin only, upserts the singleton). */
+export async function updateFlatPricing(
+  input: {
+    mode: "flat" | "margin";
+    currency: string;
+    androidMonthlyCents: number;
+    iphoneMonthlyCents: number;
+  },
+  updatedBy?: string,
+): Promise<void> {
+  await db
+    .insert(resellerSettings)
+    .values({
+      id: SETTINGS_ID,
+      marginPct: 0,
+      marginMinCents: 0,
+      pricingMode: input.mode,
+      flatCurrency: input.currency.toLowerCase(),
+      flatAndroidMonthlyCents: input.androidMonthlyCents,
+      flatIphoneMonthlyCents: input.iphoneMonthlyCents,
+      updatedBy: updatedBy ?? null,
+    })
+    .onConflictDoUpdate({
+      target: resellerSettings.id,
+      set: {
+        pricingMode: input.mode,
+        flatCurrency: input.currency.toLowerCase(),
+        flatAndroidMonthlyCents: input.androidMonthlyCents,
+        flatIphoneMonthlyCents: input.iphoneMonthlyCents,
+        updatedAt: new Date(),
+        updatedBy: updatedBy ?? null,
+      },
+    });
+}
+
 /** Persist the admin-set margin (upsert the singleton row). Server/admin only. */
 export async function updateMarginSettings(
   input: { pct: number; minCents: number; rounding: PriceRounding },
@@ -245,6 +376,13 @@ export async function getRetailCatalog(): Promise<
 > {
   if (!isCellgodsConfigured) return { ok: false, reason: "unconfigured" };
   try {
+    // Flat mode: fixed retail per platform (ignores wholesale/margin/overrides).
+    const flat = await getFlatPricing();
+    if (flat) {
+      const inventory = await getInventoryForBrowse();
+      return { ok: true, phones: inventory.map((i) => flatRetailPhone(i, flat)) };
+    }
+    // Margin mode: retail = wholesale + margin (per-device override applied).
     // Cached browse read — the public catalog tolerates ~45s staleness in
     // exchange for an instant homepage. Checkout re-checks live availability.
     const [inventory, opts, overrides] = await Promise.all([

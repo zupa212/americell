@@ -17,7 +17,11 @@ import {
   type LedgerEntry,
 } from "@/lib/cellgods";
 import { fmtMoney } from "@/lib/money";
-import { getDeviceOverrides, getMarginOpts } from "@/lib/pricing";
+import {
+  getDeviceOverrides,
+  getFlatPricingSettings,
+  getMarginOpts,
+} from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
 import Reveal from "@/components/ui/reveal";
@@ -38,6 +42,7 @@ import LottiePlayer from "@/components/ui/lottie";
 import LedgerTable from "@/components/admin/ledger-table";
 import TopupDialog from "@/components/admin/topup-dialog";
 import AutoTopupForm from "@/components/admin/auto-topup-form";
+import FlatPricingForm from "@/components/admin/flat-pricing-form";
 import PricingSettingsForm from "@/components/admin/pricing-settings-form";
 import DeviceOverridesManager from "@/components/admin/device-overrides-manager";
 import BillingToast from "@/components/admin/billing-toast";
@@ -97,6 +102,7 @@ export default async function AdminBillingPage({
 
   // Live resale margin (DB-backed, env fallback) — powers the pricing control.
   const marginOpts = await getMarginOpts();
+  const flatSettings = await getFlatPricingSettings();
   const deviceOverrides = Object.entries(await getDeviceOverrides()).map(
     ([phoneId, pct]) => ({ phoneId, pct }),
   );
@@ -333,12 +339,28 @@ export default async function AdminBillingPage({
 
                   <div>
                     <h2 className="text-base font-semibold text-foreground">
-                      Resale pricing
+                      Device pricing
                     </h2>
                     <p className="mt-1 max-w-lg text-sm text-muted-foreground">
-                      Set your markup over CellGods wholesale. Applies to every
-                      device instantly — the price customers browse and the price
-                      they&apos;re charged both read this.
+                      Fixed price per device type — every Android and every
+                      iPhone sells at these monthly prices. Applies to browse and
+                      checkout instantly. Switch to margin mode below to price off
+                      CellGods wholesale instead.
+                    </p>
+                    <div className="mt-4">
+                      <FlatPricingForm current={flatSettings} />
+                    </div>
+                  </div>
+
+                  <Separator className="bg-white/50" />
+
+                  <div>
+                    <h2 className="text-base font-semibold text-foreground">
+                      Resale margin (used only in margin mode)
+                    </h2>
+                    <p className="mt-1 max-w-lg text-sm text-muted-foreground">
+                      Your markup over CellGods wholesale. Applies only when
+                      pricing mode above is set to “Wholesale + margin”.
                     </p>
                     <div className="mt-4">
                       <PricingSettingsForm current={marginOpts} />
