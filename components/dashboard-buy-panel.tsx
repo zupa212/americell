@@ -37,6 +37,7 @@ import { cn } from "@/lib/utils";
 // build time and never pull the server module into the client bundle. DURATIONS
 // (a runtime value) is passed down as a prop instead of imported here.
 import type { BillingPeriod, PublicRetailPhone } from "@/lib/pricing";
+import { CRYPTO_ENABLED } from "@/lib/features";
 // The crypto-provider shape is a shared TYPE (erased at build); reused verbatim
 // from the reference grid so the two flows never drift.
 import type { CryptoProvider } from "@/components/pricing-grid";
@@ -433,16 +434,18 @@ export default function DashboardBuyPanel({
                         <p className="w-full text-center text-[0.7rem] text-muted-foreground">
                           Card · Apple&nbsp;Pay · Google&nbsp;Pay &amp; more
                         </p>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => setCryptoPhone(phone)}
-                          aria-label={`Pay for ${phone.model} with crypto`}
-                          className="min-h-11 w-full gap-1.5 rounded-full font-semibold"
-                        >
-                          <Coins className="h-3.5 w-3.5" aria-hidden="true" />
-                          Pay with crypto
-                        </Button>
+                        {CRYPTO_ENABLED && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setCryptoPhone(phone)}
+                            aria-label={`Pay for ${phone.model} with crypto`}
+                            className="min-h-11 w-full gap-1.5 rounded-full font-semibold"
+                          >
+                            <Coins className="h-3.5 w-3.5" aria-hidden="true" />
+                            Pay with crypto
+                          </Button>
+                        )}
                       </>
                     )}
                   </CardFooter>

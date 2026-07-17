@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { isDbConfigured } from "@/lib/db";
 import { getBalance, getInventory, isCellgodsConfigured } from "@/lib/cellgods";
 import { DURATIONS, priceForCheckout } from "@/lib/pricing";
+import { CRYPTO_ENABLED } from "@/lib/features";
 import { attachSession, createPendingRental } from "@/lib/rentals";
 import { logEvent } from "@/lib/logs";
 import { buildMoonpayUrl, isMoonpayConfigured } from "@/lib/moonpay";
@@ -18,6 +19,12 @@ type Provider = "moonpay" | "nowpayments" | "coinbase" | "btcpay";
  * returns its hosted payment URL. The client only sends { phoneId, period, provider }.
  */
 export async function POST(req: Request) {
+  if (!CRYPTO_ENABLED) {
+    return Response.json(
+      { error: "Crypto payments are temporarily unavailable." },
+      { status: 503 },
+    );
+  }
   const session = await auth();
   const userId = session?.user?.id;
   const email = session?.user?.email;

@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 // build time and never pull the server module into the client bundle. DURATIONS
 // (a runtime value) is passed down as a prop instead of imported here.
 import type { BillingPeriod, PublicRetailPhone } from "@/lib/pricing";
+import { CRYPTO_ENABLED } from "@/lib/features";
 
 // Shared frosted-glass recipe — floats over the global <SiteBackground/> aurora.
 const GLASS =
@@ -383,7 +384,7 @@ export default function PricingGrid({
                     )}
 
                     {/* Secondary: pay with crypto — opens the provider picker. */}
-                    {buyable && (
+                    {buyable && CRYPTO_ENABLED && (
                       <button
                         type="button"
                         onClick={() => setCryptoPhone(phone)}

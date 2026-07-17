@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { ShieldCheck } from "lucide-react";
+import { MessageCircle, ShieldCheck } from "lucide-react";
 import { motion, useReducedMotion, type Variants } from "motion/react";
 
 import { Separator } from "@/components/ui/separator";
 import { AuroraText } from "@/components/ui/aurora-text";
 import { cn } from "@/lib/utils";
 import { SITE } from "@/lib/site";
+import { TELEGRAM_URL } from "@/lib/features";
 
 type FooterLink = { label: string; href: string };
 type FooterColumn = { heading: string; links: FooterLink[] };
@@ -232,9 +233,21 @@ export default function SiteFooter() {
                 transition: { duration: 0.5, ease: EASE },
               })}
         >
-          <p className="text-sm text-muted-foreground">
-            &copy; {year} {SITE.name}.
-          </p>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <p className="text-sm text-muted-foreground">
+              &copy; {year} {SITE.name}.
+            </p>
+            <a
+              href={TELEGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${SITE.name} on Telegram`}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors duration-300 hover:text-[#229ED9]"
+            >
+              <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              Telegram
+            </a>
+          </div>
           <p className="text-sm font-medium text-muted-foreground">
             Remote phone infrastructure for agencies, QA &amp; enterprise teams.
           </p>

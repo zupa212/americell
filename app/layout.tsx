@@ -5,6 +5,7 @@ import StructuredData from "@/components/structured-data";
 import { Toaster } from "@/components/ui/sonner";
 import SmoothScroll from "@/components/smooth-scroll";
 import SiteBackground from "@/components/site-background";
+import TelegramBubble from "@/components/telegram-bubble";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,7 @@ export default function RootLayout({
         <SiteBackground />
         <StructuredData />
         <SmoothScroll>{children}</SmoothScroll>
+        <TelegramBubble />
         <Toaster position="top-center" richColors />
       </body>
     </html>
