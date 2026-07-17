@@ -22,6 +22,15 @@ export async function getUserById(id: string): Promise<User | undefined> {
   return rows[0];
 }
 
+/** Set a user's password hash (used by the password-reset flow). */
+export async function updatePasswordHash(
+  userId: string,
+  passwordHash: string,
+): Promise<void> {
+  if (!isDbConfigured) return;
+  await db.update(users).set({ passwordHash }).where(eq(users.id, userId));
+}
+
 export async function createUser(
   email: string,
   passwordHash: string,

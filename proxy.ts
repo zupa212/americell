@@ -40,6 +40,8 @@ function clientIp(req: NextRequest): string {
 // path -> { limit, windowMs } for brute-force-prone POSTs.
 const POST_LIMITS: Record<string, { limit: number; windowMs: number }> = {
   "/api/auth/callback/credentials": { limit: 12, windowMs: 10 * 60 * 1000 },
+  "/api/auth/forgot-password": { limit: 5, windowMs: 10 * 60 * 1000 },
+  "/api/auth/reset-password": { limit: 10, windowMs: 10 * 60 * 1000 },
   "/api/leads": { limit: 6, windowMs: 60 * 1000 },
 };
 
