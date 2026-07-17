@@ -1,16 +1,26 @@
 import Link from "next/link";
 
-import WaitlistForm from "@/components/waitlist-form";
+import WaitlistForm, { type WaitlistDevice } from "@/components/waitlist-form";
+import { getRetailCatalog } from "@/lib/pricing";
 import { buildMetadata } from "@/lib/seo";
 
 export const metadata = buildMetadata({
   title: "Waitlist", // → "Americell · Waitlist"
   description:
-    "Join the Americell waitlist. Real US iPhones & Android devices, controlled from your browser. Tell us your fleet size and we'll set you up.",
+    "Join the Americell waitlist. Real US iPhones & Android devices, controlled from your browser. Pick the phone you want and we'll set you up.",
   alternates: { canonical: "/waitlist" },
 });
 
-export default function WaitlistPage() {
+// Re-read the live catalog periodically so the phone picker reflects inventory.
+export const revalidate = 300;
+
+export default async function WaitlistPage() {
+  const catalog = await getRetailCatalog();
+  const seen = new Set<string>();
+  const devices: WaitlistDevice[] = (catalog.ok ? catalog.phones : [])
+    .filter((p) => (seen.has(p.model) ? false : (seen.add(p.model), true)))
+    .map((p) => ({ model: p.model, platform: p.platform }));
+
   return (
     <div className="dark dark-surface relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-5 py-12 sm:py-16">
       {/* Dark brand backdrop with soft glows (matches the homepage). */}
@@ -47,13 +57,13 @@ export default function WaitlistPage() {
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-white/85">
               Real US iPhones &amp; Android, controlled from your browser — from
-              your laptop or phone. Tell us your fleet size and we&rsquo;ll set
+              your laptop or phone. Pick the phone you want and we&rsquo;ll set
               you up.
             </p>
           </div>
 
           <div className="p-6 sm:p-8">
-            <WaitlistForm />
+            <WaitlistForm devices={devices} />
           </div>
         </div>
 

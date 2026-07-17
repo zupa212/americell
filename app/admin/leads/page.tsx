@@ -26,14 +26,14 @@ export default async function AdminLeadsPage() {
         Leads
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Marketing leads captured from the homepage popup ({leads.length}).
+        Marketing leads captured from the waitlist page ({leads.length}).
       </p>
 
       <div className={cn(glassCard, "mt-6 overflow-hidden")}>
         {leads.length === 0 ? (
           <p className="p-8 text-center text-sm text-muted-foreground">
-            No leads yet. They&rsquo;ll appear here as visitors submit the
-            homepage popup.
+            No leads yet. They&rsquo;ll appear here as visitors join the
+            waitlist.
           </p>
         ) : (
           <div className="overflow-x-auto">
@@ -41,7 +41,7 @@ export default async function AdminLeadsPage() {
               <thead>
                 <tr className="border-b border-white/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
                   <th className="px-5 py-3 font-medium">Email</th>
-                  <th className="px-5 py-3 font-medium">Fleet size</th>
+                  <th className="px-5 py-3 font-medium">Interested in</th>
                   <th className="px-5 py-3 font-medium">Source</th>
                   <th className="px-5 py-3 font-medium">Date</th>
                 </tr>
