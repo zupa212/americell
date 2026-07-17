@@ -172,6 +172,7 @@ type Column = {
 const COLUMNS: readonly Column[] = [
   { label: "Device", align: "left", sortKey: "model" },
   { label: "Customer", align: "left", sortKey: "customerEmail" },
+  { label: "Paid with", align: "left" },
   { label: "Status", align: "left", sortKey: "status" },
   { label: "Retail", align: "right", sortKey: "retailCents" },
   { label: "Wholesale", align: "right", sortKey: "chargedCents" },
@@ -571,6 +572,22 @@ export default function RentalsTable({
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {r.customerEmail}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "font-medium",
+                            r.paymentMethod === "Card" &&
+                              "border-brand/20 bg-brand/10 text-brand",
+                            r.paymentMethod === "NOWPayments" &&
+                              "border-cyan-500/25 bg-cyan-500/10 text-cyan-600",
+                            r.paymentMethod === "Unpaid" &&
+                              "border-amber-500/25 bg-amber-500/10 text-amber-600",
+                          )}
+                        >
+                          {r.paymentMethod}
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         {badge.label === r.status ? (

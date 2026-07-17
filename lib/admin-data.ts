@@ -155,7 +155,20 @@ export type AdminRentalRow = {
   billingPeriod: string;
   createdAt: Date;
   expiresAt: Date | null;
+  /** How the customer paid, derived from the session id (Card / NOWPayments / …). */
+  paymentMethod: string;
 };
+
+/** Human label for how a rental was paid, from the bound session-id prefix. */
+export function paymentMethodLabel(sessionId: string): string {
+  if (sessionId.startsWith("cs_")) return "Card";
+  if (sessionId.startsWith("nowpayments_")) return "NOWPayments";
+  if (sessionId.startsWith("moonpay_")) return "MoonPay";
+  if (sessionId.startsWith("coinbase_")) return "Coinbase";
+  if (sessionId.startsWith("btcpay_")) return "BTCPay";
+  if (sessionId.startsWith("pending_")) return "Unpaid";
+  return "—";
+}
 
 /**
  * Newest rentals first for the admin rentals table. `limit` is clamped to a
@@ -179,14 +192,16 @@ export async function listAllRentals(limit = 200): Promise<AdminRentalRow[]> {
       billingPeriod: rentals.billingPeriod,
       createdAt: rentals.createdAt,
       expiresAt: rentals.expiresAt,
+      stripeSessionId: rentals.stripeSessionId,
     })
     .from(rentals)
     .orderBy(desc(rentals.createdAt))
     .limit(capped);
 
-  return rows.map((r) => ({
+  return rows.map(({ stripeSessionId, ...r }) => ({
     ...r,
     marginCents: r.chargedCents === null ? null : r.retailCents - r.chargedCents,
+    paymentMethod: paymentMethodLabel(stripeSessionId),
   }));
 }
 
