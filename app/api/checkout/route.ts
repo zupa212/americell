@@ -85,6 +85,23 @@ export async function POST(req: Request) {
   const period = duration.period;
   const durationDays = duration.days;
 
+  // Money-safety: refuse a duration the device doesn't actually offer at
+  // CellGods (its wholesale price for that tier is null). Flat pricing derives a
+  // price for every tier, so without this a customer could be charged for a
+  // duration we can't fulfil.
+  const rawWholesale =
+    period === "daily"
+      ? item.price_daily
+      : period === "weekly"
+        ? item.price_weekly
+        : item.price_monthly;
+  if (rawWholesale == null) {
+    return Response.json(
+      { error: "Αυτή η διάρκεια δεν είναι διαθέσιμη για αυτή τη συσκευή." },
+      { status: 400 },
+    );
+  }
+
   const wholesale = wholesaleFor(item, period);
   // Flat mode: fixed price per platform (EUR). Margin mode: wholesale+margin.
   // Same computation the browse catalog uses, so shown price == charged price.
