@@ -385,7 +385,7 @@ export default function PricingGrid({
                     )}
 
                     {/* Secondary: pay with crypto — opens the provider picker. */}
-                    {buyable && CRYPTO_ENABLED && (
+                    {buyable && CRYPTO_ENABLED && cryptoProviders.length > 0 && (
                       <button
                         type="button"
                         onClick={() => setCryptoPhone(phone)}

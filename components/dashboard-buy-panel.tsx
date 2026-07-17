@@ -434,7 +434,7 @@ export default function DashboardBuyPanel({
                         <p className="w-full text-center text-[0.7rem] text-muted-foreground">
                           Card · Apple&nbsp;Pay · Google&nbsp;Pay &amp; more
                         </p>
-                        {CRYPTO_ENABLED && (
+                        {CRYPTO_ENABLED && cryptoProviders.length > 0 && (
                           <Button
                             type="button"
                             variant="outline"

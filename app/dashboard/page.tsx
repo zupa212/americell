@@ -36,7 +36,7 @@ function cryptoProviders(): CryptoProvider[] {
     { id: "btcpay", label: "Bitcoin & Lightning", note: "Self-custody · no KYC", noKyc: true, configured: isBtcpayConfigured },
     { id: "coinbase", label: "Coinbase Commerce", note: "Pay from any wallet · no KYC", noKyc: true, configured: isCoinbaseConfigured },
     { id: "moonpay", label: "MoonPay", note: "Card or bank → crypto", noKyc: false, configured: isMoonpayConfigured },
-  ];
+  ].filter((p) => p.configured); // only show payment methods that are actually live
 }
 
 /**
