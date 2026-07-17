@@ -41,7 +41,7 @@ export default async function AdminLeadsPage() {
               <thead>
                 <tr className="border-b border-white/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
                   <th className="px-5 py-3 font-medium">Email</th>
-                  <th className="px-5 py-3 font-medium">Interested in</th>
+                  <th className="px-5 py-3 font-medium">Quantity</th>
                   <th className="px-5 py-3 font-medium">Source</th>
                   <th className="px-5 py-3 font-medium">Date</th>
                 </tr>

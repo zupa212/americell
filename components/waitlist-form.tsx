@@ -6,31 +6,26 @@ import { toast } from "sonner";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
-
-export type WaitlistDevice = { model: string; platform: string };
-
-// Fallback choices only when the live catalog is momentarily empty.
-const FALLBACK: WaitlistDevice[] = [
-  { model: "iPhone", platform: "iphone" },
-  { model: "Android", platform: "android" },
-];
 
 /**
- * Standalone waitlist / early-access form. Pick the SPECIFIC phone you want
- * (from the live catalog) + your email → /api/leads (source: waitlist_page),
- * same store the admin Leads list shows.
+ * Standalone waitlist / early-access form: your email + the EXACT number of
+ * phones you want. Submits to /api/leads (source: waitlist_page), the same store
+ * the admin Leads list shows.
  */
-export default function WaitlistForm({ devices }: { devices: WaitlistDevice[] }) {
-  const options = devices.length > 0 ? devices : FALLBACK;
+export default function WaitlistForm() {
   const [email, setEmail] = useState("");
-  const [device, setDevice] = useState(options[0]?.model ?? "");
+  const [qty, setQty] = useState("1");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
 
   const submit = async () => {
     if (!email.trim()) {
       toast.error("Enter your email.");
+      return;
+    }
+    const n = Math.floor(Number(qty));
+    if (!Number.isFinite(n) || n < 1) {
+      toast.error("Enter how many phones you need.");
       return;
     }
     setBusy(true);
@@ -40,7 +35,7 @@ export default function WaitlistForm({ devices }: { devices: WaitlistDevice[] })
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           email: email.trim(),
-          fleetSize: device, // the specific phone they want
+          fleetSize: String(n), // exact quantity
           source: "waitlist_page",
         }),
       });
@@ -64,8 +59,7 @@ export default function WaitlistForm({ devices }: { devices: WaitlistDevice[] })
         <CheckCircle2 className="h-11 w-11 text-emerald-400" aria-hidden="true" />
         <p className="text-xl font-bold text-white">You&rsquo;re on the waitlist 🎉</p>
         <p className="max-w-xs text-sm text-white/70">
-          Thanks — we&rsquo;ll reach out about your{" "}
-          <span className="font-semibold text-white">{device}</span>.
+          Thanks — we&rsquo;ll reach out about setting up your devices.
         </p>
       </div>
     );
@@ -74,23 +68,21 @@ export default function WaitlistForm({ devices }: { devices: WaitlistDevice[] })
   return (
     <div className="flex flex-col gap-4">
       <div className="space-y-1.5">
-        <Label htmlFor="wl-device" className="text-white/80">
-          Which phone do you want?
+        <Label htmlFor="wl-qty" className="text-white/80">
+          How many phones do you need?
         </Label>
-        <select
-          id="wl-device"
-          value={device}
-          onChange={(e) => setDevice(e.target.value)}
-          className={cn(
-            "h-11 w-full rounded-lg border border-white/15 bg-white/10 px-3 text-sm text-white outline-none focus-visible:ring-2 focus-visible:ring-white/40",
-          )}
-        >
-          {options.map((o) => (
-            <option key={o.model} value={o.model} className="text-black">
-              {o.model}
-            </option>
-          ))}
-        </select>
+        <Input
+          id="wl-qty"
+          type="number"
+          inputMode="numeric"
+          min={1}
+          step={1}
+          value={qty}
+          onChange={(e) => setQty(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && submit()}
+          placeholder="e.g. 5"
+          className="h-11 border-white/15 bg-white/10 text-white placeholder:text-white/40 focus-visible:ring-white/40"
+        />
       </div>
 
       <div className="space-y-1.5">
