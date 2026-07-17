@@ -6,7 +6,6 @@ import {
   BadgeCheck,
   Coins,
   Loader2,
-  ShieldCheck,
   Smartphone,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -38,6 +37,7 @@ import { cn } from "@/lib/utils";
 // (a runtime value) is passed down as a prop instead of imported here.
 import type { BillingPeriod, PublicRetailPhone } from "@/lib/pricing";
 import { CRYPTO_ENABLED } from "@/lib/features";
+import { CryptoIcon } from "@/components/crypto-icon";
 // The crypto-provider shape is a shared TYPE (erased at build); reused verbatim
 // from the reference grid so the two flows never drift.
 import type { CryptoProvider } from "@/components/pricing-grid";
@@ -498,18 +498,7 @@ export default function DashboardBuyPanel({
                     "group flex w-full items-center gap-3 rounded-2xl border border-white/60 bg-white/60 px-4 py-3.5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/80 hover:shadow-[0_16px_40px_-20px_rgba(43,107,255,0.45)] disabled:pointer-events-none disabled:opacity-60",
                   )}
                 >
-                  <span
-                    aria-hidden="true"
-                    className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand/15 to-brand-2/15 text-brand"
-                  >
-                    {busy ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : provider.noKyc ? (
-                      <ShieldCheck className="h-5 w-5" />
-                    ) : (
-                      <Coins className="h-5 w-5" />
-                    )}
-                  </span>
+                  <CryptoIcon id={provider.id} busy={busy} />
                   <span className="min-w-0 flex-1">
                     <span className="flex items-center gap-2">
                       <span className="truncate text-sm font-bold text-foreground">
