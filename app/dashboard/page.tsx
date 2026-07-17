@@ -31,12 +31,13 @@ const ACTIVE_STATUSES = new Set(["active", "pooled"]);
  * `pricing.tsx` helper so both checkout surfaces stay in lockstep.
  */
 function cryptoProviders(): CryptoProvider[] {
-  return [
+  const all: CryptoProvider[] = [
     { id: "nowpayments", label: "NOWPayments", note: "100+ coins · no sign-up · no KYC", noKyc: true, configured: isNowpaymentsConfigured },
     { id: "btcpay", label: "Bitcoin & Lightning", note: "Self-custody · no KYC", noKyc: true, configured: isBtcpayConfigured },
     { id: "coinbase", label: "Coinbase Commerce", note: "Pay from any wallet · no KYC", noKyc: true, configured: isCoinbaseConfigured },
     { id: "moonpay", label: "MoonPay", note: "Card or bank → crypto", noKyc: false, configured: isMoonpayConfigured },
-  ].filter((p) => p.configured); // only show payment methods that are actually live
+  ];
+  return all.filter((p) => p.configured); // only show payment methods that are actually live
 }
 
 /**
