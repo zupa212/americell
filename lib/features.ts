@@ -9,7 +9,7 @@
  * (both the UI buttons and the /api/crypto/checkout + /api/moonpay/url routes
  * read this flag).
  */
-export const CRYPTO_ENABLED = false;
+export const CRYPTO_ENABLED = true;
 
 /** Public Telegram support/contact link — shown in the footer and help bubble. */
 export const TELEGRAM_URL = "https://t.me/americell";

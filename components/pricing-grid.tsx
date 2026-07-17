@@ -432,7 +432,7 @@ export default function PricingGrid({
           <div className="mt-2 flex flex-col gap-3">
             {cryptoProviders.map((provider) => {
               const busy = cryptoBusy === provider.id;
-              const disabled = cryptoBusy !== null;
+              const disabled = cryptoBusy !== null || !provider.configured;
               return (
                 <button
                   key={provider.id}
