@@ -2,7 +2,7 @@ import React, { type ComponentPropsWithoutRef, type CSSProperties } from "react"
 
 import { cn } from "@/lib/utils"
 
-export interface ShimmerButtonProps extends ComponentPropsWithoutRef<"button"> {
+export interface ShimmerButtonProps extends ComponentPropsWithoutRef<"div"> {
   shimmerColor?: string
   shimmerSize?: string
   borderRadius?: string
@@ -12,8 +12,12 @@ export interface ShimmerButtonProps extends ComponentPropsWithoutRef<"button"> {
   children?: React.ReactNode
 }
 
+// Renders a <div>, not a <button>: it's always used as a decorative visual
+// inside an <a>/<Link> that owns the click, focus and label. A <button> here
+// would be interactive content nested in an <a> — invalid HTML that the browser
+// reshuffles on hydration (React error #418).
 export const ShimmerButton = React.forwardRef<
-  HTMLButtonElement,
+  HTMLDivElement,
   ShimmerButtonProps
 >(
   (
@@ -30,7 +34,7 @@ export const ShimmerButton = React.forwardRef<
     ref
   ) => {
     return (
-      <button
+      <div
         style={
           {
             "--spread": "90deg",
@@ -88,7 +92,7 @@ export const ShimmerButton = React.forwardRef<
             "absolute inset-(--cut) -z-20 [border-radius:var(--radius)] [background:var(--bg)]"
           )}
         />
-      </button>
+      </div>
     )
   }
 )
