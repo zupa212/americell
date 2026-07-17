@@ -2,13 +2,37 @@
 
 import * as z from "zod";
 import bcrypt from "bcryptjs";
+import { headers } from "next/headers";
 import { AuthError } from "next-auth";
 import { signIn, signOut } from "@/auth";
 import { isDbConfigured } from "@/lib/db";
 import { createUser, getUserByEmail } from "@/lib/users";
 import { logEvent } from "@/lib/logs";
+import { rateLimit } from "@/lib/rate-limit";
 
 export type AuthState = { error: string | null };
+
+// Per-IP throttles for the real login/signup paths. NextAuth's signIn() runs
+// in-process from these Server Actions, so the browser POSTs to /login and
+// /signup (not the REST callback) — proxy.ts can't see those, so credential
+// stuffing / signup spam is capped HERE. Per-account brute-force lives in
+// auth.ts (per-email failures). Generous limits so shared/NAT IPs aren't hurt.
+const LOGIN_IP_MAX = 20;
+const SIGNUP_IP_MAX = 6;
+const IP_WINDOW_MS = 10 * 60 * 1000;
+const THROTTLED = "Too many attempts. Please wait a few minutes and try again.";
+
+async function clientIp(): Promise<string> {
+  const h = await headers();
+  const real = h.get("x-real-ip");
+  if (real) return real.trim();
+  const fwd = h.get("x-forwarded-for");
+  if (fwd) {
+    const parts = fwd.split(",");
+    return (parts[parts.length - 1] ?? "").trim() || "unknown";
+  }
+  return "unknown";
+}
 
 const SignupSchema = z.object({
   email: z.email(),
@@ -28,6 +52,10 @@ export async function signup(
   }
   if (!isDbConfigured) {
     return { error: "Sign-up isn't available until the database is configured." };
+  }
+
+  if (!rateLimit(`signup-ip:${await clientIp()}`, SIGNUP_IP_MAX, IP_WINDOW_MS).ok) {
+    return { error: THROTTLED };
   }
 
   const { email, password } = parsed.data;
@@ -58,6 +86,10 @@ export async function login(
 ): Promise<AuthState> {
   if (!isDbConfigured) {
     return { error: "Log-in isn't available until the database is configured." };
+  }
+
+  if (!rateLimit(`login-ip:${await clientIp()}`, LOGIN_IP_MAX, IP_WINDOW_MS).ok) {
+    return { error: THROTTLED };
   }
 
   const email = String(formData.get("email") ?? "");

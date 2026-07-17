@@ -23,9 +23,18 @@ const SECURITY_HEADERS: Record<string, string> = {
 };
 
 function clientIp(req: NextRequest): string {
+  // On Vercel, x-real-ip is the platform-set true client IP (it overwrites any
+  // client-supplied X-Forwarded-For rather than appending), so prefer it; fall
+  // back to the LAST XFF hop (the trusted proxy-appended value), never the
+  // spoofable leftmost token.
+  const real = req.headers.get("x-real-ip");
+  if (real) return real.trim();
   const fwd = req.headers.get("x-forwarded-for");
-  if (fwd) return fwd.split(",")[0]!.trim();
-  return req.headers.get("x-real-ip") ?? "unknown";
+  if (fwd) {
+    const parts = fwd.split(",");
+    return (parts[parts.length - 1] ?? "").trim() || "unknown";
+  }
+  return "unknown";
 }
 
 // path -> { limit, windowMs } for brute-force-prone POSTs.
@@ -35,7 +44,8 @@ const POST_LIMITS: Record<string, { limit: number; windowMs: number }> = {
 };
 
 export function proxy(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+  // Normalise trailing slash so /api/leads/ can't skip the exact-match lookup.
+  const pathname = req.nextUrl.pathname.replace(/\/+$/, "") || "/";
 
   if (req.method === "POST") {
     const rule = POST_LIMITS[pathname];
