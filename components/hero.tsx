@@ -434,7 +434,7 @@ function PhoneMockup({ singleBeam = false }: { singleBeam?: boolean }) {
                   </p>
                 </div>
 
-                {/* automation running glass card */}
+                {/* live session glass card */}
                 <div className="absolute inset-x-5 bottom-24">
                   <div className="rounded-2xl border border-white/15 bg-white/[0.08] p-4 shadow-[0_10px_34px_-10px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.14)] ring-1 ring-white/10 backdrop-blur-xl">
                     <div className="flex items-center gap-2">
@@ -443,7 +443,7 @@ function PhoneMockup({ singleBeam = false }: { singleBeam?: boolean }) {
                         <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
                       </span>
                       <p className="text-xs font-medium text-white">
-                        Automation running…
+                        Live session · streaming
                       </p>
                     </div>
                     <div className="mt-3 flex items-center justify-between">
@@ -704,11 +704,11 @@ export default function Hero() {
           {...item}
           className="mx-auto mt-7 max-w-2xl text-pretty text-center text-lg leading-relaxed text-muted-foreground sm:text-xl"
         >
-          {SITE.name} is remote phone infrastructure for teams that need cloud
-          access to real, physical iPhones and Android devices — not emulators
-          or simulated devices. We host, power, connect and maintain the fleet.
-          You keep full control from one dashboard — no office hardware, no
-          cables, no babysitting.
+          {SITE.name} is remote phone infrastructure for teams that need real,
+          physical iPhones and Androids in the cloud — not emulators. We host,
+          power, and maintain the fleet. You keep full control from one
+          dashboard, on your laptop or phone — no office hardware, no cables,
+          no babysitting.
         </motion.p>
 
         {/* CTAs */}

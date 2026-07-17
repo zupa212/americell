@@ -43,8 +43,8 @@ export default function AboutPage() {
             specialized equipment.
           </li>
           <li>
-            Live interaction, with the option to automate repetitive workflows
-            across an entire fleet of devices.
+            Live, hands-on control of a single device or an entire fleet — from
+            your laptop or phone.
           </li>
         </ul>
 
@@ -62,8 +62,8 @@ export default function AboutPage() {
             conditions.
           </li>
           <li>
-            Development teams building, testing, and automating mobile apps in a
-            real environment.
+            Development teams building and testing mobile apps in a real
+            environment.
           </li>
         </ul>
 
@@ -93,8 +93,8 @@ export default function AboutPage() {
           We want access to real mobile devices to be as simple as opening a tab
           in your browser — with transparency, reliability, and respect for the
           rules. We’re building the infrastructure so that teams of every size
-          can test, develop, and automate on real hardware, without compromises
-          and without needless complexity.
+          can test and develop on real hardware, without compromises and
+          without needless complexity.
         </p>
 
         <div className="mt-12 flex flex-col items-start gap-4 border-t pt-10">

@@ -5,7 +5,7 @@ export const SITE = {
   domain: "americell.example",
   tagline: "Real US phones. Controlled from your browser.",
   subtagline:
-    "Live iPhones and Androids in US datacenters. Tap, type, install, and automate — from anywhere, any time.",
+    "Live iPhones and Androids in US datacenters. Tap, type, and install — from your laptop or phone, anywhere.",
 };
 
 export const NAV_LINKS: { label: string; href: string }[] = [
@@ -41,12 +41,12 @@ export const FEATURES: Feature[] = [
   },
   {
     title: "Control from anywhere",
-    body: "A full live screen in your browser. Tap, type, swipe, and install — from any laptop, any time zone, any teammate.",
+    body: "A full live screen in your browser — laptop or phone. Tap, type, swipe, and install from any time zone, any teammate.",
     icon: "globe",
   },
   {
-    title: "Automate the routine",
-    body: "Script repeatable flows and schedule them. Run workflows on real devices for testing, QA, and scale.",
+    title: "Always on, always US",
+    body: "Your devices stay powered and online on real US connectivity — come back any time and pick up right where you left off.",
     icon: "bolt",
   },
   {
@@ -61,7 +61,7 @@ export type Step = { n: number; title: string; body: string };
 export const STEPS: Step[] = [
   { n: 1, title: "Pick a device", body: "Choose a real US phone and location from our fleet — Pixel, Galaxy, or iPhone." },
   { n: 2, title: "Connect instantly", body: "Your device boots in a US datacenter and streams to your browser in seconds." },
-  { n: 3, title: "Control & automate", body: "Drive it live or script flows that run on schedule — no cables, no local hardware." },
+  { n: 3, title: "Take control", body: "Drive the real device live from your browser — tap, type, install, sign in. No cables, no local hardware." },
 ];
 
 export type Faq = { q: string; a: string };

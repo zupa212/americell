@@ -66,7 +66,7 @@ const PILLARS: readonly Pillar[] = [
     points: [
       "Live low-latency stream, no installs or cables",
       "Fleet inventory, status, and health at a glance",
-      "Automate repetitive flows across many devices",
+      "Run the same task live across many devices",
     ],
   },
   {
@@ -84,7 +84,7 @@ const PILLARS: readonly Pillar[] = [
     title: "Session recording & full logs",
     body: "Every session is recorded and every action is logged. Reconstruct exactly what happened, on which device, by whom, and when — for audits, QA, and accountability.",
     points: [
-      "Automatic session recording",
+      "Session recording on every run",
       "Complete, timestamped activity logs",
       "Searchable history across the fleet",
     ],
@@ -150,7 +150,7 @@ const FLOW: readonly FlowStep[] = [
     icon: LayoutDashboard,
     n: "03",
     title: "Control",
-    body: "Operate the real device in real time, or automate repetitive flows across the fleet.",
+    body: "Operate the real device in real time — one device or many across the fleet.",
   },
   {
     icon: ShieldCheck,

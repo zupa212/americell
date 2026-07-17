@@ -52,7 +52,7 @@ const AUDIENCES: readonly Audience[] = [
     icon: Radar,
     title: "Mobile operations",
     scenario:
-      "Automate the repetitive, high-volume flows your business runs on and watch them execute live across the fleet. Scale from a single device to hundreds from one dashboard, with session recording on every run.",
+      "Run the repetitive, high-volume flows your business depends on — live across the fleet. Scale from a single device to hundreds from one dashboard, with session recording on every run.",
   },
   {
     icon: ShieldCheck,
