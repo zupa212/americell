@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, BadgeCheck, Check, Coins, Loader2 } from "lucide-react";
+import { ArrowRight, BadgeCheck, Check, Coins, Loader2, Signal } from "lucide-react";
 import { toast } from "sonner";
 import Reveal from "@/components/ui/reveal";
 import { Button } from "@/components/ui/button";
@@ -324,6 +324,12 @@ export default function PricingGrid({
                       another duration above.
                     </p>
                   )}
+
+                  {/* Connectivity is included, not an add-on */}
+                  <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-600">
+                    <Signal className="h-3.5 w-3.5" aria-hidden="true" />
+                    US SIM + data · included
+                  </div>
 
                   {/* What you get */}
                   <div className="mt-6 flex items-start gap-2.5 border-t border-white/50 pt-6">

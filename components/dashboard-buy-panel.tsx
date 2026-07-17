@@ -6,6 +6,7 @@ import {
   BadgeCheck,
   Coins,
   Loader2,
+  Signal,
   Smartphone,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -390,6 +391,10 @@ export default function DashboardBuyPanel({
                         another duration above.
                       </p>
                     )}
+                    <div className="inline-flex w-fit items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-600">
+                      <Signal className="h-3.5 w-3.5" aria-hidden="true" />
+                      US SIM + data · included
+                    </div>
                   </CardContent>
 
                   <CardFooter className="flex flex-col items-stretch gap-2 border-t border-white/40 bg-transparent">
