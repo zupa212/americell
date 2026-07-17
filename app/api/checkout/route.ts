@@ -2,14 +2,7 @@ import { auth } from "@/auth";
 import { isStripeConfigured, stripe } from "@/lib/stripe";
 import { isDbConfigured } from "@/lib/db";
 import { getBalance, getInventory, isCellgodsConfigured } from "@/lib/cellgods";
-import {
-  DURATIONS,
-  flatRetailPhone,
-  getFlatPricing,
-  getMarginOptsForPhone,
-  toPublicRetailPhone,
-  wholesaleFor,
-} from "@/lib/pricing";
+import { DURATIONS, priceForCheckout } from "@/lib/pricing";
 import { attachSession, createPendingRental } from "@/lib/rentals";
 import { logEvent } from "@/lib/logs";
 
@@ -85,32 +78,18 @@ export async function POST(req: Request) {
   const period = duration.period;
   const durationDays = duration.days;
 
-  // Money-safety: refuse a duration the device doesn't actually offer at
-  // CellGods (its wholesale price for that tier is null). Flat pricing derives a
-  // price for every tier, so without this a customer could be charged for a
-  // duration we can't fulfil.
-  const rawWholesale =
-    period === "daily"
-      ? item.price_daily
-      : period === "weekly"
-        ? item.price_weekly
-        : item.price_monthly;
-  if (rawWholesale == null) {
+  // ONE price resolver shared by every payment path (shown == charged).
+  const { retailCents, currency, wholesale, supported } = await priceForCheckout(
+    item,
+    period,
+  );
+  // Money-safety: refuse a duration the device doesn't actually offer at CellGods.
+  if (!supported) {
     return Response.json(
       { error: "Αυτή η διάρκεια δεν είναι διαθέσιμη για αυτή τη συσκευή." },
       { status: 400 },
     );
   }
-
-  const wholesale = wholesaleFor(item, period);
-  // Flat mode: fixed price per platform (EUR). Margin mode: wholesale+margin.
-  // Same computation the browse catalog uses, so shown price == charged price.
-  const flat = await getFlatPricing();
-  const pub = flat
-    ? flatRetailPhone(item, flat)
-    : toPublicRetailPhone(item, await getMarginOptsForPhone(item.phone_id));
-  const retailCents = pub.retail[period];
-  const currency = pub.currency.toLowerCase();
   if (retailCents < wholesale) {
     // Defensive money-safety guard — must never sell below cost.
     console.error(

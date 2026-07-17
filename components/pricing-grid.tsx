@@ -74,7 +74,18 @@ export default function PricingGrid({
   durations,
   cryptoProviders = [],
 }: PricingGridProps) {
-  const [period, setPeriod] = useState<BillingPeriod>("monthly");
+  // Only offer durations at least one live device is actually priced for at
+  // CellGods; a device shows a note for any term it doesn't support.
+  const periodSupported = (p: PublicRetailPhone, per: BillingPeriod) =>
+    p.availablePeriods.includes(per);
+  const availableDurations = durations.filter((d) =>
+    phones.some((p) => periodSupported(p, d.period)),
+  );
+  const [period, setPeriod] = useState<BillingPeriod>(() =>
+    availableDurations.some((d) => d.period === "monthly")
+      ? "monthly"
+      : (availableDurations[0]?.period ?? "monthly"),
+  );
   // Which card is mid-request (drives the spinner on that card only).
   const [pendingId, setPendingId] = useState<string | null>(null);
   // The phone whose crypto-provider picker is open (null = closed).
@@ -179,7 +190,7 @@ export default function PricingGrid({
           aria-label="Rental duration"
         >
           <TabsList className="h-11 w-full max-w-full rounded-full border border-white/50 bg-white/60 p-1 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)] ring-1 ring-white/40 backdrop-blur-md sm:w-auto">
-            {durations.map((d) => (
+            {availableDurations.map((d) => (
               <TabsTrigger
                 key={d.period}
                 value={d.period}
@@ -196,7 +207,11 @@ export default function PricingGrid({
       <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {phones.map((phone, index) => {
           const isPending = pendingId === phone.phoneId;
-          const price = fmtMoney(phone.retail[period], phone.currency);
+          const supported = periodSupported(phone, period);
+          const price = supported
+            ? fmtMoney(phone.retail[period], phone.currency)
+            : null;
+          const buyable = phone.available && supported;
           const platformLabel =
             phone.platform === "iphone" ? "iPhone" : "Android";
 
@@ -287,19 +302,26 @@ export default function PricingGrid({
                   </div>
 
                   {/* Price for the selected duration */}
-                  <div className="mt-7 flex items-baseline gap-1.5">
-                    <span
-                      className={cn(
-                        "text-4xl font-extrabold tracking-tight sm:text-5xl",
-                        GRADIENT_TEXT,
-                      )}
-                    >
-                      {price}
-                    </span>
-                    <span className="text-sm font-medium text-muted-foreground">
-                      / {activeLabel}
-                    </span>
-                  </div>
+                  {supported ? (
+                    <div className="mt-7 flex items-baseline gap-1.5">
+                      <span
+                        className={cn(
+                          "text-4xl font-extrabold tracking-tight sm:text-5xl",
+                          GRADIENT_TEXT,
+                        )}
+                      >
+                        {price}
+                      </span>
+                      <span className="text-sm font-medium text-muted-foreground">
+                        / {activeLabel}
+                      </span>
+                    </div>
+                  ) : (
+                    <p className="mt-7 text-sm text-muted-foreground">
+                      Not offered on a {activeLabel.toLowerCase()} term — pick
+                      another duration above.
+                    </p>
+                  )}
 
                   {/* What you get */}
                   <div className="mt-6 flex items-start gap-2.5 border-t border-white/50 pt-6">
@@ -320,11 +342,11 @@ export default function PricingGrid({
                     <Button
                       type="button"
                       onClick={() => handleCheckout(phone)}
-                      disabled={isPending || !phone.available}
+                      disabled={isPending || !buyable}
                       aria-label={`Get ${phone.model}`}
                       className={cn(
                         "group/cta h-12 w-full rounded-full px-6 text-sm font-semibold transition-all duration-300",
-                        phone.available
+                        buyable
                           ? "bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white shadow-glow hover:opacity-95"
                           : "bg-foreground/70 text-background",
                       )}
@@ -337,7 +359,11 @@ export default function PricingGrid({
                           />
                           Starting…
                         </>
-                      ) : phone.available ? (
+                      ) : !phone.available ? (
+                        "Unavailable"
+                      ) : !supported ? (
+                        "Unavailable for this term"
+                      ) : (
                         <>
                           Get this phone
                           <ArrowRight
@@ -345,21 +371,19 @@ export default function PricingGrid({
                             aria-hidden="true"
                           />
                         </>
-                      ) : (
-                        "Unavailable"
                       )}
                     </Button>
 
                     {/* Payment methods hint — Stripe surfaces whatever is enabled
                         in the dashboard (wallets, Link, Cash App, PayPal, BNPL). */}
-                    {phone.available && (
+                    {buyable && (
                       <p className="mt-2 text-center text-[0.7rem] text-muted-foreground">
                         Card · Apple&nbsp;Pay · Google&nbsp;Pay &amp; more
                       </p>
                     )}
 
                     {/* Secondary: pay with crypto — opens the provider picker. */}
-                    {phone.available && (
+                    {buyable && (
                       <button
                         type="button"
                         onClick={() => setCryptoPhone(phone)}

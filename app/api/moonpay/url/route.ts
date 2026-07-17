@@ -2,12 +2,7 @@ import { randomUUID } from "node:crypto";
 import { auth } from "@/auth";
 import { isDbConfigured } from "@/lib/db";
 import { getBalance, getInventory, isCellgodsConfigured } from "@/lib/cellgods";
-import {
-  DURATIONS,
-  getMarginOptsForPhone,
-  toPublicRetailPhone,
-  wholesaleFor,
-} from "@/lib/pricing";
+import { DURATIONS, priceForCheckout } from "@/lib/pricing";
 import { attachSession, createPendingRental } from "@/lib/rentals";
 import { buildMoonpayUrl, isMoonpayConfigured } from "@/lib/moonpay";
 import { logEvent } from "@/lib/logs";
@@ -55,11 +50,17 @@ export async function POST(req: Request) {
   const duration = DURATIONS.find((d) => d.period === body.period);
   if (!duration) return Response.json({ error: "Invalid period." }, { status: 400 });
 
-  const wholesale = wholesaleFor(item, duration.period);
-  const retailCents = toPublicRetailPhone(
+  // Same price resolver as Stripe checkout + browse (shown == charged).
+  const { retailCents, wholesale, supported } = await priceForCheckout(
     item,
-    await getMarginOptsForPhone(item.phone_id),
-  ).retail[duration.period];
+    duration.period,
+  );
+  if (!supported) {
+    return Response.json(
+      { error: "This duration isn't available for this device." },
+      { status: 400 },
+    );
+  }
   if (retailCents < wholesale) {
     return Response.json({ error: "Temporarily unavailable." }, { status: 503 });
   }

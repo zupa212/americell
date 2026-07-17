@@ -43,7 +43,17 @@ export type PublicRetailPhone = {
   available: boolean;
   currency: string;
   retail: Record<BillingPeriod, number>; // cents
+  availablePeriods: BillingPeriod[]; // durations CellGods actually prices for
 };
+
+/** Rental periods the device is actually priced for at CellGods (non-null wholesale). */
+export function supportedPeriods(item: InventoryPhone): BillingPeriod[] {
+  const out: BillingPeriod[] = [];
+  if (item.price_daily != null) out.push("daily");
+  if (item.price_weekly != null) out.push("weekly");
+  if (item.price_monthly != null) out.push("monthly");
+  return out;
+}
 
 /**
  * Wholesale cost (integer cents) for a phone at a given period. Returns 0 when
@@ -199,6 +209,41 @@ export function flatRetailPhone(item: InventoryPhone, flat: FlatPricing): Public
     available: item.status === "available",
     currency: flat.currency,
     retail: deriveFlatTiers(monthly),
+    availablePeriods: supportedPeriods(item),
+  };
+}
+
+/**
+ * THE single price resolver for every checkout path (Stripe / crypto / MoonPay).
+ * Returns the retail (integer cents) + currency the SAME way the browse catalog
+ * shows it (flat when active, else wholesale+margin), plus the wholesale and
+ * whether the device actually offers this duration at CellGods. Every payment
+ * route MUST use this so the shown price equals the charged price everywhere.
+ */
+export async function priceForCheckout(
+  item: InventoryPhone,
+  period: BillingPeriod,
+): Promise<{
+  retailCents: number;
+  currency: string;
+  wholesale: number;
+  supported: boolean;
+}> {
+  const rawWholesale =
+    period === "daily"
+      ? item.price_daily
+      : period === "weekly"
+        ? item.price_weekly
+        : item.price_monthly;
+  const flat = await getFlatPricing();
+  const pub = flat
+    ? flatRetailPhone(item, flat)
+    : toPublicRetailPhone(item, await getMarginOptsForPhone(item.phone_id));
+  return {
+    retailCents: pub.retail[period],
+    currency: pub.currency.toLowerCase(),
+    wholesale: wholesaleFor(item, period),
+    supported: rawWholesale != null,
   };
 }
 
@@ -362,6 +407,7 @@ export function toPublicRetailPhone(
     available: item.status === "available",
     currency: item.currency,
     retail,
+    availablePeriods: supportedPeriods(item),
   };
 }
 

@@ -131,7 +131,18 @@ export default function DashboardBuyPanel({
   durations,
   cryptoProviders = [],
 }: DashboardBuyPanelProps) {
-  const [period, setPeriod] = useState<BillingPeriod>("monthly");
+  // Only offer durations at least one live device is actually priced for at
+  // CellGods; a device shows "—" for any term it doesn't support.
+  const periodSupported = (p: PublicRetailPhone, per: BillingPeriod) =>
+    p.availablePeriods.includes(per);
+  const availableDurations = durations.filter((d) =>
+    phones.some((p) => periodSupported(p, d.period)),
+  );
+  const [period, setPeriod] = useState<BillingPeriod>(() =>
+    availableDurations.some((d) => d.period === "monthly")
+      ? "monthly"
+      : (availableDurations[0]?.period ?? "monthly"),
+  );
   // Which card is mid-request (drives the spinner on that card only).
   const [pendingId, setPendingId] = useState<string | null>(null);
   // The phone whose crypto-provider picker is open (null = closed).
@@ -248,7 +259,7 @@ export default function DashboardBuyPanel({
           className="w-full sm:w-auto"
         >
           <TabsList className="h-11 w-full rounded-full border border-white/50 bg-white/60 p-1 ring-1 ring-white/40 backdrop-blur-md sm:h-10 sm:w-auto">
-            {durations.map((d) => (
+            {availableDurations.map((d) => (
               <TabsTrigger
                 key={d.period}
                 value={d.period}
@@ -275,7 +286,11 @@ export default function DashboardBuyPanel({
         <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {sorted.map((phone, index) => {
             const isPending = pendingId === phone.phoneId;
-            const price = fmtMoney(phone.retail[period], phone.currency);
+            const supported = periodSupported(phone, period);
+            const price = supported
+              ? fmtMoney(phone.retail[period], phone.currency)
+              : null;
+            const buyable = phone.available && supported;
             const platformLabel =
               phone.platform === "iphone" ? "iPhone" : "Android";
             // Rail = green when buyable, muted otherwise; availability chip
@@ -359,25 +374,32 @@ export default function DashboardBuyPanel({
                   <CardContent className="flex flex-1 flex-col gap-3">
                     <Separator className="bg-white/50" />
                     {/* Price for the selected duration (amount + suffix grouped). */}
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-3xl font-bold tracking-tight tabular-nums text-foreground">
-                        {price}
-                      </span>
-                      <span className="text-sm font-medium text-muted-foreground">
-                        / {activeLabel}
-                      </span>
-                    </div>
+                    {supported ? (
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-3xl font-bold tracking-tight tabular-nums text-foreground">
+                          {price}
+                        </span>
+                        <span className="text-sm font-medium text-muted-foreground">
+                          / {activeLabel}
+                        </span>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        Not offered on a {activeLabel.toLowerCase()} term — pick
+                        another duration above.
+                      </p>
+                    )}
                   </CardContent>
 
                   <CardFooter className="flex flex-col items-stretch gap-2 border-t border-white/40 bg-transparent">
                     <Button
                       type="button"
                       onClick={() => handleCheckout(phone)}
-                      disabled={isPending || !phone.available}
+                      disabled={isPending || !buyable}
                       aria-label={`Rent ${phone.model}`}
                       className={cn(
                         "group/cta min-h-11 w-full rounded-full font-semibold",
-                        phone.available
+                        buyable
                           ? CTA_GRADIENT
                           : "bg-muted text-muted-foreground",
                       )}
@@ -390,7 +412,11 @@ export default function DashboardBuyPanel({
                           />
                           Starting…
                         </>
-                      ) : phone.available ? (
+                      ) : !phone.available ? (
+                        "In use"
+                      ) : !supported ? (
+                        "Unavailable for this term"
+                      ) : (
                         <>
                           Rent this phone
                           <ArrowRight
@@ -398,13 +424,11 @@ export default function DashboardBuyPanel({
                             aria-hidden="true"
                           />
                         </>
-                      ) : (
-                        "In use"
                       )}
                     </Button>
 
                     {/* Payment methods hint + quiet crypto secondary (buyable only). */}
-                    {phone.available && (
+                    {buyable && (
                       <>
                         <p className="w-full text-center text-[0.7rem] text-muted-foreground">
                           Card · Apple&nbsp;Pay · Google&nbsp;Pay &amp; more
