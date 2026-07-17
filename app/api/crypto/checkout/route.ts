@@ -6,6 +6,7 @@ import { DURATIONS, priceForCheckout } from "@/lib/pricing";
 import { CRYPTO_ENABLED } from "@/lib/features";
 import { attachSession, createPendingRental } from "@/lib/rentals";
 import { logEvent } from "@/lib/logs";
+import { isAdminEmail } from "@/lib/admin";
 import { buildMoonpayUrl, isMoonpayConfigured } from "@/lib/moonpay";
 import { createNowpaymentsInvoice, isNowpaymentsConfigured } from "@/lib/nowpayments";
 import { createCoinbaseCharge, isCoinbaseConfigured } from "@/lib/coinbase";
@@ -31,6 +32,8 @@ export async function POST(req: Request) {
   if (!userId || !email) {
     return Response.json({ error: "Please log in to continue." }, { status: 401 });
   }
+  const owner = isAdminEmail(email); // owners see the real block reason
+  const usd = (c: number) => `$${(c / 100).toFixed(2)}`;
 
   let body: { phoneId?: string; period?: string; provider?: string };
   try {
@@ -93,7 +96,18 @@ export async function POST(req: Request) {
     return Response.json({ error: "Temporarily unavailable." }, { status: 503 });
   }
   if (balance.credit_balance_cents < wholesale) {
-    return Response.json({ error: "Temporarily unavailable." }, { status: 503 });
+    console.warn(
+      `[crypto-checkout] low reseller credit: balance=${balance.credit_balance_cents} < wholesale=${wholesale}`,
+    );
+    return Response.json(
+      {
+        error: "Temporarily unavailable.",
+        ...(owner && {
+          reason: `Low CellGods credit: you have ${usd(balance.credit_balance_cents)}, but this ${duration.period} needs ${usd(wholesale)} wholesale. Top up your CellGods balance.`,
+        }),
+      },
+      { status: 503 },
+    );
   }
 
   const rental = await createPendingRental({

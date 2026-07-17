@@ -115,7 +115,7 @@ type DashboardBuyPanelProps = {
   cryptoProviders?: CryptoProvider[];
 };
 
-type CheckoutResponse = { url?: string; error?: string; demo?: boolean };
+type CheckoutResponse = { url?: string; error?: string; demo?: boolean; reason?: string };
 
 /**
  * DashboardBuyPanel — client island for the customer dashboard.
@@ -178,7 +178,7 @@ export default function DashboardBuyPanel({
       toast(
         data.demo
           ? "Payments are in demo mode — not configured yet."
-          : (data.error ?? "Couldn't start checkout. Please try again."),
+          : (data.reason ?? data.error ?? "Couldn't start checkout. Please try again."),
       );
     } catch {
       toast("Network error. Please try again.");
@@ -212,7 +212,7 @@ export default function DashboardBuyPanel({
       toast(
         data.demo
           ? "Crypto payments are in demo mode — not configured yet."
-          : (data.error ?? "Couldn't start crypto checkout. Please try again."),
+          : (data.reason ?? data.error ?? "Couldn't start crypto checkout. Please try again."),
       );
     } catch {
       toast("Network error. Please try again.");

@@ -5,6 +5,7 @@ import { getBalance, getInventory, isCellgodsConfigured } from "@/lib/cellgods";
 import { DURATIONS, priceForCheckout } from "@/lib/pricing";
 import { attachSession, createPendingRental } from "@/lib/rentals";
 import { logEvent } from "@/lib/logs";
+import { isAdminEmail } from "@/lib/admin";
 
 /**
  * Customer purchase — reseller flow B (RESELLER_PLAN §5.5).
@@ -28,6 +29,11 @@ export async function POST(req: Request) {
       { status: 401 },
     );
   }
+  // Owners get the real block reason in the response (customers get the neutral
+  // white-label message, so the reseller model never leaks).
+  const owner = isAdminEmail(email);
+  const eur = (c: number) => `€${(c / 100).toFixed(2)}`;
+  const usd = (c: number) => `$${(c / 100).toFixed(2)}`;
 
   // Fail closed: retail Stripe + CellGods + DB must all be configured, else demo.
   if (!isStripeConfigured || !stripe || !isCellgodsConfigured || !isDbConfigured) {
@@ -96,7 +102,12 @@ export async function POST(req: Request) {
       `[checkout] retail<wholesale for ${item.phone_id}/${period}: ${retailCents} < ${wholesale}`,
     );
     return Response.json(
-      { error: "Προσωρινά μη διαθέσιμο." },
+      {
+        error: "Προσωρινά μη διαθέσιμο.",
+        ...(owner && {
+          reason: `Retail ${eur(retailCents)} would be below wholesale ${usd(wholesale)} for this ${period} — refusing to sell below cost.`,
+        }),
+      },
       { status: 503 },
     );
   }
@@ -107,7 +118,10 @@ export async function POST(req: Request) {
     balance = await getBalance();
   } catch {
     return Response.json(
-      { error: "Προσωρινά μη διαθέσιμο." },
+      {
+        error: "Προσωρινά μη διαθέσιμο.",
+        ...(owner && { reason: "Couldn't reach CellGods to read your credit balance." }),
+      },
       { status: 503 },
     );
   }
@@ -116,7 +130,12 @@ export async function POST(req: Request) {
       `[checkout] low reseller credit: balance=${balance.credit_balance_cents} < wholesale=${wholesale}`,
     );
     return Response.json(
-      { error: "Προσωρινά μη διαθέσιμο." },
+      {
+        error: "Προσωρινά μη διαθέσιμο.",
+        ...(owner && {
+          reason: `Low CellGods credit: you have ${usd(balance.credit_balance_cents)}, but this ${period} needs ${usd(wholesale)} wholesale. Top up your CellGods balance.`,
+        }),
+      },
       { status: 503 },
     );
   }
