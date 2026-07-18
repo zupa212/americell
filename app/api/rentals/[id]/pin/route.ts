@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { decryptPin } from "@/lib/crypto";
 import { getRentalForUser } from "@/lib/rentals";
+import { logEvent } from "@/lib/logs";
 
 /**
  * GET /api/rentals/[id]/pin — reveal the CellGods PIN to the owner (§5.5 E).
@@ -49,5 +50,15 @@ export async function GET(
   }
 
   const pin = decryptPin(rental.pinCiphertext);
+  // Audit: PIN revealed to the owner (security-critical, never log the PIN itself).
+  await logEvent({
+    actorType: "customer",
+    actorEmail: session.user.email,
+    actorId: session.user.id,
+    action: "device.pin_revealed",
+    targetType: "rental",
+    targetId: rental.id,
+    metadata: { model: rental.model },
+  });
   return Response.json({ pin }, { headers: NO_STORE });
 }

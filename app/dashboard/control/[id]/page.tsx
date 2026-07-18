@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 
 import { auth } from "@/auth";
 import { getRentalForUser } from "@/lib/rentals";
+import { logEvent } from "@/lib/logs";
 import { AuroraText } from "@/components/ui/aurora-text";
 import StreamViewer from "@/components/stream-viewer";
 
@@ -42,6 +43,19 @@ export default async function ControlPage({
   }
 
   const live = ACTIVE.has(rental.status) && Boolean(rental.streamUrl);
+
+  // Audit: the owner opened the remote-control page for this device (best-effort).
+  if (live) {
+    await logEvent({
+      actorType: "customer",
+      actorEmail: session.user.email,
+      actorId: session.user.id,
+      action: "device.control_opened",
+      targetType: "rental",
+      targetId: rental.id,
+      metadata: { model: rental.model },
+    });
+  }
 
   return (
     <div className="relative flex min-h-screen flex-col">

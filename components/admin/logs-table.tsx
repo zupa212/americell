@@ -137,6 +137,9 @@ const KNOWN_ACTIONS: readonly string[] = [
   "rental.refunded",
   "rental.pending_credit",
   "rental.cancelled",
+  "device.control_opened",
+  "device.stream_opened",
+  "device.pin_revealed",
   "admin.activate",
   "admin.deactivate",
   "admin.topup",
@@ -151,6 +154,9 @@ const ACTION_LABELS: Record<string, string> = {
   "rental.refunded": "Refund issued",
   "rental.pending_credit": "Credit pending",
   "rental.cancelled": "Rental cancelled",
+  "device.control_opened": "Remote control opened",
+  "device.stream_opened": "Live stream opened",
+  "device.pin_revealed": "PIN revealed",
   "admin.activate": "Activate",
   "admin.deactivate": "Deactivate",
   "admin.topup": "Credit top-up",
@@ -203,6 +209,7 @@ const PREFIX_BADGE: Record<string, string> = {
   system: "bg-slate-500/10 text-slate-600 dark:text-slate-300",
   rental: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300",
   checkout: "bg-amber-500/10 text-amber-700 dark:text-amber-300",
+  device: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-300",
 };
 
 // Solid dot color per prefix, for the action-select option markers.
@@ -212,6 +219,7 @@ const PREFIX_DOT: Record<string, string> = {
   system: "bg-slate-500",
   rental: "bg-emerald-500",
   checkout: "bg-amber-500",
+  device: "bg-indigo-500",
 };
 
 function prefixBadgeClass(action: string): string {

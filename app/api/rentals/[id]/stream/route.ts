@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { getRentalForUser } from "@/lib/rentals";
+import { logEvent } from "@/lib/logs";
 
 /**
  * GET /api/rentals/[id]/stream — ownership-checked, same-origin redirect to the
@@ -28,6 +29,17 @@ export async function GET(
   if (!rental || !ACTIVE.has(rental.status) || !rental.streamUrl) {
     return new Response("Not available", { status: 404, headers: NO_STORE });
   }
+
+  // Audit: the owner opened the live device stream (best-effort, never blocks).
+  await logEvent({
+    actorType: "customer",
+    actorEmail: session.user.email,
+    actorId: session.user.id,
+    action: "device.stream_opened",
+    targetType: "rental",
+    targetId: rental.id,
+    metadata: { model: rental.model },
+  });
 
   return new Response(null, {
     status: 302,

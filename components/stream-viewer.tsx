@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Check,
   Copy,
   ExternalLink,
   KeyRound,
   Loader2,
-  Maximize,
-  RefreshCw,
+  Radio,
   ShieldCheck,
   TriangleAlert,
 } from "lucide-react";
@@ -31,11 +30,16 @@ function formatRemaining(ms: number): string {
 }
 
 /**
- * Embeds the live device stream in an <iframe> inside Americell chrome
- * (white-label). The stream URL carries a 4h token; once it goes stale the
- * customer re-enters the PIN inside the frame to re-mint a fresh session. A
- * "new tab" affordance stays available as a fallback if the provider blocks
- * framing, but the default experience never leaves americell.*.
+ * Americell-branded LAUNCHER for the live device.
+ *
+ * The upstream video plays best as a TOP-LEVEL tab: the provider serves the real
+ * player (jsmpeg + a WebSocket video feed) from a nested frame, and that deep
+ * cross-origin nesting breaks the player when embedded in our own <iframe>. So we
+ * present our own branded card and open the live stream in a NEW WINDOW from here.
+ *
+ * The stream URL is same-origin (`/api/rentals/[id]/stream`, a server redirect
+ * resolves the upstream), so the provider's domain never appears in our src, our
+ * links, or the page source (white-label).
  */
 export default function StreamViewer({
   rentalId,
@@ -51,14 +55,12 @@ export default function StreamViewer({
   streamMintedAt: string | null;
 }) {
   // Same-origin URL: a server-side redirect resolves the upstream stream, so the
-  // provider's domain never appears in the src, the link or the page source.
+  // provider's domain never appears in the link or the page source.
   const streamSrc = `/api/rentals/${rentalId}/stream`;
-  const frameRef = useRef<HTMLIFrameElement>(null);
   const [pin, setPin] = useState<string | null>(null);
   const [pinLoading, setPinLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [nowMs, setNowMs] = useState<number | null>(null);
-  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     const tick = () => setNowMs(Date.now());
@@ -76,19 +78,6 @@ export default function StreamViewer({
     nowMs == null || expiresMs == null ? "—" : formatRemaining(expiresMs - nowMs);
   const tokenFresh =
     nowMs != null && mintedMs != null && nowMs - mintedMs < FOUR_HOURS_MS;
-
-  function fullscreen() {
-    const el = frameRef.current;
-    if (el?.requestFullscreen) {
-      el.requestFullscreen().catch(() => {
-        toast.error("Couldn't enter fullscreen.");
-      });
-    }
-  }
-
-  function reloadStream() {
-    setReloadKey((k) => k + 1);
-  }
 
   async function revealPin() {
     if (pin) return;
@@ -125,6 +114,8 @@ export default function StreamViewer({
     }
   }
 
+  const platformLabel = platform === "iphone" ? "iPhone" : "Android";
+
   return (
     <div className="flex flex-col gap-4">
       {/* Control bar */}
@@ -134,7 +125,7 @@ export default function StreamViewer({
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
           </span>
-          Live · {platform === "iphone" ? "iPhone" : "Android"} {model}
+          Live · {platformLabel} {model}
         </span>
 
         <span
@@ -188,57 +179,59 @@ export default function StreamViewer({
               PIN
             </Button>
           )}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={reloadStream}
-            className="h-11 flex-1 gap-1.5 rounded-full border-white/50 bg-white/60 backdrop-blur-md sm:h-7 sm:flex-initial"
-          >
-            <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
-            <span className="hidden sm:inline">Reload</span>
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            onClick={fullscreen}
-            className="h-11 flex-1 gap-1.5 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white sm:h-7 sm:flex-initial"
-          >
-            <Maximize className="h-3.5 w-3.5" aria-hidden="true" />
-            <span className="hidden sm:inline">Fullscreen</span>
-          </Button>
         </div>
       </div>
 
-      {/* The stream itself — 9:16 PORTRAIT (like a real phone), centered and
-          framed in Americell glass. No referrerPolicy override: the upstream page
-          must keep a same-origin referer to load its own player (jsmpeg). */}
+      {/* Branded launcher — 9:16 portrait, our logo. Opens the live device in a
+          new window (the reliable path; the upstream player breaks when embedded
+          in a nested cross-origin iframe). */}
       <div className="flex justify-center">
-        <div className="relative aspect-[9/16] h-[78dvh] max-h-[880px] w-auto max-w-full overflow-hidden rounded-[2rem] border border-white/50 bg-black shadow-[0_20px_70px_-24px_rgba(30,41,120,0.45)] ring-1 ring-white/30">
-          <iframe
-            key={reloadKey}
-            ref={frameRef}
-            src={streamSrc}
-            title={`Americell — remote control ${model}`}
-            className="absolute inset-0 h-full w-full border-0 bg-black"
-            allow="autoplay; fullscreen; clipboard-read; clipboard-write; accelerometer; gyroscope"
+        <div className="relative flex aspect-[9/16] h-[72dvh] max-h-[820px] w-auto max-w-full flex-col items-center justify-center gap-6 overflow-hidden rounded-[2rem] border border-white/50 bg-gradient-to-b from-white/75 to-white/45 px-6 text-center shadow-[0_20px_70px_-24px_rgba(30,41,120,0.45)] ring-1 ring-white/30 backdrop-blur-xl">
+          {/* soft brand glow */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -top-16 left-1/2 h-56 w-56 -translate-x-1/2 rounded-full bg-brand/15 blur-3xl"
           />
+          {/* our logo */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/americell-mark.png"
+            alt="Americell"
+            width={464}
+            height={260}
+            className="relative h-14 w-auto"
+          />
+          <div className="relative">
+            <p className="text-xl font-bold text-foreground">
+              {platformLabel} {model}
+            </p>
+            <p className="mt-1.5 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-600">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              Live · ready to control
+            </p>
+          </div>
+          <a
+            href={streamSrc}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft px-7 text-sm font-semibold text-white shadow-glow ring-1 ring-white/20 transition-all duration-300 hover:-translate-y-0.5"
+          >
+            <Radio className="h-4 w-4" aria-hidden="true" />
+            Open live control
+            <ExternalLink
+              className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+              aria-hidden="true"
+            />
+          </a>
+          <p className="relative max-w-[30ch] text-xs leading-relaxed text-muted-foreground">
+            Opens in a new window for the smoothest live control. If it asks for a
+            code, use your PIN above.
+          </p>
         </div>
       </div>
-
-      {/* Fallback if the provider blocks embedding. */}
-      <p className="text-center text-xs text-muted-foreground">
-        Live view not loading?{" "}
-        <a
-          href={streamSrc}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 font-medium text-brand hover:text-brand-2"
-        >
-          Open in a new tab
-          <ExternalLink className="h-3 w-3" aria-hidden="true" />
-        </a>
-      </p>
     </div>
   );
 }
