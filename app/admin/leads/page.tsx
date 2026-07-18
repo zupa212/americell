@@ -21,7 +21,7 @@ export default async function AdminLeadsPage() {
   const leads = await listLeads();
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-1 py-4 sm:px-3 sm:py-6">
+    <div className="mx-auto w-full max-w-7xl px-1 py-4 sm:px-3 sm:py-6">
       <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
         Leads
       </h1>

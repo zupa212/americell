@@ -516,7 +516,7 @@ export default function CustomersTable({
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
                           align="end"
-                          className="border-white/50 bg-white/80 ring-white/40 backdrop-blur-xl"
+                          className="border-white/50 bg-white/80 ring-white/40 backdrop-blur-xl dark:border-white/10 dark:bg-neutral-900/90 dark:ring-white/10"
                         >
                           <DropdownMenuLabel className="truncate">
                             {c.email}
@@ -552,7 +552,7 @@ export default function CustomersTable({
         }}
       >
         {detail ? (
-          <DialogContent className="sm:max-w-md border-white/50 bg-white/80 ring-white/40 backdrop-blur-xl">
+          <DialogContent className="sm:max-w-md border-white/50 bg-white/80 ring-white/40 backdrop-blur-xl dark:border-white/10 dark:bg-neutral-900/90 dark:ring-white/10">
             <DialogHeader>
               <div className="flex items-center gap-3">
                 <Avatar email={detail.email} className="h-11 w-11 text-sm" />

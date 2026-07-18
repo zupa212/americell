@@ -393,7 +393,7 @@ export default function LedgerTable({
                 {(v: TypeFilter | null) => TYPE_ITEMS[v ?? "all"]}
               </SelectValue>
             </SelectTrigger>
-            <SelectContent className="border-white/50 bg-white/80 backdrop-blur-xl">
+            <SelectContent className="border-white/50 bg-white/80 backdrop-blur-xl dark:border-white/10 dark:bg-neutral-900/90">
               {(Object.keys(TYPE_ITEMS) as TypeFilter[]).map((key) => (
                 <SelectItem key={key} value={key}>
                   {TYPE_ITEMS[key]}
@@ -415,7 +415,7 @@ export default function LedgerTable({
                 {(v: DirFilter | null) => DIR_ITEMS[v ?? "all"]}
               </SelectValue>
             </SelectTrigger>
-            <SelectContent className="border-white/50 bg-white/80 backdrop-blur-xl">
+            <SelectContent className="border-white/50 bg-white/80 backdrop-blur-xl dark:border-white/10 dark:bg-neutral-900/90">
               {(Object.keys(DIR_ITEMS) as DirFilter[]).map((key) => (
                 <SelectItem key={key} value={key}>
                   {DIR_ITEMS[key]}

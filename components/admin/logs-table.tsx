@@ -282,7 +282,8 @@ function metaEntries(meta: unknown): [string, string][] | null {
 // Glass overrides shared by the toolbar's shadcn inputs.
 const GLASS_INPUT =
   "border-white/50 bg-white/60 backdrop-blur-md dark:bg-input/30";
-const GLASS_POPUP = "border-white/50 bg-white/85 backdrop-blur-xl";
+const GLASS_POPUP =
+  "border-white/50 bg-white/85 backdrop-blur-xl dark:border-white/10 dark:bg-neutral-900/90";
 
 // ── Shared 60s clock ───────────────────────────────────────────────────────
 // A single ticking store shared by every TimeCell (one interval, not one per

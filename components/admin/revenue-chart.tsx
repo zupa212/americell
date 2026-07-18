@@ -330,7 +330,7 @@ export function RevenueChart({ data, currency = "usd", className }: RevenueChart
         {/* Hover tooltip (glass) — tracks the active bar horizontally */}
         {activeBar ? (
           <div
-            className="pointer-events-none absolute top-1 z-10 -translate-x-1/2 rounded-xl border border-white/60 bg-white/80 px-3 py-1.5 text-center shadow-[0_10px_30px_-12px_rgba(30,41,120,0.35)] backdrop-blur-md"
+            className="pointer-events-none absolute top-1 z-10 -translate-x-1/2 rounded-xl border border-white/60 bg-white/80 px-3 py-1.5 text-center shadow-[0_10px_30px_-12px_rgba(30,41,120,0.35)] backdrop-blur-md dark:border-white/10 dark:bg-neutral-900/90"
             style={{ left: `${tooltipLeft}%` }}
           >
             <p className="text-[11px] font-medium text-muted-foreground">
