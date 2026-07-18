@@ -6,6 +6,7 @@ import {
   type NowpaymentsIpn,
 } from "@/lib/nowpayments";
 import { fulfillCryptoRental } from "@/lib/crypto-fulfill";
+import { sendOpsAlert } from "@/lib/alerts";
 
 /** NOWPayments IPN → exactly-once activation on a settled payment. */
 export async function POST(req: Request) {
@@ -36,6 +37,24 @@ export async function POST(req: Request) {
   // Only fulfil on a settled payment (finished/confirmed) mapped to a rental.
   if ((status !== "finished" && status !== "confirmed") || !rentalId || !txId) {
     return Response.json({ received: true });
+  }
+
+  // Defensive underpayment guard: 'finished' already implies a full settle, but
+  // if the crypto amounts are present require the received amount to cover the
+  // expected one — never activate (and spend wholesale) on a short payment.
+  if (
+    ipn.pay_amount != null &&
+    ipn.actually_paid != null &&
+    ipn.actually_paid < ipn.pay_amount
+  ) {
+    console.error(
+      `[ALERT] nowpayments underpaid rental=${rentalId}: actually_paid=${ipn.actually_paid} < pay_amount=${ipn.pay_amount}`,
+    );
+    await sendOpsAlert(
+      "Crypto underpayment — not activated",
+      `NOWPayments rental ${rentalId} was underpaid (${ipn.actually_paid} < ${ipn.pay_amount} crypto). Not activated — review manually.`,
+    );
+    return Response.json({ received: true, underpaid: true });
   }
 
   const result = await fulfillCryptoRental({

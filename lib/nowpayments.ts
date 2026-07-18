@@ -86,4 +86,7 @@ export type NowpaymentsIpn = {
   payment_status?: string; // "finished" | "confirmed" | "partially_paid" | ...
   order_id?: string;
   payment_id?: string | number;
+  pay_amount?: number; // expected crypto amount
+  actually_paid?: number; // crypto amount actually received
+  price_amount?: number; // fiat amount requested
 };

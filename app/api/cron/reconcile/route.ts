@@ -1,6 +1,6 @@
 import { stripe, isStripeConfigured } from "@/lib/stripe";
 import { isDbConfigured } from "@/lib/db";
-import { CellgodsError } from "@/lib/cellgods";
+import { CellgodsError, getBalance } from "@/lib/cellgods";
 import {
   listReconcilable,
   beginActivation,
@@ -120,5 +120,26 @@ export async function GET(req: Request) {
     }
   }
 
-  return Response.json({ ok: true, ...stats }, { headers: { "Cache-Control": "no-store" } });
+  // Proactive low-credit alert: warn before customers get stuck. Fires when the
+  // balance is below your CellGods auto-topup threshold (or a $20 floor). The
+  // permanent fix is enabling CellGods auto top-up; this is the safety net.
+  let credit: number | null = null;
+  try {
+    const bal = await getBalance();
+    credit = bal.credit_balance_cents;
+    const threshold = bal.auto_topup?.threshold_cents ?? 2000;
+    if (credit < threshold) {
+      await sendOpsAlert(
+        "CellGods credit is low",
+        `Your CellGods credit is $${(credit / 100).toFixed(2)} — below $${(threshold / 100).toFixed(2)}. Top up so activations don't stall. (${stats.pendingCredit} rental(s) are waiting on credit right now.)`,
+      );
+    }
+  } catch {
+    // balance read is best-effort; never fail the cron on it
+  }
+
+  return Response.json(
+    { ok: true, creditCents: credit, ...stats },
+    { headers: { "Cache-Control": "no-store" } },
+  );
 }

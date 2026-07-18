@@ -34,12 +34,10 @@ export async function POST(req: Request) {
   const rentalId = ev?.data?.metadata?.rentalId;
   const chargeId = ev?.data?.id ?? ev?.id;
 
-  // A charge is settled on confirmed/resolved.
-  if (
-    (type !== "charge:confirmed" && type !== "charge:resolved") ||
-    !rentalId ||
-    !chargeId
-  ) {
+  // Only 'charge:confirmed' means fully paid. 'charge:resolved' also fires for
+  // UNDERPAID/overpaid charges an admin later resolved — never activate on that,
+  // or we'd deliver a paid-in-full rental for a short payment.
+  if (type !== "charge:confirmed" || !rentalId || !chargeId) {
     return Response.json({ received: true });
   }
 
