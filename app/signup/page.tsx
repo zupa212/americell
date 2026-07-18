@@ -24,17 +24,17 @@ const initial: AuthState = { error: null };
 
 // Frosted-glass surface recipe — floats over the global aurora (SiteBackground).
 const glassCard =
-  "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
+  "rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl ring-1 ring-white/10 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
 
 // Smooth, legible glass inputs.
 const glassInput =
-  "h-11 border-white/50 bg-white/60 backdrop-blur-md transition-all duration-300 focus-visible:bg-white/80 focus-visible:ring-brand/40 sm:h-8";
+  "h-11 border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 focus-visible:bg-white/10 focus-visible:ring-brand/40 sm:h-8";
 
 export default function SignupPage() {
   const [state, action, pending] = useActionState(signup, initial);
 
   return (
-    <main className="relative flex min-h-[80vh] flex-col items-center justify-center overflow-hidden px-5 py-12 sm:px-6 sm:py-16">
+    <main className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden bg-[#0a0d16] px-5 py-12 text-white sm:px-6 sm:py-16">
       {/* Ambient particles drifting behind the glass for depth. */}
       <Particles
         className="pointer-events-none absolute inset-0 -z-[1]"
@@ -64,7 +64,7 @@ export default function SignupPage() {
           className={cn(
             "relative w-full max-w-sm overflow-hidden py-6",
             glassCard,
-            "transition-all duration-300 hover:bg-white/70 hover:-translate-y-1 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)]",
+            "transition-all duration-300 hover:bg-white/10 hover:-translate-y-1 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)]",
           )}
         >
           <ShineBorder
@@ -80,10 +80,10 @@ export default function SignupPage() {
             colorTo="var(--color-brand-2)"
           />
           <CardHeader>
-            <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
+            <CardTitle className="text-2xl font-bold tracking-tight text-white">
               Create your account
             </CardTitle>
-            <CardDescription className="text-muted-foreground">
+            <CardDescription className="text-white/55">
               Start controlling real US devices in minutes.
             </CardDescription>
           </CardHeader>
@@ -116,7 +116,7 @@ export default function SignupPage() {
                   aria-describedby="password-hint"
                   className={glassInput}
                 />
-                <p id="password-hint" className="text-xs text-muted-foreground">
+                <p id="password-hint" className="text-xs text-white/55">
                   At least 8 characters.
                 </p>
               </div>
@@ -124,7 +124,7 @@ export default function SignupPage() {
               {state.error ? (
                 <Alert
                   variant="destructive"
-                  className="border-white/50 bg-white/60 backdrop-blur-md"
+                  className="border-white/10 bg-white/5 backdrop-blur-md"
                 >
                   <AlertDescription>{state.error}</AlertDescription>
                 </Alert>
@@ -140,7 +140,7 @@ export default function SignupPage() {
               </Button>
             </form>
 
-            <p className="mt-4 text-center text-sm text-muted-foreground">
+            <p className="mt-4 text-center text-sm text-white/55">
               Already have an account?{" "}
               <Link
                 href="/login"

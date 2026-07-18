@@ -455,18 +455,29 @@ function OverviewSection({
           <Suspense> in page.tsx covers its useSearchParams. */}
       <CheckoutSuccess activeCount={activeCount} />
 
-      {/* Live availability — the first thing a customer sees on login. */}
+      {/* Live availability — the first, most prominent thing on login. */}
       <button
         type="button"
         onClick={() => onSelect("rent")}
-        className="group flex w-full items-center justify-between gap-3 rounded-3xl border border-white/50 bg-white/60 p-4 text-left ring-1 ring-white/40 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-white/75 sm:p-5"
+        className="group relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-3xl border border-white/40 bg-gradient-to-br from-brand/12 via-brand-2/10 to-brand-soft/12 p-5 text-left ring-1 ring-white/40 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.45)] sm:p-6"
       >
-        <span className="flex min-w-0 items-center gap-3">
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-white shadow-glow ring-1 ring-white/40">
-            <Smartphone className="h-5 w-5" />
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-brand/20 blur-3xl"
+        />
+        <span className="relative flex min-w-0 items-center gap-3.5">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-white shadow-glow ring-1 ring-white/40">
+            <Smartphone className="h-6 w-6" />
           </span>
           <span className="min-w-0">
-            <span className="block text-base font-semibold text-foreground">
+            <span className="mb-1 inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[0.65rem] font-bold tracking-wider text-emerald-600 uppercase">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              </span>
+              Live
+            </span>
+            <span className="block text-lg font-bold tracking-tight text-foreground sm:text-xl">
               {availableCount > 0
                 ? `${availableCount} US ${availableCount === 1 ? "phone" : "phones"} available now`
                 : "Live US inventory"}
@@ -478,8 +489,8 @@ function OverviewSection({
             </span>
           </span>
         </span>
-        <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft px-4 py-2 text-sm font-semibold text-white shadow-glow">
-          Rent
+        <span className="relative inline-flex shrink-0 items-center gap-1 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft px-5 py-2.5 text-sm font-semibold text-white shadow-glow ring-1 ring-white/20">
+          Rent now
           <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
         </span>
       </button>
