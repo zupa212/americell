@@ -32,8 +32,10 @@ const BASE_URL =
     : "https://buy-sandbox.moonpay.com";
 
 export type MoonpayUrlInput = {
-  /** Retail amount in USD (dollars, may be decimal). */
+  /** Retail amount in `currency` (dollars/euros, may be decimal). */
   amountUsd: number;
+  /** ISO base currency code, default usd. */
+  currency?: string;
   /** Our rental id — echoed back on the webhook as externalTransactionId. */
   externalTransactionId: string;
   email?: string;
@@ -52,7 +54,7 @@ export function buildMoonpayUrl(input: MoonpayUrlInput): string {
   const params = new URLSearchParams({
     apiKey: PUBLISHABLE_KEY,
     currencyCode: CURRENCY_CODE,
-    baseCurrencyCode: "usd",
+    baseCurrencyCode: (input.currency ?? "usd").toLowerCase(),
     baseCurrencyAmount: String(input.amountUsd),
     walletAddress: WALLET_ADDRESS,
     externalTransactionId: input.externalTransactionId,

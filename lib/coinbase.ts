@@ -14,7 +14,8 @@ const API_BASE = "https://api.commerce.coinbase.com";
 export const isCoinbaseConfigured = Boolean(API_KEY);
 
 export type CoinbaseChargeInput = {
-  amountUsd: number;
+  amountUsd: number; // amount in `currency`
+  currency?: string; // ISO code, default usd
   rentalId: string;
   name: string;
   description: string;
@@ -37,7 +38,7 @@ export async function createCoinbaseCharge(
       name: input.name,
       description: input.description,
       pricing_type: "fixed_price",
-      local_price: { amount: input.amountUsd.toFixed(2), currency: "USD" },
+      local_price: { amount: input.amountUsd.toFixed(2), currency: (input.currency ?? "usd").toUpperCase() },
       metadata: { rentalId: input.rentalId },
       redirect_url: input.redirectUrl,
       cancel_url: input.cancelUrl,

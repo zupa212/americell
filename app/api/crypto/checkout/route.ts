@@ -75,7 +75,7 @@ export async function POST(req: Request) {
   if (!duration) return Response.json({ error: "Invalid period." }, { status: 400 });
 
   // Same price resolver as Stripe checkout + browse (shown == charged).
-  const { retailCents, wholesale, supported } = await priceForCheckout(
+  const { retailCents, currency, wholesale, supported } = await priceForCheckout(
     item,
     duration.period,
   );
@@ -135,6 +135,7 @@ export async function POST(req: Request) {
     if (provider === "moonpay") {
       url = buildMoonpayUrl({
         amountUsd,
+        currency,
         externalTransactionId: rental.id,
         email,
         redirectUrl: `${origin}/dashboard?crypto=success`,
@@ -142,15 +143,17 @@ export async function POST(req: Request) {
     } else if (provider === "nowpayments") {
       ({ url } = await createNowpaymentsInvoice({
         amountUsd,
+        currency,
         orderId: rental.id,
         description,
         ipnUrl: `${origin}/api/nowpayments/webhook`,
         successUrl: `${origin}/dashboard?crypto=success`,
-        cancelUrl: `${origin}/#pricing`,
+        cancelUrl: `${origin}/dashboard?tab=rent`,
       }));
     } else if (provider === "btcpay") {
       ({ url } = await createBtcpayInvoice({
         amountUsd,
+        currency,
         orderId: rental.id,
         description,
         redirectUrl: `${origin}/dashboard?crypto=success`,
@@ -158,11 +161,12 @@ export async function POST(req: Request) {
     } else {
       ({ url } = await createCoinbaseCharge({
         amountUsd,
+        currency,
         rentalId: rental.id,
         name: "Americell rental",
         description,
         redirectUrl: `${origin}/dashboard?crypto=success`,
-        cancelUrl: `${origin}/#pricing`,
+        cancelUrl: `${origin}/dashboard?tab=rent`,
       }));
     }
   } catch (e) {

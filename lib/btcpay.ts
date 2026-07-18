@@ -18,7 +18,8 @@ const WEBHOOK_SECRET = process.env.BTCPAY_WEBHOOK_SECRET;
 export const isBtcpayConfigured = Boolean(BASE && API_KEY && STORE_ID);
 
 export type BtcpayInvoiceInput = {
-  amountUsd: number;
+  amountUsd: number; // amount in `currency`
+  currency?: string; // ISO code, default usd
   orderId: string; // rental id
   description: string;
   redirectUrl?: string;
@@ -38,7 +39,7 @@ export async function createBtcpayInvoice(
     },
     body: JSON.stringify({
       amount: input.amountUsd.toFixed(2),
-      currency: "USD",
+      currency: (input.currency ?? "usd").toUpperCase(),
       metadata: { orderId: input.orderId, itemDesc: input.description },
       checkout: input.redirectUrl ? { redirectURL: input.redirectUrl } : undefined,
     }),

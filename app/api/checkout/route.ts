@@ -172,7 +172,7 @@ export async function POST(req: Request) {
     "http://localhost:3000";
   const successUrl =
     process.env.CHECKOUT_SUCCESS_URL ?? `${origin}/dashboard?checkout=success`;
-  const cancelUrl = process.env.CHECKOUT_CANCEL_URL ?? `${origin}/#pricing`;
+  const cancelUrl = process.env.CHECKOUT_CANCEL_URL ?? `${origin}/dashboard?tab=rent`;
 
   const checkout = await stripe.checkout.sessions.create({
     mode: "payment",

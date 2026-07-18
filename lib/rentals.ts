@@ -294,6 +294,47 @@ export async function markRefunded(sid: string): Promise<void> {
     );
 }
 
+/**
+ * Recovery CAS `activation_pending_credit → activating` — the reconcile cron
+ * re-claims a paid-but-credit-starved rental so `activateRental` can retry once
+ * the reseller balance is topped up. Same exactly-once shape as `beginActivation`.
+ */
+export async function retryPendingCredit(
+  sid: string,
+): Promise<Rental | undefined> {
+  if (!isDbConfigured) return undefined;
+  const rows = await db
+    .update(rentals)
+    .set({
+      status: "activating",
+      activationAttempts: sql`${rentals.activationAttempts} + 1`,
+      updatedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(rentals.stripeSessionId, sid),
+        eq(rentals.status, "activation_pending_credit"),
+      ),
+    )
+    .returning();
+  return rows[0];
+}
+
+/**
+ * Rentals the reconcile cron should re-drive: `paid` (a transient failure or a
+ * missed webhook redelivery) and `activation_pending_credit` (waiting on a
+ * top-up). Oldest first so the earliest-paid customer is served first.
+ */
+export async function listReconcilable(limit = 50): Promise<Rental[]> {
+  if (!isDbConfigured) return [];
+  return db
+    .select()
+    .from(rentals)
+    .where(inArray(rentals.status, ["paid", "activation_pending_credit"]))
+    .orderBy(rentals.createdAt)
+    .limit(Math.min(Math.max(Math.trunc(limit), 1), 200));
+}
+
 /** Terminal `active → deactivated` (customer/admin cancel of a live rental). */
 export async function markDeactivated(sid: string): Promise<void> {
   if (!isDbConfigured) return;

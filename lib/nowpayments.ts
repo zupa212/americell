@@ -14,7 +14,8 @@ const API_BASE = "https://api.nowpayments.io/v1";
 export const isNowpaymentsConfigured = Boolean(API_KEY);
 
 export type NowpaymentsInvoiceInput = {
-  amountUsd: number;
+  amountUsd: number; // amount in `currency`
+  currency?: string; // ISO code, default usd
   orderId: string; // rental id
   description: string;
   ipnUrl: string;
@@ -31,7 +32,7 @@ export async function createNowpaymentsInvoice(
     headers: { "x-api-key": API_KEY, "content-type": "application/json" },
     body: JSON.stringify({
       price_amount: input.amountUsd,
-      price_currency: "usd",
+      price_currency: (input.currency ?? "usd").toLowerCase(),
       order_id: input.orderId,
       order_description: input.description,
       ipn_callback_url: input.ipnUrl,
