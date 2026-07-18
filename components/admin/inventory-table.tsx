@@ -56,6 +56,9 @@ export type InventoryRow = {
   platform: Platform; // CellGods `type`
   status: string;
   available: boolean;
+  /** "pool" = pre-paid (no credit charge to activate) · "shared" = charged at activation. */
+  source: string | null;
+  assignable: boolean | null;
   currency: string;
   priceMonthlyCents: number | null; // wholesale
   retailMonthlyCents: number | null; // computed retail estimate (same math as checkout)
@@ -403,6 +406,7 @@ export default function InventoryTable({
             />
             <TableHead>Type</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Source</TableHead>
             <SortableHead
               label="Wholesale / mo"
               align="right"
@@ -440,7 +444,7 @@ export default function InventoryTable({
         <TableBody>
           {visible.length === 0 ? (
             <TableRow className="border-white/40 hover:bg-transparent">
-              <TableCell colSpan={6} className="py-12 text-center">
+              <TableCell colSpan={7} className="py-12 text-center">
                 <div className="flex flex-col items-center gap-3">
                   <span
                     aria-hidden
@@ -503,6 +507,30 @@ export default function InventoryTable({
                       {statusLabel(row.status)}
                     </span>
                   </span>
+                </TableCell>
+                <TableCell>
+                  {row.source ? (
+                    <span className="inline-flex flex-col items-start gap-1">
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "w-fit font-medium",
+                          row.source === "pool"
+                            ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                            : "border-muted-foreground/20 bg-muted text-muted-foreground",
+                        )}
+                      >
+                        {row.source === "pool" ? "Pool · pre-paid" : "Shared"}
+                      </Badge>
+                      {row.assignable === false && (
+                        <span className="text-[0.7rem] font-medium text-amber-600 dark:text-amber-400">
+                          not assignable
+                        </span>
+                      )}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )}
                 </TableCell>
                 <TableCell className="text-right font-medium tabular-nums text-foreground">
                   {money(row.priceMonthlyCents, row.currency)}

@@ -25,7 +25,7 @@ export async function POST(req: Request) {
   const email = session?.user?.email;
   if (!userId || !email) {
     return Response.json(
-      { error: "Παρακαλώ συνδέσου για να συνεχίσεις." },
+      { error: "Please log in to continue." },
       { status: 401 },
     );
   }
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
   if (!isStripeConfigured || !stripe || !isCellgodsConfigured || !isDbConfigured) {
     return Response.json(
       {
-        error: "Οι πληρωμές είναι σε λειτουργία demo — δεν έχει ρυθμιστεί ακόμα.",
+        error: "Payments are in demo mode — not set up yet.",
         demo: true,
       },
       { status: 503 },
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
   try {
     body = await req.json();
   } catch {
-    return Response.json({ error: "Μη έγκυρο αίτημα." }, { status: 400 });
+    return Response.json({ error: "Invalid request." }, { status: 400 });
   }
 
   // 2. Live inventory → find the phone; enforce availability at buy time.
@@ -59,18 +59,18 @@ export async function POST(req: Request) {
     inventory = await getInventory();
   } catch {
     return Response.json(
-      { error: "Προσωρινά μη διαθέσιμο." },
+      { error: "Temporarily unavailable." },
       { status: 503 },
     );
   }
 
   const item = inventory.find((p) => p.phone_id === body.phoneId);
   if (!item) {
-    return Response.json({ error: "Άγνωστη συσκευή." }, { status: 400 });
+    return Response.json({ error: "Unknown device." }, { status: 400 });
   }
   if (item.status !== "available") {
     return Response.json(
-      { error: "Η συσκευή μόλις δεσμεύτηκε." },
+      { error: "That device was just reserved." },
       { status: 409 },
     );
   }
@@ -79,7 +79,7 @@ export async function POST(req: Request) {
   //    matches the browse price exactly; invariant: retail >= wholesale.
   const duration = DURATIONS.find((d) => d.period === body.period);
   if (!duration) {
-    return Response.json({ error: "Μη έγκυρη περίοδος." }, { status: 400 });
+    return Response.json({ error: "Invalid period." }, { status: 400 });
   }
   const period = duration.period;
   const durationDays = duration.days;
@@ -92,7 +92,7 @@ export async function POST(req: Request) {
   // Money-safety: refuse a duration the device doesn't actually offer at CellGods.
   if (!supported) {
     return Response.json(
-      { error: "Αυτή η διάρκεια δεν είναι διαθέσιμη για αυτή τη συσκευή." },
+      { error: "This duration isn't available for this device." },
       { status: 400 },
     );
   }
@@ -103,7 +103,7 @@ export async function POST(req: Request) {
     );
     return Response.json(
       {
-        error: "Προσωρινά μη διαθέσιμο.",
+        error: "Temporarily unavailable.",
         ...(owner && {
           reason: `Retail ${eur(retailCents)} would be below wholesale ${usd(wholesale)} for this ${period} — refusing to sell below cost.`,
         }),
@@ -112,32 +112,37 @@ export async function POST(req: Request) {
     );
   }
 
-  // 4. Fulfilment preflight: never charge a customer we can't fulfil from credit.
-  let balance;
-  try {
-    balance = await getBalance();
-  } catch {
-    return Response.json(
-      {
-        error: "Προσωρινά μη διαθέσιμο.",
-        ...(owner && { reason: "Couldn't reach CellGods to read your credit balance." }),
-      },
-      { status: 503 },
-    );
-  }
-  if (balance.credit_balance_cents < wholesale) {
-    console.warn(
-      `[checkout] low reseller credit: balance=${balance.credit_balance_cents} < wholesale=${wholesale}`,
-    );
-    return Response.json(
-      {
-        error: "Προσωρινά μη διαθέσιμο.",
-        ...(owner && {
-          reason: `Low CellGods credit: you have ${usd(balance.credit_balance_cents)}, but this ${period} needs ${usd(wholesale)} wholesale. Top up your CellGods balance.`,
-        }),
-      },
-      { status: 503 },
-    );
+  // 4. Fulfilment preflight: only shared-pool activations spend credit at
+  //    activation time. Pool devices are pre-paid, so skip the credit gate —
+  //    they sell even at $0 balance.
+  const prePaid = item.source === "pool";
+  if (!prePaid) {
+    let balance;
+    try {
+      balance = await getBalance();
+    } catch {
+      return Response.json(
+        {
+          error: "Temporarily unavailable.",
+          ...(owner && { reason: "Couldn't reach CellGods to read your credit balance." }),
+        },
+        { status: 503 },
+      );
+    }
+    if (balance.credit_balance_cents < wholesale) {
+      console.warn(
+        `[checkout] low reseller credit: balance=${balance.credit_balance_cents} < wholesale=${wholesale}`,
+      );
+      return Response.json(
+        {
+          error: "Temporarily unavailable.",
+          ...(owner && {
+            reason: `Low CellGods credit: you have ${usd(balance.credit_balance_cents)}, but this ${period} needs ${usd(wholesale)} wholesale. Top up your CellGods balance (or use a pre-paid pool device).`,
+          }),
+        },
+        { status: 503 },
+      );
+    }
   }
 
   // 5. Snapshot the rental (pending_payment). wholesale + retail are frozen here.

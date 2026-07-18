@@ -49,6 +49,8 @@ function toRow(p: InventoryPhone, opts: MarginOpts): InventoryRow {
     platform: p.type,
     status: p.status,
     available: p.status === "available",
+    source: p.source ?? null,
+    assignable: p.assignable ?? null,
     currency: p.currency,
     priceMonthlyCents: p.price_monthly,
     // Only estimate retail when there's a wholesale monthly price to mark up.

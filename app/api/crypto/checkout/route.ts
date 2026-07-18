@@ -89,25 +89,30 @@ export async function POST(req: Request) {
     return Response.json({ error: "Temporarily unavailable." }, { status: 503 });
   }
 
-  let balance;
-  try {
-    balance = await getBalance();
-  } catch {
-    return Response.json({ error: "Temporarily unavailable." }, { status: 503 });
-  }
-  if (balance.credit_balance_cents < wholesale) {
-    console.warn(
-      `[crypto-checkout] low reseller credit: balance=${balance.credit_balance_cents} < wholesale=${wholesale}`,
-    );
-    return Response.json(
-      {
-        error: "Temporarily unavailable.",
-        ...(owner && {
-          reason: `Low CellGods credit: you have ${usd(balance.credit_balance_cents)}, but this ${duration.period} needs ${usd(wholesale)} wholesale. Top up your CellGods balance.`,
-        }),
-      },
-      { status: 503 },
-    );
+  // Pool devices are pre-paid — skip the credit gate; only shared-pool
+  // activations spend credit at activation time.
+  const prePaid = item.source === "pool";
+  if (!prePaid) {
+    let balance;
+    try {
+      balance = await getBalance();
+    } catch {
+      return Response.json({ error: "Temporarily unavailable." }, { status: 503 });
+    }
+    if (balance.credit_balance_cents < wholesale) {
+      console.warn(
+        `[crypto-checkout] low reseller credit: balance=${balance.credit_balance_cents} < wholesale=${wholesale}`,
+      );
+      return Response.json(
+        {
+          error: "Temporarily unavailable.",
+          ...(owner && {
+            reason: `Low CellGods credit: you have ${usd(balance.credit_balance_cents)}, but this ${duration.period} needs ${usd(wholesale)} wholesale. Top up your CellGods balance (or use a pre-paid pool device).`,
+          }),
+        },
+        { status: 503 },
+      );
+    }
   }
 
   const rental = await createPendingRental({

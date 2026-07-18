@@ -56,6 +56,11 @@ export type InventoryPhone = {
   model: string;
   type: Platform;
   status: string; // "available", ...
+  /** "pool" = stocked to your account, PRE-PAID (activation charges no credit);
+   *  "shared" = global pool, charged wholesale at activation time. */
+  source?: string;
+  /** Whether this phone can be assigned to a customer via /activate. */
+  assignable?: boolean;
   price_daily: number | null;
   price_weekly: number | null;
   price_monthly: number | null; // cents
