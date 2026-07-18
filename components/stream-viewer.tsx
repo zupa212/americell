@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Check,
   Copy,
+  ExternalLink,
   KeyRound,
   Loader2,
-  Radio,
+  Maximize,
+  RefreshCw,
   ShieldCheck,
-  Smartphone,
   TriangleAlert,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -30,18 +31,14 @@ function formatRemaining(ms: number): string {
 }
 
 /**
- * Live device launcher, in a BLACK Americell-branded 9:16 frame.
+ * Live device EMBEDDED in a black 9:16 Americell frame (white-label: the
+ * same-origin `/api/rentals/[id]/stream` redirect resolves the upstream, so the
+ * provider's domain never appears in our src or page source).
  *
- * The upstream live control runs over a WebSocket (+ a control popup) whose
- * server only accepts a TOP-LEVEL page — it rejects our cross-origin iframe's
- * origin, so an embedded player loads but never connects ("Control:
- * Connecting…"). So we open the live phone in a NEW WINDOW from our branded
- * frame, where it connects and plays. The stream URL is same-origin
- * (`/api/rentals/[id]/stream`, a server redirect resolves the upstream), so the
- * provider's domain never appears in our links or page source (white-label).
- *
- * The upstream session token is ~4h; when it lapses a fresh activation mints a
- * new one. `tokenFresh` surfaces that state here.
+ * The upstream player opens a control POPUP; the iframe must be able to open it,
+ * so we do NOT sandbox and pass a generous `allow`. If the browser blocks the
+ * third-party popup/connection, the "Open full-screen" fallback runs it
+ * top-level. The ~4h session token is surfaced via `tokenFresh`.
  */
 export default function StreamViewer({
   rentalId,
@@ -57,10 +54,12 @@ export default function StreamViewer({
   streamMintedAt: string | null;
 }) {
   const streamSrc = `/api/rentals/${rentalId}/stream`;
+  const frameRef = useRef<HTMLIFrameElement>(null);
   const [pin, setPin] = useState<string | null>(null);
   const [pinLoading, setPinLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [nowMs, setNowMs] = useState<number | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     const tick = () => setNowMs(Date.now());
@@ -78,6 +77,17 @@ export default function StreamViewer({
     nowMs == null || expiresMs == null ? "—" : formatRemaining(expiresMs - nowMs);
   const tokenFresh =
     nowMs != null && mintedMs != null && nowMs - mintedMs < FOUR_HOURS_MS;
+
+  function fullscreen() {
+    const el = frameRef.current;
+    if (el?.requestFullscreen) {
+      el.requestFullscreen().catch(() => toast.error("Couldn't enter fullscreen."));
+    }
+  }
+
+  function reloadStream() {
+    setReloadKey((k) => k + 1);
+  }
 
   async function revealPin() {
     if (pin) return;
@@ -174,18 +184,40 @@ export default function StreamViewer({
               PIN
             </Button>
           )}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={reloadStream}
+            className="h-11 flex-1 gap-1.5 rounded-full border-white/15 bg-white/10 text-white hover:bg-white/20 sm:h-8 sm:flex-initial"
+          >
+            <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="hidden sm:inline">Reload</span>
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            onClick={fullscreen}
+            className="h-11 flex-1 gap-1.5 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white sm:h-8 sm:flex-initial"
+          >
+            <Maximize className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="hidden sm:inline">Fullscreen</span>
+          </Button>
         </div>
       </div>
 
-      {/* Black 9:16 Americell frame — opens the live phone in a new window. */}
+      {/* The live device — EMBEDDED here, 9:16 black frame with our logo. */}
       <div className="flex justify-center">
-        <div className="relative flex aspect-[9/16] h-[80dvh] max-h-[900px] w-auto max-w-full flex-col items-center justify-center gap-6 overflow-hidden rounded-[2rem] border border-white/10 bg-black px-6 text-center shadow-[0_20px_70px_-24px_rgba(0,0,0,0.85)] ring-1 ring-white/10">
-          {/* brand glow */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -top-20 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-brand/25 blur-3xl"
+        <div className="relative aspect-[9/16] h-[80dvh] max-h-[900px] w-auto max-w-full overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_20px_70px_-24px_rgba(0,0,0,0.85)] ring-1 ring-white/10">
+          <iframe
+            key={reloadKey}
+            ref={frameRef}
+            src={streamSrc}
+            title={`Americell — remote control ${model}`}
+            className="absolute inset-0 h-full w-full border-0 bg-black"
+            allow="autoplay; fullscreen; clipboard-read; clipboard-write; accelerometer; gyroscope; camera; microphone"
           />
-          {/* logo watermark, top-left */}
+          {/* Americell logo watermark — never intercepts device taps. */}
           <div className="pointer-events-none absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 backdrop-blur-md">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -197,37 +229,25 @@ export default function StreamViewer({
             />
             <span className="text-xs font-semibold text-white">Americell</span>
           </div>
-
-          <span className="relative grid h-16 w-16 place-items-center rounded-2xl bg-white/5 ring-1 ring-white/10">
-            <Smartphone className="h-7 w-7 text-white/80" aria-hidden="true" />
-          </span>
-          <div className="relative">
-            <p className="text-xl font-bold text-white">
-              {platformLabel} {model}
-            </p>
-            <p className="mt-1.5 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-400">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-              </span>
-              {tokenFresh ? "Live · ready to control" : "Session expired — rent again"}
-            </p>
-          </div>
-          <a
-            href={streamSrc}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft px-8 text-sm font-semibold text-white shadow-glow ring-1 ring-white/20 transition-all duration-300 hover:-translate-y-0.5"
-          >
-            <Radio className="h-4 w-4" aria-hidden="true" />
-            Open live phone
-          </a>
-          <p className="relative max-w-[32ch] text-xs leading-relaxed text-white/50">
-            Opens full-screen in a new window for live control (the live video
-            connects best top-level). If it asks for a code, use your PIN above.
-          </p>
         </div>
       </div>
+
+      {/* Fallback if the embedded control can't connect (browser blocks the
+          third-party popup/session). */}
+      <p className="text-center text-xs text-white/50">
+        Stuck on “Connecting…”? Tap <span className="text-white/80">Reload</span>, allow the
+        popup, or{" "}
+        <a
+          href={streamSrc}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 font-medium text-brand-soft hover:text-white"
+        >
+          open full-screen
+          <ExternalLink className="h-3 w-3" aria-hidden="true" />
+        </a>
+        .
+      </p>
     </div>
   );
 }
