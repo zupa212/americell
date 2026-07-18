@@ -132,10 +132,10 @@ const SECTIONS: readonly SectionMeta[] = [
  * ──────────────────────────────────────────────────────────────────────────── */
 
 const glassCard =
-  "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
+  "rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
 
 const CTA_GRADIENT =
-  "bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white shadow-glow border-white/30 ring-1 ring-white/20 hover:opacity-95";
+  "bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white shadow-glow border-white/10 ring-1 ring-white/20 hover:opacity-95";
 
 /* ── Receipt status mapping (same palette rental-card uses) ─────────────────── */
 
@@ -277,13 +277,13 @@ function ShellNav({
         </span>
         <Badge
           variant="secondary"
-          className="ml-0.5 h-5 gap-1 border border-white/50 bg-white/60 px-2 text-[0.7rem] text-foreground backdrop-blur-md"
+          className="ml-0.5 h-5 gap-1 border border-white/10 bg-white/5 px-2 text-[0.7rem] text-foreground backdrop-blur-md"
         >
           Account
         </Badge>
       </Link>
 
-      <Separator className="bg-white/50" />
+      <Separator className="bg-white/5" />
 
       <nav
         aria-label="Dashboard sections"
@@ -302,7 +302,7 @@ function ShellNav({
                     "group/nav flex min-h-11 w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium outline-none transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background",
                     active
                       ? "bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white shadow-sm shadow-brand/25 ring-1 ring-white/30"
-                      : "text-muted-foreground hover:bg-white/60 hover:text-foreground",
+                      : "text-muted-foreground hover:bg-white/5 hover:text-foreground",
                   )}
                 >
                   <Icon
@@ -316,7 +316,7 @@ function ShellNav({
                   {active && (
                     <span
                       aria-hidden="true"
-                      className="ml-auto h-1.5 w-1.5 rounded-full bg-white/90"
+                      className="ml-auto h-1.5 w-1.5 rounded-full bg-white/10"
                     />
                   )}
                 </button>
@@ -326,10 +326,10 @@ function ShellNav({
         </ul>
       </nav>
 
-      <Separator className="bg-white/50" />
+      <Separator className="bg-white/5" />
 
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2.5 rounded-2xl border border-white/50 bg-white/50 px-3 py-2 ring-1 ring-white/40 backdrop-blur-md">
+        <div className="flex items-center gap-2.5 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 ring-1 ring-white/40 backdrop-blur-md">
           <span
             aria-hidden="true"
             className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-xs font-semibold text-white ring-1 ring-white/40"
@@ -352,7 +352,7 @@ function ShellNav({
             variant="outline"
             size="lg"
             aria-label="Sign out"
-            className="min-h-11 w-full justify-start gap-2 border-white/50 bg-white/60 backdrop-blur-md hover:bg-white/70"
+            className="min-h-11 w-full justify-start gap-2 border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10"
             render={<button type="submit" />}
           >
             <LogOut className="h-4 w-4" aria-hidden="true" />
@@ -384,7 +384,7 @@ function StatCard({
       <span
         aria-hidden="true"
         className={cn(
-          "grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-white/50 bg-white/60 backdrop-blur-md",
+          "grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md",
           iconClass,
         )}
       >
@@ -497,7 +497,7 @@ function OverviewSection({
               <div className="flex min-w-0 items-center gap-3">
                 <span
                   aria-hidden="true"
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-white/50 bg-white/60 text-brand backdrop-blur-md"
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/5 text-brand backdrop-blur-md"
                 >
                   <Clock className="h-5 w-5" />
                 </span>
@@ -516,7 +516,7 @@ function OverviewSection({
                 type="button"
                 variant="outline"
                 onClick={() => onSelect("phones")}
-                className="min-h-11 w-full gap-2 rounded-full border-white/50 bg-white/60 backdrop-blur-md hover:bg-white/70 sm:w-auto"
+                className="min-h-11 w-full gap-2 rounded-full border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 sm:w-auto"
               >
                 View my phones
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -532,7 +532,7 @@ function OverviewSection({
               <div className="flex min-w-0 items-center gap-3">
                 <span
                   aria-hidden="true"
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-white/50 bg-white/60 text-brand backdrop-blur-md"
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/5 text-brand backdrop-blur-md"
                 >
                   <ReceiptText className="h-5 w-5" />
                 </span>
@@ -553,7 +553,7 @@ function OverviewSection({
                 type="button"
                 variant="outline"
                 onClick={() => onSelect("rent")}
-                className="min-h-11 w-full gap-2 rounded-full border-white/50 bg-white/60 backdrop-blur-md hover:bg-white/70 sm:w-auto"
+                className="min-h-11 w-full gap-2 rounded-full border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 sm:w-auto"
               >
                 Rent another
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -566,7 +566,7 @@ function OverviewSection({
           <div className="mx-auto flex w-full max-w-sm flex-col items-center gap-3 px-6 py-12 sm:py-14">
             <span
               aria-hidden="true"
-              className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/50 bg-white/70 text-brand backdrop-blur-md"
+              className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-brand backdrop-blur-md"
             >
               <Smartphone className="h-6 w-6" />
             </span>
@@ -606,7 +606,7 @@ function PhonesSection({
 }) {
   if (!dbConnected) {
     return (
-      <Alert className="border-white/50 bg-white/60 backdrop-blur-md">
+      <Alert className="border-white/10 bg-white/5 backdrop-blur-md">
         <Database className="h-4 w-4" aria-hidden="true" />
         <AlertTitle>The database isn&rsquo;t connected yet.</AlertTitle>
         <AlertDescription>
@@ -625,7 +625,7 @@ function PhonesSection({
         <div className="mx-auto flex w-full max-w-sm flex-col items-center gap-3 px-6 py-12 sm:py-14">
           <span
             aria-hidden="true"
-            className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/50 bg-white/70 text-brand backdrop-blur-md"
+            className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-brand backdrop-blur-md"
           >
             <Smartphone className="h-6 w-6" />
           </span>
@@ -695,7 +695,7 @@ function RentHowItWorks() {
     { n: 3, t: "Control it live", d: "Drive it from your browser — US SIM & data included." },
   ];
   return (
-    <div className="rounded-3xl border border-white/50 bg-white/60 p-5 ring-1 ring-white/40 backdrop-blur-xl sm:p-6">
+    <div className="rounded-3xl border border-white/10 bg-white/5 p-5 ring-1 ring-white/40 backdrop-blur-xl sm:p-6">
       <p className="text-sm font-semibold text-foreground">How renting works</p>
       <ol className="mt-3 grid gap-3 sm:grid-cols-3">
         {steps.map((s) => (
@@ -790,7 +790,7 @@ function BillingSection({
             <div className="overflow-x-auto">
               <table className="w-full min-w-[36rem] border-collapse text-left text-sm">
                 <thead>
-                  <tr className="border-b border-white/50 text-xs tracking-wide text-muted-foreground uppercase">
+                  <tr className="border-b border-white/10 text-xs tracking-wide text-muted-foreground uppercase">
                     <th scope="col" className="px-4 py-3 font-medium">
                       Device
                     </th>
@@ -815,7 +815,7 @@ function BillingSection({
                     return (
                       <tr
                         key={row.id}
-                        className="border-b border-white/40 last:border-0"
+                        className="border-b border-white/10 last:border-0"
                       >
                         <td className="px-4 py-3">
                           <div className="flex min-w-0 items-center gap-2">
@@ -886,7 +886,7 @@ function BillingSection({
             </div>
           </div>
 
-          <Separator className="bg-white/50" />
+          <Separator className="bg-white/5" />
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             {/* No password-change route exists (auth.ts only exposes
@@ -899,7 +899,7 @@ function BillingSection({
                 variant="outline"
                 size="lg"
                 aria-label="Sign out"
-                className="min-h-11 w-full gap-2 border-white/50 bg-white/60 backdrop-blur-md hover:bg-white/70 sm:w-auto"
+                className="min-h-11 w-full gap-2 border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 sm:w-auto"
                 render={<button type="submit" />}
               >
                 <LogOut className="h-4 w-4" aria-hidden="true" />
@@ -957,10 +957,10 @@ export default function DashboardShell({
   const CurrentIcon = current.icon;
 
   return (
-    <div className="relative min-h-screen">
+    <div className="dark dark-surface relative min-h-screen bg-background text-foreground">
       {/* Fixed glass sidebar — md+ only. */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 p-3 md:flex">
-        <div className="flex flex-1 flex-col rounded-3xl border border-white/50 bg-white/60 p-4 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)] ring-1 ring-white/40 backdrop-blur-xl">
+        <div className="flex flex-1 flex-col rounded-3xl border border-white/10 bg-white/5 p-4 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)] ring-1 ring-white/40 backdrop-blur-xl">
           <ShellNav email={email} section={section} onSelect={select} />
         </div>
       </aside>
@@ -968,7 +968,7 @@ export default function DashboardShell({
       {/* Content column — offset for the sidebar on md+. */}
       <div className="md:pl-72">
         <header className="sticky top-0 z-30 px-3 pt-3 sm:px-4">
-          <div className="flex items-center gap-3 rounded-2xl border border-white/50 bg-white/60 px-3 py-2.5 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)] ring-1 ring-white/40 backdrop-blur-xl md:px-4">
+          <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)] ring-1 ring-white/40 backdrop-blur-xl md:px-4">
             {/* Mobile menu — collapses the sidebar into a Sheet (< md only). */}
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger
@@ -976,7 +976,7 @@ export default function DashboardShell({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="size-11 rounded-xl text-foreground hover:bg-white/70 md:hidden"
+                    className="size-11 rounded-xl text-foreground hover:bg-white/10 md:hidden"
                     aria-label="Open menu"
                   />
                 }
@@ -986,7 +986,7 @@ export default function DashboardShell({
               <SheetContent
                 side="left"
                 showCloseButton={false}
-                className="gap-0 border-white/40 bg-white/70 p-4 backdrop-blur-xl data-[side=left]:w-80 data-[side=left]:sm:max-w-80"
+                className="gap-0 border-white/10 bg-white/10 p-4 backdrop-blur-xl data-[side=left]:w-80 data-[side=left]:sm:max-w-80"
               >
                 <SheetTitle className="sr-only">Dashboard navigation</SheetTitle>
                 <SheetDescription className="sr-only">

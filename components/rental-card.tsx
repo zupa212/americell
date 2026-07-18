@@ -74,16 +74,16 @@ export type RentalCardData = {
  * (a) The frosted-glass surface — applied ONLY to `<Card>`, verbatim on both
  * cards. `relative` anchors the status rail; the Card primitive already ships
  * `overflow-hidden` (which clips the rail to the rounded-3xl corners) so we do
- * NOT re-declare overflow. `rounded-3xl`/`bg-white/65`/`ring-white/40` override
+ * NOT re-declare overflow. `rounded-3xl`/`bg-white/5`/`ring-white/40` override
  * the primitive's defaults via tailwind-merge. `[--card-spacing:--spacing(5)]`
  * is the one roomifier token: 20px padding on every slot + 20px inter-slot gap.
  */
 const GLASS_SURFACE =
-  "relative h-full rounded-3xl border border-white/50 bg-white/65 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)] [--card-spacing:--spacing(5)]";
+  "relative h-full rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)] [--card-spacing:--spacing(5)]";
 
 /** (b) The hover affordance — the shared interaction accent, reduced-motion-safe. */
 const GLASS_LIFT =
-  "transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/75 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none";
+  "transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none";
 
 /**
  * (c) The ONLY status palette, dark-paired for WCAG AA over the white/65 frost.
@@ -392,7 +392,7 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
         {isActive ? (
           <>
             {/* Live expiry countdown */}
-            <div className="flex items-center gap-2 rounded-2xl border border-white/50 bg-white/50 px-3 py-2 text-sm backdrop-blur-md">
+            <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-sm backdrop-blur-md">
               <Clock
                 className="h-4 w-4 shrink-0 text-brand"
                 aria-hidden="true"
@@ -439,7 +439,7 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
               <button
                 type="button"
                 onClick={copyPin}
-                className="group flex min-h-11 items-center gap-2 rounded-2xl border border-white/50 bg-white/50 px-3 py-2 text-left text-sm backdrop-blur-md transition-colors hover:bg-white/70 sm:min-h-10"
+                className="group flex min-h-11 items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-left text-sm backdrop-blur-md transition-colors hover:bg-white/10 sm:min-h-10"
               >
                 <KeyRound
                   className="h-4 w-4 shrink-0 text-brand"
@@ -468,7 +468,7 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
                 variant="outline"
                 onClick={revealPin}
                 disabled={pinLoading}
-                className="h-11 w-full justify-start gap-2 rounded-2xl border-white/50 bg-white/50 backdrop-blur-md sm:h-10"
+                className="h-11 w-full justify-start gap-2 rounded-2xl border-white/10 bg-white/5 backdrop-blur-md sm:h-10"
               >
                 {pinLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -509,7 +509,7 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
         )}
       </CardContent>
 
-      <CardFooter className="flex flex-col items-stretch gap-2 border-t border-white/40 bg-transparent">
+      <CardFooter className="flex flex-col items-stretch gap-2 border-t border-white/10 bg-transparent">
         {isActive ? (
           <>
             <RemoteControlButton rentalId={rental.id} />
@@ -519,7 +519,7 @@ export default function RentalCard({ rental }: { rental: RentalCardData }) {
                 variant="outline"
                 onClick={renew}
                 disabled={renewLoading}
-                className="h-11 flex-1 gap-2 rounded-full border-white/50 bg-white/50 backdrop-blur-md sm:h-10"
+                className="h-11 flex-1 gap-2 rounded-full border-white/10 bg-white/5 backdrop-blur-md sm:h-10"
               >
                 {renewLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />

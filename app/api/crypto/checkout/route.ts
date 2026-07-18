@@ -12,6 +12,7 @@ import { createNowpaymentsInvoice, isNowpaymentsConfigured } from "@/lib/nowpaym
 import { createCoinbaseCharge, isCoinbaseConfigured } from "@/lib/coinbase";
 import { createBtcpayInvoice, isBtcpayConfigured } from "@/lib/btcpay";
 import { rentalRef } from "@/lib/rental-ref";
+import { couponDiscountCents, findCoupon } from "@/lib/coupons";
 
 type Provider = "moonpay" | "nowpayments" | "coinbase" | "btcpay";
 
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
   }
   const owner = isAdminEmail(email); // owners bypass money-safety guards to test
 
-  let body: { phoneId?: string; period?: string; provider?: string };
+  let body: { phoneId?: string; period?: string; provider?: string; code?: string };
   try {
     body = await req.json();
   } catch {
@@ -84,7 +85,11 @@ export async function POST(req: Request) {
   // is set, admins pay that flat amount on any period; customer prices untouched.
   const testCents = Math.trunc(Number(process.env.OWNER_TEST_PRICE_CENTS));
   const ownerTest = owner && Number.isFinite(testCents) && testCents > 0;
-  const chargeCents = ownerTest ? testCents : retailCents;
+  // Coupon discount (crypto's own promo layer, mirrors the Stripe promo code).
+  const discountCents = couponDiscountCents(body.code, retailCents, currency);
+  const chargeCents = ownerTest
+    ? testCents
+    : Math.max(50, retailCents - discountCents);
 
   if (!supported) {
     return Response.json(
@@ -191,7 +196,7 @@ export async function POST(req: Request) {
     action: "checkout.started",
     targetType: "rental",
     targetId: rental.id,
-    metadata: { phoneId: item.phone_id, period: duration.period, retailCents: chargeCents, method: provider, orderRef: ref, ownerTest },
+    metadata: { phoneId: item.phone_id, period: duration.period, retailCents: chargeCents, method: provider, orderRef: ref, ownerTest, couponCode: discountCents > 0 ? findCoupon(body.code)?.code : undefined },
   });
 
   return Response.json({ url });

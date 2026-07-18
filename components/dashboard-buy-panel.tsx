@@ -32,6 +32,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { fmtMoney } from "@/lib/money";
+import { couponDiscountCents } from "@/lib/coupons";
 import { cn } from "@/lib/utils";
 // Types ONLY — `@/lib/pricing` is server-only, so these imports are erased at
 // build time and never pull the server module into the client bundle. DURATIONS
@@ -51,11 +52,11 @@ import type { CryptoProvider } from "@/components/pricing-grid";
 
 /** Frosted-glass surface — applied ONLY on `<Card>`; sets the 20px slot rhythm. */
 const GLASS_SURFACE =
-  "relative h-full rounded-3xl border border-white/50 bg-white/65 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)] [--card-spacing:--spacing(5)]";
+  "relative h-full rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)] [--card-spacing:--spacing(5)]";
 
 /** Hover affordance (reduced-motion-safe) layered on top of the surface. */
 const GLASS_LIFT =
-  "transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/75 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none";
+  "transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)] motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:shadow-none";
 
 /**
  * The ONLY status palette — dark-paired for AA over the frost.
@@ -151,6 +152,8 @@ export default function DashboardBuyPanel({
   const [cryptoPhone, setCryptoPhone] = useState<PublicRetailPhone | null>(null);
   // Which crypto provider is mid-request (drives the row spinner).
   const [cryptoBusy, setCryptoBusy] = useState<CryptoProvider["id"] | null>(null);
+  // Optional promo code entered in the crypto picker (e.g. AMERICELL50).
+  const [cryptoCode, setCryptoCode] = useState("");
 
   const activeLabel = durations.find((d) => d.period === period)?.label ?? "";
 
@@ -199,7 +202,12 @@ export default function DashboardBuyPanel({
       const res = await fetch("/api/crypto/checkout", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ phoneId: phone.phoneId, period, provider }),
+        body: JSON.stringify({
+          phoneId: phone.phoneId,
+          period,
+          provider,
+          code: cryptoCode.trim() || undefined,
+        }),
       });
       if (res.status === 401) {
         window.location.href = "/login";
@@ -260,7 +268,7 @@ export default function DashboardBuyPanel({
           aria-label="Rental duration"
           className="w-full sm:w-auto"
         >
-          <TabsList className="h-11 w-full rounded-full border border-white/50 bg-white/60 p-1 ring-1 ring-white/40 backdrop-blur-md sm:h-10 sm:w-auto">
+          <TabsList className="h-11 w-full rounded-full border border-white/10 bg-white/5 p-1 ring-1 ring-white/40 backdrop-blur-md sm:h-10 sm:w-auto">
             {availableDurations.map((d) => (
               <TabsTrigger
                 key={d.period}
@@ -279,7 +287,7 @@ export default function DashboardBuyPanel({
 
       {phones.length === 0 ? (
         // catalog.ok but empty — keep the header, show one calm centered panel.
-        <div className="mt-5 rounded-3xl border border-white/50 bg-white/60 p-8 text-center backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]">
+        <div className="mt-5 rounded-3xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]">
           <p className="text-sm text-muted-foreground">
             No devices available right now — inventory changes constantly.
           </p>
@@ -327,7 +335,7 @@ export default function DashboardBuyPanel({
                     <CardTitle className="flex min-w-0 items-center gap-2">
                       <span
                         aria-hidden="true"
-                        className="grid h-8 w-8 shrink-0 place-items-center rounded-2xl border border-white/50 bg-white/50 backdrop-blur-md"
+                        className="grid h-8 w-8 shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md"
                       >
                         <Smartphone
                           className={cn(
@@ -374,7 +382,7 @@ export default function DashboardBuyPanel({
                   </CardHeader>
 
                   <CardContent className="flex flex-1 flex-col gap-3">
-                    <Separator className="bg-white/50" />
+                    <Separator className="bg-white/5" />
                     {/* Price for the selected duration (amount + suffix grouped). */}
                     {supported ? (
                       <div className="flex items-baseline gap-1.5">
@@ -397,7 +405,7 @@ export default function DashboardBuyPanel({
                     </div>
                   </CardContent>
 
-                  <CardFooter className="flex flex-col items-stretch gap-2 border-t border-white/40 bg-transparent">
+                  <CardFooter className="flex flex-col items-stretch gap-2 border-t border-white/10 bg-transparent">
                     <Button
                       type="button"
                       onClick={() => handleCheckout(phone)}
@@ -468,7 +476,7 @@ export default function DashboardBuyPanel({
           if (!open && !cryptoBusy) setCryptoPhone(null);
         }}
       >
-        <DialogContent className="max-w-[calc(100%-2rem)] rounded-3xl border-white/50 bg-white/80 backdrop-blur-xl sm:max-w-md">
+        <DialogContent className="dark dark-surface max-w-[calc(100%-2rem)] rounded-3xl border-white/10 bg-neutral-900/90 text-foreground backdrop-blur-xl sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-xl font-extrabold tracking-tight">
               Pay with crypto
@@ -487,6 +495,49 @@ export default function DashboardBuyPanel({
             </DialogDescription>
           </DialogHeader>
 
+          {cryptoPhone ? (
+            <div className="mt-1">
+              <label
+                htmlFor="crypto-code"
+                className="text-xs font-medium text-muted-foreground"
+              >
+                Promo code (optional)
+              </label>
+              <input
+                id="crypto-code"
+                type="text"
+                value={cryptoCode}
+                onChange={(e) => setCryptoCode(e.target.value.toUpperCase())}
+                placeholder="e.g. AMERICELL50"
+                autoComplete="off"
+                className="mt-1 h-10 w-full rounded-xl border border-white/10 bg-white/10 px-3 text-sm font-medium tracking-wide text-foreground uppercase outline-none backdrop-blur-md focus:border-brand focus:ring-2 focus:ring-brand/20"
+              />
+              {(() => {
+                const d = couponDiscountCents(
+                  cryptoCode,
+                  cryptoPhone.retail[period],
+                  cryptoPhone.currency,
+                );
+                if (d > 0) {
+                  return (
+                    <p className="mt-1.5 text-xs font-semibold text-emerald-600">
+                      −{fmtMoney(d, cryptoPhone.currency)} applied — you pay{" "}
+                      {fmtMoney(
+                        cryptoPhone.retail[period] - d,
+                        cryptoPhone.currency,
+                      )}
+                    </p>
+                  );
+                }
+                return cryptoCode.trim() ? (
+                  <p className="mt-1.5 text-xs text-muted-foreground">
+                    Not valid for this order.
+                  </p>
+                ) : null;
+              })()}
+            </div>
+          ) : null}
+
           <div className="mt-2 flex flex-col gap-3">
             {cryptoProviders.map((provider) => {
               const busy = cryptoBusy === provider.id;
@@ -500,7 +551,7 @@ export default function DashboardBuyPanel({
                   }
                   disabled={disabled}
                   className={cn(
-                    "group flex w-full items-center gap-3 rounded-2xl border border-white/60 bg-white/60 px-4 py-3.5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/80 hover:shadow-[0_16px_40px_-20px_rgba(43,107,255,0.45)] disabled:pointer-events-none disabled:opacity-60",
+                    "group flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-left transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10 hover:shadow-[0_16px_40px_-20px_rgba(43,107,255,0.45)] disabled:pointer-events-none disabled:opacity-60",
                   )}
                 >
                   <CryptoIcon id={provider.id} busy={busy} />
