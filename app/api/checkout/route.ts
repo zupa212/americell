@@ -88,6 +88,15 @@ export async function POST(req: Request) {
     item,
     period,
   );
+
+  // Owner test price: when OWNER_TEST_PRICE_CENTS is set, owners (admins) are
+  // charged that flat amount on ANY period — customer/public prices are NEVER
+  // touched — so we can run a cheap end-to-end test. Off unless the env is set.
+  const testCents = Math.trunc(Number(process.env.OWNER_TEST_PRICE_CENTS));
+  const ownerTest = owner && Number.isFinite(testCents) && testCents > 0;
+  // What Stripe actually charges + what we snapshot on the rental (shown==charged).
+  const chargeCents = ownerTest ? testCents : retailCents;
+
   // Money-safety: refuse a duration the device doesn't actually offer at CellGods.
   if (!supported) {
     return Response.json(
@@ -134,7 +143,7 @@ export async function POST(req: Request) {
     billingPeriod: period,
     durationDays,
     wholesaleQuotedCents: wholesale,
-    retailCents,
+    retailCents: chargeCents,
   });
 
   // Human-readable order reference (AMC-XXXXXXXX) derived from the rental UUID.
@@ -150,7 +159,7 @@ export async function POST(req: Request) {
     action: "checkout.started",
     targetType: "rental",
     targetId: rental.id,
-    metadata: { phoneId: item.phone_id, period, retailCents, orderRef: ref },
+    metadata: { phoneId: item.phone_id, period, retailCents: chargeCents, orderRef: ref, ownerTest },
   });
 
   // 6. One-time RETAIL Stripe Checkout (inline price_data in cents). No
@@ -172,10 +181,10 @@ export async function POST(req: Request) {
         price_data: {
           currency,
           product_data: {
-            name: `Americell — ${item.model} (${duration.label})`,
+            name: `Americell — ${item.model} (${duration.label})${ownerTest ? " · TEST" : ""}`,
             description: `Order ${ref} · ${duration.label} rental · real US ${platformLabel}, US SIM & data included`,
           },
-          unit_amount: retailCents,
+          unit_amount: chargeCents,
         },
       },
     ],
