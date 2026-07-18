@@ -56,6 +56,19 @@ export function supportedPeriods(item: InventoryPhone): BillingPeriod[] {
 }
 
 /**
+ * Which durations to OFFER for a device under flat pricing.
+ *  - Pool devices are pre-paid: any duration is fulfillable via `duration_days`
+ *    at $0 activation cost, so offer all three tiers (flat pricing derives
+ *    daily/weekly from the monthly price). This is how daily gets enabled.
+ *  - Shared devices only offer the tiers CellGods actually prices, so we never
+ *    charge for a duration whose wholesale we can't verify.
+ */
+export function availablePeriodsFor(item: InventoryPhone): BillingPeriod[] {
+  if (item.source === "pool") return ["daily", "weekly", "monthly"];
+  return supportedPeriods(item);
+}
+
+/**
  * Wholesale cost (integer cents) for a phone at a given period. Returns 0 when
  * that tier is unpriced (`price_*` null) — retailCentsFor still floors at >= 0,
  * and checkout enforces availability/credit before charging.
@@ -209,7 +222,7 @@ export function flatRetailPhone(item: InventoryPhone, flat: FlatPricing): Public
     available: item.status === "available",
     currency: flat.currency,
     retail: deriveFlatTiers(monthly),
-    availablePeriods: supportedPeriods(item),
+    availablePeriods: availablePeriodsFor(item),
   };
 }
 
@@ -229,12 +242,6 @@ export async function priceForCheckout(
   wholesale: number;
   supported: boolean;
 }> {
-  const rawWholesale =
-    period === "daily"
-      ? item.price_daily
-      : period === "weekly"
-        ? item.price_weekly
-        : item.price_monthly;
   const flat = await getFlatPricing();
   const pub = flat
     ? flatRetailPhone(item, flat)
@@ -243,7 +250,9 @@ export async function priceForCheckout(
     retailCents: pub.retail[period],
     currency: pub.currency.toLowerCase(),
     wholesale: wholesaleFor(item, period),
-    supported: rawWholesale != null,
+    // Offer the tier when the active pricing mode exposes it (pool devices get
+    // all tiers under flat pricing; shared only their CellGods-priced tiers).
+    supported: pub.availablePeriods.includes(period),
   };
 }
 
