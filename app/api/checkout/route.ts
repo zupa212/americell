@@ -192,6 +192,10 @@ export async function POST(req: Request) {
     customer_email: email,
     success_url: successUrl,
     cancel_url: cancelUrl,
+    // Let customers enter a Stripe promotion code (e.g. AMERICELL50 = €50 off) at
+    // checkout. Create the coupon + promo code in the Stripe Dashboard; the
+    // discount applies to the session total (works with inline price_data).
+    allow_promotion_codes: true,
     // Professional touch: a submit-side note so the buyer knows what lands next.
     custom_text: {
       submit: {
