@@ -409,11 +409,13 @@ function StatCard({
 
 function OverviewSection({
   activeCount,
+  availableCount,
   rentals,
   billing,
   onSelect,
 }: {
   activeCount: number;
+  availableCount: number;
   rentals: DashboardShellProps["rentals"];
   billing: BillingRow[];
   onSelect: (key: SectionKey) => void;
@@ -452,6 +454,35 @@ function OverviewSection({
       {/* Post-payment banner — renders nothing on a normal visit; the single
           <Suspense> in page.tsx covers its useSearchParams. */}
       <CheckoutSuccess activeCount={activeCount} />
+
+      {/* Live availability — the first thing a customer sees on login. */}
+      <button
+        type="button"
+        onClick={() => onSelect("rent")}
+        className="group flex w-full items-center justify-between gap-3 rounded-3xl border border-white/50 bg-white/60 p-4 text-left ring-1 ring-white/40 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-white/75 sm:p-5"
+      >
+        <span className="flex min-w-0 items-center gap-3">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-white shadow-glow ring-1 ring-white/40">
+            <Smartphone className="h-5 w-5" />
+          </span>
+          <span className="min-w-0">
+            <span className="block text-base font-semibold text-foreground">
+              {availableCount > 0
+                ? `${availableCount} US ${availableCount === 1 ? "phone" : "phones"} available now`
+                : "Live US inventory"}
+            </span>
+            <span className="block truncate text-sm text-muted-foreground">
+              {availableCount > 0
+                ? "Real US iPhones & Android — ready to rent"
+                : "Check back soon — inventory changes constantly"}
+            </span>
+          </span>
+        </span>
+        <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft px-4 py-2 text-sm font-semibold text-white shadow-glow">
+          Rent
+          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+        </span>
+      </button>
 
       {hasAny ? (
         <>
@@ -1032,6 +1063,9 @@ export default function DashboardShell({
           {section === "overview" ? (
             <OverviewSection
               activeCount={activeCount}
+              availableCount={
+                store.ok ? store.phones.filter((p) => p.available).length : 0
+              }
               rentals={rentals}
               billing={billing}
               onSelect={select}

@@ -33,17 +33,17 @@ const initial: AuthState = { error: null };
 
 // Frosted-glass surface recipe — floats over the global aurora (SiteBackground).
 const glassCard =
-  "rounded-3xl border border-white/50 bg-white/60 backdrop-blur-xl ring-1 ring-white/40 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
+  "rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl ring-1 ring-white/10 shadow-[0_10px_40px_-12px_rgba(30,41,120,0.18)]";
 
 // Smooth, legible glass inputs. Roomy (h-11) on mobile for comfortable tapping,
 // tightening to the app's dense field height (h-8) from sm up. text-base on the
 // primitive keeps mobile Safari from zooming on focus.
 const glassInput =
-  "h-11 border-white/50 bg-white/60 backdrop-blur-md transition-all duration-300 focus-visible:bg-white/80 focus-visible:ring-brand/40 sm:h-8";
+  "h-11 border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 focus-visible:bg-white/10 focus-visible:ring-brand/40 sm:h-8";
 
 // Leading glyph nested inside a glass input.
 const leadingIcon =
-  "pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground";
+  "pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-white/55";
 
 export default function LoginPage() {
   const [state, action, pending] = useActionState(login, initial);
@@ -52,7 +52,7 @@ export default function LoginPage() {
   const invalid = state.error ? true : undefined;
 
   return (
-    <main className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-4 py-10 sm:px-6 sm:py-16">
+    <main className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden bg-[#0a0d16] px-4 py-10 text-white sm:px-6 sm:py-16">
       {/* Ambient particles drifting behind the glass for depth. */}
       <Particles
         className="pointer-events-none absolute inset-0 -z-[1]"
@@ -83,7 +83,7 @@ export default function LoginPage() {
           className={cn(
             "relative w-full overflow-hidden py-6 sm:py-7",
             glassCard,
-            "transition-all duration-300 hover:-translate-y-1 hover:bg-white/70 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)] motion-reduce:transition-none motion-reduce:hover:translate-y-0",
+            "transition-all duration-300 hover:-translate-y-1 hover:bg-white/10 hover:shadow-[0_24px_70px_-24px_rgba(43,107,255,0.35)] motion-reduce:transition-none motion-reduce:hover:translate-y-0",
           )}
         >
           <ShineBorder
@@ -99,10 +99,10 @@ export default function LoginPage() {
             colorTo="var(--color-brand-2)"
           />
           <CardHeader>
-            <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
+            <CardTitle className="text-2xl font-bold tracking-tight text-white">
               Welcome back
             </CardTitle>
-            <CardDescription className="text-muted-foreground">
+            <CardDescription className="text-white/55">
               Log in to your Americell account.
             </CardDescription>
           </CardHeader>
@@ -153,7 +153,7 @@ export default function LoginPage() {
                     onClick={() => setShowPassword((v) => !v)}
                     aria-label={showPassword ? "Hide password" : "Show password"}
                     aria-pressed={showPassword}
-                    className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-lg text-muted-foreground transition-colors duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 sm:w-9"
+                    className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-lg text-white/55 transition-colors duration-200 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 sm:w-9"
                   >
                     {showPassword ? (
                       <EyeOff aria-hidden="true" className="size-4" />
@@ -167,7 +167,7 @@ export default function LoginPage() {
               {state.error ? (
                 <Alert
                   variant="destructive"
-                  className="border-white/50 bg-white/60 backdrop-blur-md"
+                  className="border-white/10 bg-white/5 backdrop-blur-md"
                 >
                   <TriangleAlert aria-hidden="true" />
                   <AlertDescription>{state.error}</AlertDescription>
@@ -194,7 +194,7 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            <p className="mt-5 text-center text-sm text-muted-foreground">
+            <p className="mt-5 text-center text-sm text-white/55">
               New to Americell?{" "}
               <Link
                 href="/signup"
@@ -206,7 +206,7 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
-        <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
+        <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-xs text-white/55">
           <ShieldCheck aria-hidden="true" className="size-3.5 shrink-0" />
           Encrypted, private sign-in
         </p>
