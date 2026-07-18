@@ -5,7 +5,6 @@ import Stats from "@/components/stats";
 import Features from "@/components/features";
 import HowItWorks from "@/components/how-it-works";
 import Pricing from "@/components/pricing";
-import Testimonials from "@/components/testimonials";
 import Faq from "@/components/faq";
 import CallToAction from "@/components/cta";
 import SiteFooter from "@/components/site-footer";
@@ -32,7 +31,6 @@ export default function Page() {
         <Features />
         <HowItWorks />
         <Pricing />
-        <Testimonials />
         <Faq />
         <CallToAction />
       </main>

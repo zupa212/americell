@@ -688,14 +688,43 @@ function PhonesSection({
 
 /* ── 3) RENT A PHONE ────────────────────────────────────────────────────────── */
 
+function RentHowItWorks() {
+  const steps = [
+    { n: 1, t: "Rent a real US phone", d: "Pick a device and how long you need it." },
+    { n: 2, t: "We activate it in seconds", d: "You get a PIN + a live control link the moment you pay." },
+    { n: 3, t: "Control it live", d: "Drive it from your browser — US SIM & data included." },
+  ];
+  return (
+    <div className="rounded-3xl border border-white/50 bg-white/60 p-5 ring-1 ring-white/40 backdrop-blur-xl sm:p-6">
+      <p className="text-sm font-semibold text-foreground">How renting works</p>
+      <ol className="mt-3 grid gap-3 sm:grid-cols-3">
+        {steps.map((s) => (
+          <li key={s.n} className="flex items-start gap-3">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand via-brand-2 to-brand-soft text-xs font-bold text-white">
+              {s.n}
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-semibold text-foreground">{s.t}</span>
+              <span className="block text-xs leading-relaxed text-muted-foreground">{s.d}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
 function RentSection({ store }: { store: DashboardShellProps["store"] }) {
   if (store.ok) {
     return (
-      <DashboardBuyPanel
-        phones={store.phones}
-        durations={store.durations}
-        cryptoProviders={store.cryptoProviders}
-      />
+      <div className="flex flex-col gap-5">
+        <RentHowItWorks />
+        <DashboardBuyPanel
+          phones={store.phones}
+          durations={store.durations}
+          cryptoProviders={store.cryptoProviders}
+        />
+      </div>
     );
   }
 

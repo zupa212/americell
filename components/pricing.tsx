@@ -1,5 +1,6 @@
 import "server-only";
 
+import Link from "next/link";
 import Reveal from "@/components/ui/reveal";
 import PricingGrid, { type CryptoProvider } from "@/components/pricing-grid";
 import { AuroraText } from "@/components/ui/aurora-text";
@@ -141,34 +142,30 @@ export default async function Pricing() {
         ) : (
           <Reveal delay={0.08} className="mx-auto mt-14 max-w-xl">
             <div className={cn(GLASS, "p-8 text-center sm:p-10")}>
-              {catalog.reason === "unconfigured" ? (
-                <>
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-2">
-                    Demo mode
-                  </p>
-                  <h3 className="mt-3 text-xl font-bold text-foreground">
-                    Live inventory isn&apos;t wired up yet
-                  </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                    The device provider isn&apos;t configured in this environment,
-                    so we can&apos;t show live pricing right now. Checkout and
-                    activations are paused for the moment.
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-2">
-                    Temporary hiccup
-                  </p>
-                  <h3 className="mt-3 text-xl font-bold text-foreground">
-                    Inventory didn&apos;t load
-                  </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                    We couldn&apos;t load available devices just now. Refresh in a
-                    moment to see live pricing.
-                  </p>
-                </>
-              )}
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-2">
+                {catalog.reason === "error" ? "Temporary hiccup" : "Selling fast"}
+              </p>
+              <h3 className="mt-3 text-xl font-bold text-foreground">
+                {catalog.reason === "error"
+                  ? "Inventory didn't load"
+                  : "US devices sell out fast"}
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                Real US iPhones from{" "}
+                <span className="font-semibold text-foreground">€250/mo</span> and
+                Android from{" "}
+                <span className="font-semibold text-foreground">€150/mo</span> — US
+                SIM &amp; data included.{" "}
+                {catalog.reason === "error"
+                  ? "Refresh in a moment for live stock, or get notified below."
+                  : "Get notified the moment they're back in stock."}
+              </p>
+              <Link
+                href="/waitlist"
+                className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft px-7 text-sm font-semibold text-white shadow-glow transition-all duration-300 hover:-translate-y-0.5"
+              >
+                Join the waitlist
+              </Link>
             </div>
           </Reveal>
         )}

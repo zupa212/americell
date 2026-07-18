@@ -61,7 +61,7 @@ export default function LogosStrip() {
 
           <Reveal delay={0.1}>
             <p className="mt-3 text-center text-[11px] font-semibold uppercase tracking-[0.28em] text-muted-foreground/70">
-              Trusted by teams at
+Every rental, no catches
             </p>
           </Reveal>
 

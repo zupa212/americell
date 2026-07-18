@@ -741,6 +741,16 @@ export default function Hero() {
           </motion.div>
         </motion.div>
 
+        {/* price anchor — answer the #1 objection above the fold */}
+        <motion.p
+          {...item}
+          className="mx-auto mt-6 text-center text-sm font-medium text-muted-foreground"
+        >
+          Real US phones from{" "}
+          <span className="font-bold text-foreground">€150</span>/month · US SIM
+          &amp; data included
+        </motion.p>
+
         {/* trust row — honest product highlights */}
         <motion.ul
           {...item}

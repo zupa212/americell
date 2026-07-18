@@ -29,10 +29,10 @@ type StatText = {
 type Stat = StatNumeric | StatText;
 
 const STATS: readonly Stat[] = [
-  { prefix: "<", value: 50, suffix: "ms", label: "Average latency" },
-  { text: "99.9%", label: "Platform uptime" },
-  { value: 24, suffix: "/7", label: "Dedicated devices" },
-  { text: "Minutes", label: "To deploy a fleet" },
+  { text: "100%", label: "Real US hardware — no emulators" },
+  { text: "US SIM", label: "+ data included, every device" },
+  { text: "Instant", label: "PIN + live link the moment you pay" },
+  { text: "No-KYC", label: "crypto payment option" },
 ];
 
 // Shared frosted-glass recipe used across the site.

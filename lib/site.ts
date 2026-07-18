@@ -12,7 +12,6 @@ export const NAV_LINKS: { label: string; href: string }[] = [
   { label: "Home", href: "/" },
   { label: "How it works", href: "/#how" },
   { label: "Pricing", href: "/#pricing" },
-  { label: "Clients", href: "/#clients" },
   { label: "Blog", href: "/blog" },
 ];
 
@@ -115,11 +114,12 @@ export const TESTIMONIALS: Testimonial[] = [
   },
 ];
 
+// Honest trust chips — real, verifiable product guarantees, not invented clients.
 export const CLIENT_LOGOS: string[] = [
-  "Northbeam",
-  "Lattice Labs",
-  "Verde QA",
-  "Hammerhead",
-  "Studio Nine",
-  "Pacific Apps",
+  "Real US devices",
+  "US SIM + data included",
+  "Instant activation",
+  "No-KYC crypto",
+  "No setup fees",
+  "Cancel anytime",
 ];
