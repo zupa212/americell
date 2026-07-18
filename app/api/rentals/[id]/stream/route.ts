@@ -41,10 +41,21 @@ export async function GET(
     metadata: { model: rental.model },
   });
 
+  // When a first-party stream proxy is configured (Cloudflare Worker — see
+  // infra/stream-proxy), route the iframe THROUGH it so the stream HTML + the
+  // live WebSocket load first-party and play EMBEDDED. Unset STREAM_PROXY_ORIGIN
+  // to instantly revert to the direct (top-level) URL.
+  const proxy = process.env.STREAM_PROXY_ORIGIN?.replace(/\/+$/, "");
+  const location = proxy
+    ? rental.streamUrl
+        .replace("https://iphone.devicecontrol.app", `${proxy}/_ip`)
+        .replace("https://devicecontrol.app", proxy)
+    : rental.streamUrl;
+
   return new Response(null, {
     status: 302,
     headers: {
-      Location: rental.streamUrl,
+      Location: location,
       // strict-origin-when-cross-origin (NOT no-referrer): the upstream stream
       // page needs a referer to load its OWN player assets (jsmpeg.min.js) — with
       // no-referrer those subresource requests 403. This still only leaks our

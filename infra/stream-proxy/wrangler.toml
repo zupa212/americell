@@ -1,0 +1,15 @@
+name = "americell-stream-proxy"
+main = "worker.js"
+compatibility_date = "2024-11-01"
+
+# Gives you a free test URL: https://americell-stream-proxy.<your-subdomain>.workers.dev
+workers_dev = true
+
+# --- Production: first-party subdomain (recommended once it works) ------------
+# Requires ameri-cell.com to be a Cloudflare zone (nameservers on Cloudflare;
+# keep the Vercel app via CNAME/A records). Then uncomment, `wrangler deploy`,
+# and set STREAM_PROXY_ORIGIN=https://stream.ameri-cell.com on Vercel.
+#
+# routes = [
+#   { pattern = "stream.ameri-cell.com/*", zone_name = "ameri-cell.com" }
+# ]
