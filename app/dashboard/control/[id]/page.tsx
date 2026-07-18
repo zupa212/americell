@@ -44,6 +44,18 @@ export default async function ControlPage({
 
   const live = ACTIVE.has(rental.status) && Boolean(rental.streamUrl);
 
+  // First-party embed path: the stream served through our own /embed proxy so it
+  // plays INSIDE our page (with our logo) instead of on the provider's domain.
+  const embedSrc = (() => {
+    if (!rental.streamUrl) return null;
+    try {
+      const u = new URL(rental.streamUrl);
+      return `/embed${u.pathname}${u.search}`;
+    } catch {
+      return null;
+    }
+  })();
+
   // Audit: the owner opened the remote-control page for this device (best-effort).
   if (live) {
     await logEvent({
@@ -95,6 +107,7 @@ export default async function ControlPage({
             rentalId={rental.id}
             model={rental.model}
             platform={rental.platform}
+            embedSrc={embedSrc}
             expiresAt={rental.expiresAt ? rental.expiresAt.toISOString() : null}
             streamMintedAt={
               rental.streamMintedAt ? rental.streamMintedAt.toISOString() : null
