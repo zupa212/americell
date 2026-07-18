@@ -96,7 +96,9 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
-  if (retailCents < wholesale) {
+  // Owners bypass the money-safety guards to test the payment flow end-to-end
+  // (e.g. a €1 test charge). Real customers are always protected.
+  if (retailCents < wholesale && !owner) {
     // Defensive money-safety guard — must never sell below cost.
     console.error(
       `[checkout] retail<wholesale for ${item.phone_id}/${period}: ${retailCents} < ${wholesale}`,
@@ -116,7 +118,7 @@ export async function POST(req: Request) {
   //    activation time. Pool devices are pre-paid, so skip the credit gate —
   //    they sell even at $0 balance.
   const prePaid = item.source === "pool";
-  if (!prePaid) {
+  if (!prePaid && !owner) {
     let balance;
     try {
       balance = await getBalance();
