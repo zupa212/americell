@@ -58,12 +58,12 @@ export default async function ControlPage({
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col">
-      <header className="sticky top-0 z-40 border-b border-white/40 bg-white/55 backdrop-blur-xl">
+    <div className="relative flex min-h-screen flex-col bg-[#07090f] text-white">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-black/40 backdrop-blur-xl">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:gap-3 sm:px-6">
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/60 hover:text-foreground"
+            className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Back
@@ -80,13 +80,10 @@ export default async function ControlPage({
             />
             <span className="tracking-tight">
               <AuroraText>Americell</AuroraText>
-              <span className="hidden text-muted-foreground sm:inline">
-                {" "}
-                · Remote control
-              </span>
+              <span className="hidden text-white/50 sm:inline"> · Remote control</span>
             </span>
           </div>
-          <span className="hidden text-sm text-muted-foreground sm:block">
+          <span className="hidden text-sm text-white/50 sm:block">
             {rental.model}
           </span>
         </div>
@@ -104,11 +101,11 @@ export default async function ControlPage({
             }
           />
         ) : (
-          <div className="mx-auto mt-10 max-w-md rounded-3xl border border-white/50 bg-white/60 p-8 text-center backdrop-blur-xl">
-            <h1 className="text-lg font-bold text-foreground">
+          <div className="mx-auto mt-10 max-w-md rounded-3xl border border-white/10 bg-white/5 p-8 text-center backdrop-blur-xl">
+            <h1 className="text-lg font-bold text-white">
               This device isn&rsquo;t active
             </h1>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="mt-2 text-sm text-white/60">
               This rental isn&rsquo;t available for remote control right now.
             </p>
             <Link

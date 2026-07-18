@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Check,
   Copy,
   ExternalLink,
   KeyRound,
   Loader2,
-  Radio,
+  Maximize,
+  RefreshCw,
   ShieldCheck,
   TriangleAlert,
 } from "lucide-react";
@@ -30,16 +31,15 @@ function formatRemaining(ms: number): string {
 }
 
 /**
- * Americell-branded LAUNCHER for the live device.
+ * Live device stream, embedded in a 9:16 BLACK frame inside Americell chrome
+ * (white-label — the same-origin `/api/rentals/[id]/stream` redirect resolves the
+ * upstream, so the provider's domain never appears in our src or page source).
  *
- * The upstream video plays best as a TOP-LEVEL tab: the provider serves the real
- * player (jsmpeg + a WebSocket video feed) from a nested frame, and that deep
- * cross-origin nesting breaks the player when embedded in our own <iframe>. So we
- * present our own branded card and open the live stream in a NEW WINDOW from here.
- *
- * The stream URL is same-origin (`/api/rentals/[id]/stream`, a server redirect
- * resolves the upstream), so the provider's domain never appears in our src, our
- * links, or the page source (white-label).
+ * The upstream session token is short-lived (~4h). When it lapses the upstream
+ * frame shows "stream access expired — re-enter your PIN"; the customer taps
+ * Reload and types the PIN (shown here) inside the frame to re-mint a fresh
+ * session. `referrerPolicy` is intentionally NOT no-referrer, so the upstream can
+ * load its own player assets.
  */
 export default function StreamViewer({
   rentalId,
@@ -54,13 +54,13 @@ export default function StreamViewer({
   expiresAt: string | null;
   streamMintedAt: string | null;
 }) {
-  // Same-origin URL: a server-side redirect resolves the upstream stream, so the
-  // provider's domain never appears in the link or the page source.
   const streamSrc = `/api/rentals/${rentalId}/stream`;
+  const frameRef = useRef<HTMLIFrameElement>(null);
   const [pin, setPin] = useState<string | null>(null);
   const [pinLoading, setPinLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [nowMs, setNowMs] = useState<number | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     const tick = () => setNowMs(Date.now());
@@ -79,22 +79,28 @@ export default function StreamViewer({
   const tokenFresh =
     nowMs != null && mintedMs != null && nowMs - mintedMs < FOUR_HOURS_MS;
 
+  function fullscreen() {
+    const el = frameRef.current;
+    if (el?.requestFullscreen) {
+      el.requestFullscreen().catch(() => toast.error("Couldn't enter fullscreen."));
+    }
+  }
+
+  function reloadStream() {
+    setReloadKey((k) => k + 1);
+  }
+
   async function revealPin() {
     if (pin) return;
     setPinLoading(true);
     try {
-      const res = await fetch(`/api/rentals/${rentalId}/pin`, {
-        cache: "no-store",
-      });
+      const res = await fetch(`/api/rentals/${rentalId}/pin`, { cache: "no-store" });
       const data = (await res.json().catch(() => ({}))) as {
         pin?: string;
         error?: string;
       };
-      if (res.ok && data.pin) {
-        setPin(data.pin);
-      } else {
-        toast.error(data.error ?? "Couldn't retrieve the PIN.");
-      }
+      if (res.ok && data.pin) setPin(data.pin);
+      else toast.error(data.error ?? "Couldn't retrieve the PIN.");
     } catch {
       toast.error("Network error. Please try again.");
     } finally {
@@ -117,10 +123,10 @@ export default function StreamViewer({
   const platformLabel = platform === "iphone" ? "iPhone" : "Android";
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Control bar */}
-      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/50 bg-white/55 px-3 py-2 backdrop-blur-xl">
-        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-foreground">
+    <div className="flex flex-col gap-3">
+      {/* Control bar (dark) */}
+      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 backdrop-blur-xl">
+        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-white">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
@@ -132,8 +138,8 @@ export default function StreamViewer({
           className={cn(
             "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
             tokenFresh
-              ? "bg-emerald-50/70 text-emerald-700"
-              : "bg-amber-50/70 text-amber-700",
+              ? "bg-emerald-500/15 text-emerald-300"
+              : "bg-amber-500/15 text-amber-300",
           )}
         >
           {tokenFresh ? (
@@ -141,10 +147,10 @@ export default function StreamViewer({
           ) : (
             <TriangleAlert className="h-3.5 w-3.5" aria-hidden="true" />
           )}
-          {tokenFresh ? "Live link" : "Enter the PIN on the device"}
+          {tokenFresh ? "Live link" : "Tap Reload + enter PIN"}
         </span>
 
-        <span className="text-xs text-muted-foreground">Expires in {countdown}</span>
+        <span className="text-xs text-white/50">Expires in {countdown}</span>
 
         <div className="flex w-full items-center gap-1.5 sm:ml-auto sm:w-auto">
           {pin ? (
@@ -153,7 +159,7 @@ export default function StreamViewer({
               variant="outline"
               size="sm"
               onClick={copyPin}
-              className="h-11 flex-1 gap-1.5 rounded-full border-white/50 bg-white/60 font-mono tracking-[0.2em] backdrop-blur-md sm:h-7 sm:flex-initial"
+              className="h-11 flex-1 gap-1.5 rounded-full border-white/15 bg-white/10 font-mono tracking-[0.2em] text-white hover:bg-white/20 sm:h-8 sm:flex-initial"
             >
               {copied ? (
                 <Check className="h-3.5 w-3.5" aria-hidden="true" />
@@ -169,7 +175,7 @@ export default function StreamViewer({
               size="sm"
               onClick={revealPin}
               disabled={pinLoading}
-              className="h-11 flex-1 gap-1.5 rounded-full border-white/50 bg-white/60 backdrop-blur-md sm:h-7 sm:flex-initial"
+              className="h-11 flex-1 gap-1.5 rounded-full border-white/15 bg-white/10 text-white hover:bg-white/20 sm:h-8 sm:flex-initial"
             >
               {pinLoading ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
@@ -179,59 +185,68 @@ export default function StreamViewer({
               PIN
             </Button>
           )}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={reloadStream}
+            className="h-11 flex-1 gap-1.5 rounded-full border-white/15 bg-white/10 text-white hover:bg-white/20 sm:h-8 sm:flex-initial"
+          >
+            <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="hidden sm:inline">Reload</span>
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            onClick={fullscreen}
+            className="h-11 flex-1 gap-1.5 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white sm:h-8 sm:flex-initial"
+          >
+            <Maximize className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="hidden sm:inline">Fullscreen</span>
+          </Button>
         </div>
       </div>
 
-      {/* Branded launcher — 9:16 portrait, our logo. Opens the live device in a
-          new window (the reliable path; the upstream player breaks when embedded
-          in a nested cross-origin iframe). */}
+      {/* The stream — 9:16 PORTRAIT, black, with our logo watermark. */}
       <div className="flex justify-center">
-        <div className="relative flex aspect-[9/16] h-[72dvh] max-h-[820px] w-auto max-w-full flex-col items-center justify-center gap-6 overflow-hidden rounded-[2rem] border border-white/50 bg-gradient-to-b from-white/75 to-white/45 px-6 text-center shadow-[0_20px_70px_-24px_rgba(30,41,120,0.45)] ring-1 ring-white/30 backdrop-blur-xl">
-          {/* soft brand glow */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -top-16 left-1/2 h-56 w-56 -translate-x-1/2 rounded-full bg-brand/15 blur-3xl"
+        <div className="relative aspect-[9/16] h-[80dvh] max-h-[900px] w-auto max-w-full overflow-hidden rounded-[2rem] border border-white/10 bg-black shadow-[0_20px_70px_-24px_rgba(0,0,0,0.8)] ring-1 ring-white/10">
+          <iframe
+            key={reloadKey}
+            ref={frameRef}
+            src={streamSrc}
+            title={`Americell — remote control ${model}`}
+            className="absolute inset-0 h-full w-full border-0 bg-black"
+            allow="autoplay; fullscreen; clipboard-read; clipboard-write; accelerometer; gyroscope"
           />
-          {/* our logo */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/americell-mark.png"
-            alt="Americell"
-            width={464}
-            height={260}
-            className="relative h-14 w-auto"
-          />
-          <div className="relative">
-            <p className="text-xl font-bold text-foreground">
-              {platformLabel} {model}
-            </p>
-            <p className="mt-1.5 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-600">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-              </span>
-              Live · ready to control
-            </p>
-          </div>
-          <a
-            href={streamSrc}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft px-7 text-sm font-semibold text-white shadow-glow ring-1 ring-white/20 transition-all duration-300 hover:-translate-y-0.5"
-          >
-            <Radio className="h-4 w-4" aria-hidden="true" />
-            Open live control
-            <ExternalLink
-              className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
-              aria-hidden="true"
+          {/* Americell logo watermark — never intercepts device taps. */}
+          <div className="pointer-events-none absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 backdrop-blur-md">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/americell-mark.png"
+              alt="Americell"
+              width={464}
+              height={260}
+              className="h-4 w-auto"
             />
-          </a>
-          <p className="relative max-w-[30ch] text-xs leading-relaxed text-muted-foreground">
-            Opens in a new window for the smoothest live control. If it asks for a
-            code, use your PIN above.
-          </p>
+            <span className="text-xs font-semibold text-white">Americell</span>
+          </div>
         </div>
       </div>
+
+      {/* Fallbacks. */}
+      <p className="text-center text-xs text-white/50">
+        Says “stream access expired”? Tap <span className="text-white/80">Reload</span> and enter your PIN.{" "}
+        Still nothing?{" "}
+        <a
+          href={streamSrc}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 font-medium text-brand-soft hover:text-white"
+        >
+          Open in a new tab
+          <ExternalLink className="h-3 w-3" aria-hidden="true" />
+        </a>
+      </p>
     </div>
   );
 }
