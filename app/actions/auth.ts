@@ -9,6 +9,7 @@ import { isDbConfigured } from "@/lib/db";
 import { createUser, getUserByEmail } from "@/lib/users";
 import { logEvent } from "@/lib/logs";
 import { rateLimit } from "@/lib/rate-limit";
+import { sendWelcomeEmail, sendSigninEmail } from "@/lib/email";
 
 export type AuthState = { error: string | null };
 
@@ -75,6 +76,11 @@ export async function signup(
     action: "customer.signup",
   });
 
+  // Branded welcome email — best-effort. MUST run before signIn(): signIn throws
+  // NEXT_REDIRECT on success, so anything after it is unreachable. sendMail never
+  // throws and is a no-op until RESEND_API_KEY is set, so this can't block signup.
+  await sendWelcomeEmail(email);
+
   // signIn redirects on success (throws NEXT_REDIRECT, which must propagate).
   await signIn("credentials", { email, password, redirectTo: "/dashboard" });
   return { error: null };
@@ -111,6 +117,11 @@ export async function login(
       actorEmail: email,
       action: "customer.login",
     });
+    // Sign-in notification email — best-effort, never blocks. Placed HERE (not in
+    // Auth.js events.signIn) so it fires only for interactive logins and NOT for
+    // the signup auto-login, which uses signup()'s own signIn call — a new user
+    // gets the welcome email only, never welcome + sign-in.
+    await sendSigninEmail(email, { ip: await clientIp() });
     throw error;
   }
 }

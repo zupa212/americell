@@ -4,9 +4,11 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   CalendarClock,
+  Check,
   ChevronDown,
   ChevronsUpDown,
   ChevronUp,
+  Copy,
   ListFilter,
   RefreshCw,
   Search,
@@ -170,6 +172,7 @@ type Column = {
 };
 
 const COLUMNS: readonly Column[] = [
+  { label: "Transaction ID", align: "left" },
   { label: "Device", align: "left", sortKey: "model" },
   { label: "Customer", align: "left", sortKey: "customerEmail" },
   { label: "Paid with", align: "left" },
@@ -219,6 +222,17 @@ export default function RentalsTable({
   const [periodFilter, setPeriodFilter] = useState<string>(ALL);
   const [sortKey, setSortKey] = useState<SortKey>("createdAt");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  async function copyRef(r: AdminRentalRow) {
+    try {
+      await navigator.clipboard?.writeText(r.transactionRef);
+      setCopiedId(r.id);
+      window.setTimeout(() => setCopiedId(null), 1500);
+    } catch {
+      // Clipboard blocked (insecure context / permissions) — silently ignore.
+    }
+  }
 
   // Distinct statuses / periods actually present, in a sensible order.
   const statusOptions = useMemo(() => {
@@ -560,6 +574,21 @@ export default function RentalsTable({
                       className="border-white/40 transition-colors hover:bg-white/30 dark:hover:bg-white/5"
                     >
                       <TableCell>
+                        <button
+                          type="button"
+                          onClick={() => void copyRef(r)}
+                          title="Copy transaction ID"
+                          className="group inline-flex items-center gap-1 font-mono text-xs text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                          <span>{r.transactionRef}</span>
+                          {copiedId === r.id ? (
+                            <Check className="size-3.5 text-emerald-600" />
+                          ) : (
+                            <Copy className="size-3.5 opacity-40 group-hover:opacity-70" />
+                          )}
+                        </button>
+                      </TableCell>
+                      <TableCell>
                         <span className="font-medium text-foreground">
                           {r.model}
                         </span>
@@ -667,7 +696,7 @@ export default function RentalsTable({
               <TableFooter className="border-t border-white/40 bg-white/40 dark:bg-white/5">
                 <TableRow className="border-white/40 hover:bg-transparent">
                   <TableCell
-                    colSpan={3}
+                    colSpan={5}
                     className="text-xs font-medium tracking-wide text-muted-foreground uppercase"
                   >
                     Totals · {visible.length.toLocaleString("en-US")} rental

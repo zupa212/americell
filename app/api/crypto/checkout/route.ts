@@ -11,6 +11,7 @@ import { buildMoonpayUrl, isMoonpayConfigured } from "@/lib/moonpay";
 import { createNowpaymentsInvoice, isNowpaymentsConfigured } from "@/lib/nowpayments";
 import { createCoinbaseCharge, isCoinbaseConfigured } from "@/lib/coinbase";
 import { createBtcpayInvoice, isBtcpayConfigured } from "@/lib/btcpay";
+import { rentalRef } from "@/lib/rental-ref";
 
 type Provider = "moonpay" | "nowpayments" | "coinbase" | "btcpay";
 
@@ -128,12 +129,15 @@ export async function POST(req: Request) {
   });
   await attachSession(rental.id, `${provider}_${randomUUID()}`);
 
+  // Same human-readable order reference as the card flow (from the rental UUID).
+  const ref = rentalRef(rental.id);
+
   const origin =
     req.headers.get("origin") ??
     process.env.NEXT_PUBLIC_SITE_URL ??
     "http://localhost:3000";
   const amountUsd = retailCents / 100;
-  const description = `Americell — ${item.model} (${duration.label})`;
+  const description = `Order ${ref} — Americell ${item.model} (${duration.label})`;
 
   let url: string;
   try {
@@ -168,7 +172,7 @@ export async function POST(req: Request) {
         amountUsd,
         currency,
         rentalId: rental.id,
-        name: "Americell rental",
+        name: `Americell rental · ${ref}`,
         description,
         redirectUrl: `${origin}/dashboard?crypto=success`,
         cancelUrl: `${origin}/dashboard?tab=rent`,
@@ -186,7 +190,7 @@ export async function POST(req: Request) {
     action: "checkout.started",
     targetType: "rental",
     targetId: rental.id,
-    metadata: { phoneId: item.phone_id, period: duration.period, retailCents, method: provider },
+    metadata: { phoneId: item.phone_id, period: duration.period, retailCents, method: provider, orderRef: ref },
   });
 
   return Response.json({ url });

@@ -4,6 +4,7 @@ import { desc, eq, gte, sql } from "drizzle-orm";
 
 import { rentals, users } from "@/db/schema";
 import { db, isDbConfigured } from "@/lib/db";
+import { rentalRef } from "@/lib/rental-ref";
 
 /**
  * Server-only READ helpers for the AMERICELL admin panel (RESELLER_PLAN §6).
@@ -143,6 +144,8 @@ export async function listCustomers(): Promise<CustomerRow[]> {
 
 export type AdminRentalRow = {
   id: string;
+  /** Human-readable order reference (AMC-XXXXXXXX) — matches the Stripe receipt. */
+  transactionRef: string;
   model: string;
   platform: string;
   customerEmail: string;
@@ -200,6 +203,7 @@ export async function listAllRentals(limit = 200): Promise<AdminRentalRow[]> {
 
   return rows.map(({ stripeSessionId, ...r }) => ({
     ...r,
+    transactionRef: rentalRef(r.id),
     marginCents: r.chargedCents === null ? null : r.retailCents - r.chargedCents,
     paymentMethod: paymentMethodLabel(stripeSessionId),
   }));

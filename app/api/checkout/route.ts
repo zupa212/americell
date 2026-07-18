@@ -6,6 +6,7 @@ import { DURATIONS, priceForCheckout } from "@/lib/pricing";
 import { attachSession, createPendingRental } from "@/lib/rentals";
 import { logEvent } from "@/lib/logs";
 import { isAdminEmail } from "@/lib/admin";
+import { rentalRef } from "@/lib/rental-ref";
 
 /**
  * Customer purchase — reseller flow B (RESELLER_PLAN §5.5).
@@ -32,8 +33,6 @@ export async function POST(req: Request) {
   // Owners get the real block reason in the response (customers get the neutral
   // white-label message, so the reseller model never leaks).
   const owner = isAdminEmail(email);
-  const eur = (c: number) => `€${(c / 100).toFixed(2)}`;
-  const usd = (c: number) => `$${(c / 100).toFixed(2)}`;
 
   // Fail closed: retail Stripe + CellGods + DB must all be configured, else demo.
   if (!isStripeConfigured || !stripe || !isCellgodsConfigured || !isDbConfigured) {
@@ -138,6 +137,11 @@ export async function POST(req: Request) {
     retailCents,
   });
 
+  // Human-readable order reference (AMC-XXXXXXXX) derived from the rental UUID.
+  // Surfaced on the Stripe product/receipt AND the admin table via the SAME
+  // rentalRef() helper, so what the customer sees == what the admin sees.
+  const ref = rentalRef(rental.id);
+
   // Audit: pending rental snapshot created (best-effort, never blocks checkout).
   await logEvent({
     actorType: "customer",
@@ -146,7 +150,7 @@ export async function POST(req: Request) {
     action: "checkout.started",
     targetType: "rental",
     targetId: rental.id,
-    metadata: { phoneId: item.phone_id, period, retailCents },
+    metadata: { phoneId: item.phone_id, period, retailCents, orderRef: ref },
   });
 
   // 6. One-time RETAIL Stripe Checkout (inline price_data in cents). No
@@ -159,6 +163,7 @@ export async function POST(req: Request) {
     process.env.CHECKOUT_SUCCESS_URL ?? `${origin}/dashboard?checkout=success`;
   const cancelUrl = process.env.CHECKOUT_CANCEL_URL ?? `${origin}/dashboard?tab=rent`;
 
+  const platformLabel = item.type === "iphone" ? "iPhone" : "Android";
   const checkout = await stripe.checkout.sessions.create({
     mode: "payment",
     line_items: [
@@ -168,6 +173,7 @@ export async function POST(req: Request) {
           currency,
           product_data: {
             name: `Americell — ${item.model} (${duration.label})`,
+            description: `Order ${ref} · ${duration.label} rental · real US ${platformLabel}, US SIM & data included`,
           },
           unit_amount: retailCents,
         },
@@ -177,14 +183,29 @@ export async function POST(req: Request) {
     customer_email: email,
     success_url: successUrl,
     cancel_url: cancelUrl,
+    // Professional touch: a submit-side note so the buyer knows what lands next.
+    custom_text: {
+      submit: {
+        message:
+          "You'll get your device PIN and a secure live-control link on your dashboard the moment payment clears.",
+      },
+    },
     metadata: {
       rentalId: rental.id,
+      transactionRef: ref,
       userId,
       phoneId: item.phone_id,
       period,
       durationDays: String(durationDays),
     },
-    payment_intent_data: { metadata: { rentalId: rental.id } },
+    // receipt_email triggers Stripe's branded email receipt (logo comes from
+    // Stripe → Settings → Branding). description shows the order ref on the
+    // charge/receipt. rentalId is kept for webhook lookups (idempotency).
+    payment_intent_data: {
+      description: `${ref} — ${item.model} (${duration.label})`,
+      receipt_email: email,
+      metadata: { rentalId: rental.id, transactionRef: ref },
+    },
   });
 
   // 7. Bind the Stripe session id to the rental (webhook idempotency key).
