@@ -33,8 +33,7 @@ export async function POST(req: Request) {
   if (!userId || !email) {
     return Response.json({ error: "Please log in to continue." }, { status: 401 });
   }
-  const owner = isAdminEmail(email); // owners see the real block reason
-  const usd = (c: number) => `$${(c / 100).toFixed(2)}`;
+  const owner = isAdminEmail(email); // owners bypass money-safety guards to test
 
   let body: { phoneId?: string; period?: string; provider?: string };
   try {
@@ -80,20 +79,27 @@ export async function POST(req: Request) {
     item,
     duration.period,
   );
+
+  // Owner test price mirror (see card /api/checkout): when OWNER_TEST_PRICE_CENTS
+  // is set, admins pay that flat amount on any period; customer prices untouched.
+  const testCents = Math.trunc(Number(process.env.OWNER_TEST_PRICE_CENTS));
+  const ownerTest = owner && Number.isFinite(testCents) && testCents > 0;
+  const chargeCents = ownerTest ? testCents : retailCents;
+
   if (!supported) {
     return Response.json(
       { error: "This duration isn't available for this device." },
       { status: 400 },
     );
   }
-  if (retailCents < wholesale) {
+  if (retailCents < wholesale && !owner) {
     return Response.json({ error: "Temporarily unavailable." }, { status: 503 });
   }
 
   // Pool devices are pre-paid — skip the credit gate; only shared-pool
-  // activations spend credit at activation time.
+  // activations spend credit at activation time. Owners bypass to test.
   const prePaid = item.source === "pool";
-  if (!prePaid) {
+  if (!prePaid && !owner) {
     let balance;
     try {
       balance = await getBalance();
@@ -105,12 +111,7 @@ export async function POST(req: Request) {
         `[crypto-checkout] low reseller credit: balance=${balance.credit_balance_cents} < wholesale=${wholesale}`,
       );
       return Response.json(
-        {
-          error: "Temporarily unavailable.",
-          ...(owner && {
-            reason: `Low CellGods credit: you have ${usd(balance.credit_balance_cents)}, but this ${duration.period} needs ${usd(wholesale)} wholesale. Top up your CellGods balance (or use a pre-paid pool device).`,
-          }),
-        },
+        { error: "Temporarily unavailable." },
         { status: 503 },
       );
     }
@@ -125,7 +126,7 @@ export async function POST(req: Request) {
     billingPeriod: duration.period,
     durationDays: duration.days,
     wholesaleQuotedCents: wholesale,
-    retailCents,
+    retailCents: chargeCents,
   });
   await attachSession(rental.id, `${provider}_${randomUUID()}`);
 
@@ -136,7 +137,7 @@ export async function POST(req: Request) {
     req.headers.get("origin") ??
     process.env.NEXT_PUBLIC_SITE_URL ??
     "http://localhost:3000";
-  const amountUsd = retailCents / 100;
+  const amountUsd = chargeCents / 100;
   const description = `Order ${ref} — Americell ${item.model} (${duration.label})`;
 
   let url: string;
@@ -190,7 +191,7 @@ export async function POST(req: Request) {
     action: "checkout.started",
     targetType: "rental",
     targetId: rental.id,
-    metadata: { phoneId: item.phone_id, period: duration.period, retailCents, method: provider, orderRef: ref },
+    metadata: { phoneId: item.phone_id, period: duration.period, retailCents: chargeCents, method: provider, orderRef: ref, ownerTest },
   });
 
   return Response.json({ url });

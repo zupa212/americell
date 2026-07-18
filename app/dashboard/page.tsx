@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
+import { isAdminEmail } from "@/lib/admin";
 import { isDbConfigured } from "@/lib/db";
 import type { Rental } from "@/db/schema";
 import { listRentalsForUser, markExpired } from "@/lib/rentals";
@@ -138,6 +139,23 @@ export default async function DashboardPage() {
   // Component with the shell as its single client island.
   const catalog = await getRetailCatalog();
 
+  // Owner test price: when OWNER_TEST_PRICE_CENTS is set and an ADMIN is viewing,
+  // rewrite the rent-panel catalog to that flat price on every period so the
+  // dashboard price MATCHES what checkout actually charges the owner. This never
+  // affects customers — it only rewrites the catalog for admin viewers.
+  const testCents = Math.trunc(Number(process.env.OWNER_TEST_PRICE_CENTS));
+  const ownerTest =
+    isAdminEmail(email) && Number.isFinite(testCents) && testCents > 0;
+  const storePhones =
+    catalog.ok && ownerTest
+      ? catalog.phones.map((p) => ({
+          ...p,
+          retail: { daily: testCents, weekly: testCents, monthly: testCents },
+        }))
+      : catalog.ok
+        ? catalog.phones
+        : [];
+
   // One Suspense boundary covers BOTH the shell's `?tab` sync read and the
   // nested <CheckoutSuccess/> — both call useSearchParams.
   return (
@@ -150,7 +168,7 @@ export default async function DashboardPage() {
           catalog.ok
             ? {
                 ok: true,
-                phones: catalog.phones,
+                phones: storePhones,
                 durations: DURATIONS,
                 cryptoProviders: cryptoProviders(),
               }
