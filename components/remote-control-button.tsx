@@ -6,11 +6,11 @@ import { Radio } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * "Open remote control" — navigates to the INTERNAL, Americell-branded control
- * page (`/dashboard/control/[id]`) that embeds the live device stream inside our
- * own chrome. We deliberately do NOT open the raw upstream stream URL in a new
- * tab, so the customer never sees the underlying provider's domain/branding
- * (white-label). The control page re-checks ownership server-side.
+ * "Open remote control" — opens the INTERNAL, Americell-branded control page
+ * (`/dashboard/control/[id]`) in a NEW TAB, so the live device fills its own
+ * window like a real phone. It's OUR white-label page (not the raw upstream
+ * stream URL), so the customer never sees the underlying provider's
+ * domain/branding. The control page re-checks ownership server-side.
  */
 export default function RemoteControlButton({
   rentalId,
@@ -24,6 +24,8 @@ export default function RemoteControlButton({
   return (
     <Link
       href={`/dashboard/control/${rentalId}`}
+      target="_blank"
+      rel="noopener noreferrer"
       className={cn(
         "group relative flex h-11 w-full items-center justify-center gap-2 overflow-hidden rounded-full",
         "bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-sm font-semibold text-white",

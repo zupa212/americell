@@ -210,17 +210,20 @@ export default function StreamViewer({
         </div>
       </div>
 
-      {/* The stream itself — framed in Americell glass. */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/50 bg-black/90 shadow-[0_20px_70px_-24px_rgba(30,41,120,0.45)] ring-1 ring-white/30">
-        <iframe
-          key={reloadKey}
-          ref={frameRef}
-          src={streamSrc}
-          title={`Americell — remote control ${model}`}
-          className="h-[68dvh] max-h-[820px] min-h-[420px] w-full border-0 bg-black sm:h-[72vh]"
-          allow="autoplay; fullscreen; clipboard-read; clipboard-write; accelerometer; gyroscope"
-          referrerPolicy="no-referrer"
-        />
+      {/* The stream itself — 9:16 PORTRAIT (like a real phone), centered and
+          framed in Americell glass. No referrerPolicy override: the upstream page
+          must keep a same-origin referer to load its own player (jsmpeg). */}
+      <div className="flex justify-center">
+        <div className="relative aspect-[9/16] h-[78dvh] max-h-[880px] w-auto max-w-full overflow-hidden rounded-[2rem] border border-white/50 bg-black shadow-[0_20px_70px_-24px_rgba(30,41,120,0.45)] ring-1 ring-white/30">
+          <iframe
+            key={reloadKey}
+            ref={frameRef}
+            src={streamSrc}
+            title={`Americell — remote control ${model}`}
+            className="absolute inset-0 h-full w-full border-0 bg-black"
+            allow="autoplay; fullscreen; clipboard-read; clipboard-write; accelerometer; gyroscope"
+          />
+        </div>
       </div>
 
       {/* Fallback if the provider blocks embedding. */}

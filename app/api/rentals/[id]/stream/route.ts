@@ -33,8 +33,11 @@ export async function GET(
     status: 302,
     headers: {
       Location: rental.streamUrl,
-      // Don't leak our page URL to the upstream, and never cache the token URL.
-      "Referrer-Policy": "no-referrer",
+      // strict-origin-when-cross-origin (NOT no-referrer): the upstream stream
+      // page needs a referer to load its OWN player assets (jsmpeg.min.js) — with
+      // no-referrer those subresource requests 403. This still only leaks our
+      // ORIGIN (never the rental-id path or token) to the upstream.
+      "Referrer-Policy": "strict-origin-when-cross-origin",
       ...NO_STORE,
     },
   });
