@@ -103,15 +103,7 @@ export async function POST(req: Request) {
     console.error(
       `[checkout] retail<wholesale for ${item.phone_id}/${period}: ${retailCents} < ${wholesale}`,
     );
-    return Response.json(
-      {
-        error: "Temporarily unavailable.",
-        ...(owner && {
-          reason: `Retail ${eur(retailCents)} would be below wholesale ${usd(wholesale)} for this ${period} — refusing to sell below cost.`,
-        }),
-      },
-      { status: 503 },
-    );
+    return Response.json({ error: "Temporarily unavailable." }, { status: 503 });
   }
 
   // 4. Fulfilment preflight: only shared-pool activations spend credit at
@@ -123,27 +115,13 @@ export async function POST(req: Request) {
     try {
       balance = await getBalance();
     } catch {
-      return Response.json(
-        {
-          error: "Temporarily unavailable.",
-          ...(owner && { reason: "Couldn't reach CellGods to read your credit balance." }),
-        },
-        { status: 503 },
-      );
+      return Response.json({ error: "Temporarily unavailable." }, { status: 503 });
     }
     if (balance.credit_balance_cents < wholesale) {
       console.warn(
         `[checkout] low reseller credit: balance=${balance.credit_balance_cents} < wholesale=${wholesale}`,
       );
-      return Response.json(
-        {
-          error: "Temporarily unavailable.",
-          ...(owner && {
-            reason: `Low CellGods credit: you have ${usd(balance.credit_balance_cents)}, but this ${period} needs ${usd(wholesale)} wholesale. Top up your CellGods balance (or use a pre-paid pool device).`,
-          }),
-        },
-        { status: 503 },
-      );
+      return Response.json({ error: "Temporarily unavailable." }, { status: 503 });
     }
   }
 
