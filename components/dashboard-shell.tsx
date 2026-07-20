@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  Printer,
   ReceiptText,
   ShoppingBag,
   Smartphone,
@@ -35,7 +36,15 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { fmtMoney } from "@/lib/money";
+import { rentalRef } from "@/lib/rental-ref";
+import { SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 // Types ONLY — `@/lib/pricing` is server-only, so these imports are erased at
 // build time and never pull the server module into the client bundle.
@@ -812,6 +821,7 @@ function BillingSection({
   email: string;
   billing: BillingRow[];
 }) {
+  const [receiptRow, setReceiptRow] = useState<BillingRow | null>(null);
   return (
     <div className="flex flex-col gap-8">
       <section>
@@ -847,6 +857,12 @@ function BillingSection({
                     </th>
                     <th scope="col" className="px-4 py-3 font-medium">
                       Date
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-4 py-3 text-right font-medium"
+                    >
+                      Receipt
                     </th>
                   </tr>
                 </thead>
@@ -895,6 +911,18 @@ function BillingSection({
                         <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
                           {formatDate(row.createdAt)}
                         </td>
+                        <td className="px-4 py-3 text-right">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setReceiptRow(row)}
+                            className="gap-1.5 border-white/50 bg-white/50 backdrop-blur-md hover:bg-white/70"
+                          >
+                            <ReceiptText className="h-3.5 w-3.5" />
+                            View
+                          </Button>
+                        </td>
                       </tr>
                     );
                   })}
@@ -904,6 +932,90 @@ function BillingSection({
           </div>
         )}
       </section>
+
+      {/* Printable receipt — one per rental (each rental IS its own receipt). */}
+      <Dialog
+        open={receiptRow !== null}
+        onOpenChange={(o) => {
+          if (!o) setReceiptRow(null);
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          {receiptRow ? (
+            <>
+              <DialogHeader className="sr-only">
+                <DialogTitle>Receipt {rentalRef(receiptRow.id)}</DialogTitle>
+              </DialogHeader>
+              <div
+                id="receipt-print"
+                className="flex flex-col gap-4 text-foreground"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-black tracking-tight">
+                    {SITE.name}
+                  </span>
+                  <span
+                    className={cn(
+                      "rounded-full px-2.5 py-1 text-xs font-semibold",
+                      RECEIPT_CHIP[billingReceipt(receiptRow.status).tone],
+                    )}
+                  >
+                    {billingReceipt(receiptRow.status).label}
+                  </span>
+                </div>
+                <Separator className="bg-white/50" />
+                <div className="grid grid-cols-2 gap-y-1.5 text-sm">
+                  <span className="text-muted-foreground">Receipt no.</span>
+                  <span className="text-right font-mono font-medium">
+                    {rentalRef(receiptRow.id)}
+                  </span>
+                  <span className="text-muted-foreground">Date</span>
+                  <span className="text-right">
+                    {formatDate(receiptRow.createdAt)}
+                  </span>
+                  <span className="text-muted-foreground">Billed to</span>
+                  <span className="truncate text-right" title={email}>
+                    {email}
+                  </span>
+                </div>
+                <Separator className="bg-white/50" />
+                <div className="flex items-center justify-between gap-3 text-sm">
+                  <span className="min-w-0">
+                    <span className="font-medium">{receiptRow.model}</span>
+                    <span className="text-muted-foreground">
+                      {" "}
+                      · {platformPill(receiptRow.platform).label} ·{" "}
+                      {termLabel(receiptRow.billingPeriod)}
+                    </span>
+                  </span>
+                  <span className="shrink-0 font-semibold tabular-nums">
+                    {fmtMoney(receiptRow.amountCents, receiptRow.currency)}
+                  </span>
+                </div>
+                <Separator className="bg-white/50" />
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold">Total paid</span>
+                  <span className="text-xl font-black tabular-nums">
+                    {fmtMoney(receiptRow.amountCents, receiptRow.currency)}
+                  </span>
+                </div>
+                <p className="text-center text-xs text-muted-foreground">
+                  {SITE.name} — real US phones, controlled from your phone. Thank
+                  you!
+                </p>
+              </div>
+              <Button
+                type="button"
+                onClick={() => window.print()}
+                className="w-full gap-2 bg-gradient-to-r from-brand via-brand-2 to-brand-soft text-white"
+              >
+                <Printer className="h-4 w-4" />
+                Print / Save PDF
+              </Button>
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
 
       <section>
         <h2 className="text-lg font-semibold tracking-tight text-foreground">

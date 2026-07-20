@@ -379,3 +379,22 @@ body {
     @apply font-sans;
   }
 }
+
+/* Print: isolate the receipt (#receipt-print) and hide the rest of the app. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #receipt-print,
+  #receipt-print * {
+    visibility: visible;
+  }
+  #receipt-print {
+    position: fixed;
+    inset: 0;
+    margin: 0;
+    padding: 32px;
+    background: #ffffff;
+    color: #0b1020;
+  }
+}

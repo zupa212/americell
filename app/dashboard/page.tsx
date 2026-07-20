@@ -84,7 +84,9 @@ function toBillingRow(r: Rental): BillingRow {
     platform: r.platform,
     billingPeriod: r.billingPeriod,
     amountCents: r.retailCents,
-    currency: "usd",
+    // Flat pricing bills in EUR (retailCents is EUR); the rentals table has no
+    // per-row currency column yet, so the receipt/history render in euros.
+    currency: "eur",
     status: r.status,
     createdAt: r.createdAt.toISOString(),
   };
