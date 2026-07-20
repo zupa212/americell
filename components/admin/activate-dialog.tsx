@@ -100,6 +100,7 @@ export default function ActivateDialog({
   const [email, setEmail] = useState("");
   const [period, setPeriod] = useState<BillingPeriod>(defaultPeriod);
   const [days, setDays] = useState<number>(defaultDays);
+  const [priceEur, setPriceEur] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ActivateResult | null>(null);
@@ -138,6 +139,9 @@ export default function ActivateDialog({
           customer_email: email.trim(),
           duration_days: days,
           billing_period: period,
+          retail_cents: priceEur.trim()
+            ? Math.round(Number(priceEur) * 100)
+            : undefined,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -323,6 +327,31 @@ export default function ActivateDialog({
                 disabled={pending}
                 className="border-white/50 bg-white/50 ring-1 ring-white/30 backdrop-blur-md"
               />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="activate-price">Sale price (€)</Label>
+              <div className="relative">
+                <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm text-muted-foreground">
+                  €
+                </span>
+                <Input
+                  id="activate-price"
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  inputMode="decimal"
+                  placeholder="250"
+                  value={priceEur}
+                  onChange={(e) => setPriceEur(e.target.value)}
+                  disabled={pending}
+                  className="border-white/50 bg-white/50 pl-7 ring-1 ring-white/30 backdrop-blur-md"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Recorded as the rental price — shows in the customer&apos;s
+                dashboard &amp; your revenue.
+              </p>
             </div>
 
             {error && (

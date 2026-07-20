@@ -4,9 +4,13 @@ import { requireAdmin } from "@/lib/admin";
 import {
   CellgodsError,
   activate,
+  getInventory,
   isCellgodsConfigured,
 } from "@/lib/cellgods";
 import { logEvent } from "@/lib/logs";
+import { getUserByEmail } from "@/lib/users";
+import { encryptPin } from "@/lib/crypto";
+import { insertActiveRental } from "@/lib/rentals";
 
 /**
  * POST /api/admin/orders/activate — owner-only activation proxy (RESELLER_PLAN §6.3).
@@ -39,6 +43,9 @@ const ActivateBody = z.object({
   customer_email: z.email(),
   duration_days: z.number().int().positive(),
   billing_period: z.enum(["daily", "weekly", "monthly"]),
+  // Optional sale price to record for the rental (e.g. €250 = 25000). Absent →
+  // falls back to the wholesale actually charged.
+  retail_cents: z.number().int().nonnegative().optional(),
 });
 
 export async function POST(req: Request) {
@@ -94,8 +101,39 @@ export async function POST(req: Request) {
         customer_email: parsed.data.customer_email,
         duration_days: parsed.data.duration_days,
         charged_cents: result.charged_cents,
+        retail_cents: parsed.data.retail_cents ?? null,
       },
     });
+
+    // Best-effort bookkeeping: mirror the manual activation as an ACTIVE rental so
+    // it appears in the customer's dashboard AND the admin book (with the PIN +
+    // stream so their Control page works). NEVER fails the activation response —
+    // the device is already provisioned; a bookkeeping error just logs.
+    try {
+      const user = await getUserByEmail(parsed.data.customer_email);
+      if (user) {
+        const inventory = await getInventory().catch(() => []);
+        const item = inventory.find((p) => p.phone_id === parsed.data.phone_id);
+        await insertActiveRental({
+          userId: user.id,
+          customerEmail: parsed.data.customer_email,
+          phoneId: parsed.data.phone_id,
+          model: item?.model ?? parsed.data.phone_id,
+          platform: item?.type ?? "iphone",
+          billingPeriod: parsed.data.billing_period,
+          durationDays: parsed.data.duration_days,
+          retailCents: parsed.data.retail_cents ?? result.charged_cents,
+          chargedCents: result.charged_cents,
+          cellgodsOrderId: result.order_id,
+          pinCiphertext: encryptPin(result.pin),
+          streamUrl: result.stream_url,
+          expiresAt: new Date(result.expires_at),
+        });
+      }
+    } catch (err) {
+      console.error("[admin/activate] rental record insert failed", err);
+    }
+
     // Contains pin + stream_url — admin-only, never cached.
     return Response.json(result, { headers: NO_STORE });
   } catch (e) {

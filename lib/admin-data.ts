@@ -169,6 +169,7 @@ export function paymentMethodLabel(sessionId: string): string {
   if (sessionId.startsWith("moonpay_")) return "MoonPay";
   if (sessionId.startsWith("coinbase_")) return "Coinbase";
   if (sessionId.startsWith("btcpay_")) return "BTCPay";
+  if (sessionId.startsWith("manual_")) return "Manual";
   if (sessionId.startsWith("pending_")) return "Unpaid";
   return "—";
 }

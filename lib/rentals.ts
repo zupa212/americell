@@ -79,6 +79,60 @@ export async function createPendingRental(
   return row;
 }
 
+/** A fully-active rental recorded from a MANUAL (admin) activation — no Stripe. */
+export type InsertActiveRentalInput = {
+  userId: string;
+  customerEmail: string;
+  phoneId: string;
+  model: string;
+  platform: Platform;
+  billingPeriod: BillingPeriod;
+  durationDays: number;
+  retailCents: number; // what the customer was billed (e.g. €200)
+  chargedCents: number; // wholesale actually spent (activate.charged_cents)
+  cellgodsOrderId: string;
+  pinCiphertext: string; // already AES-encrypted by the caller
+  streamUrl: string;
+  expiresAt: Date;
+};
+
+/**
+ * Record an admin/manual activation as a fully-`active` rental so it shows in the
+ * customer's dashboard AND the admin book. The device is already provisioned at
+ * CellGods; this is the bookkeeping mirror (no Stripe session — the id is seeded
+ * `manual_<orderId>`). `cellgodsOrderId` is UNIQUE, so a duplicate insert for the
+ * same order throws — callers treat this as best-effort and never fail the
+ * activation response on a bookkeeping error.
+ */
+export async function insertActiveRental(v: InsertActiveRentalInput): Promise<Rental> {
+  if (!isDbConfigured) throw new Error("DATABASE_URL is not set.");
+  const now = new Date();
+  const [row] = await db
+    .insert(rentals)
+    .values({
+      userId: v.userId,
+      customerEmail: v.customerEmail,
+      phoneId: v.phoneId,
+      model: v.model,
+      platform: v.platform,
+      billingPeriod: v.billingPeriod,
+      durationDays: v.durationDays,
+      wholesaleQuotedCents: v.chargedCents,
+      retailCents: v.retailCents,
+      chargedCents: v.chargedCents,
+      status: "active",
+      stripeSessionId: `manual_${v.cellgodsOrderId}`,
+      cellgodsOrderId: v.cellgodsOrderId,
+      streamUrl: v.streamUrl,
+      pinCiphertext: v.pinCiphertext,
+      streamMintedAt: now,
+      activatedAt: now,
+      expiresAt: v.expiresAt,
+    })
+    .returning();
+  return row;
+}
+
 /**
  * Bind the real Stripe Checkout Session id to a freshly-created pending rental
  * (§5.5 B7), replacing the `pending_…` placeholder. This is the webhook's
