@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import {
   Check,
   Copy,
@@ -59,6 +59,7 @@ export default function StreamViewer({
   const [pinLoading, setPinLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [nowMs, setNowMs] = useState<number | null>(null);
+  const [opening, setOpening] = useState(false);
 
   useEffect(() => {
     const tick = () => setNowMs(Date.now());
@@ -107,6 +108,47 @@ export default function StreamViewer({
     }
   }
 
+  /**
+   * Open the live phone. The upstream stream *session* expires ~hourly (black
+   * screen / "Control: Connecting…") even while the rental is active, so we first
+   * RE-GRAB a fresh link server-side (POST /refresh → re-`activate`, free on a
+   * pool device), then point the tab at our same-origin /stream redirect, which
+   * now serves the freshly-stored URL. The tab is opened synchronously up-front so
+   * it isn't swallowed by a popup blocker after the await.
+   */
+  async function openLive(e: MouseEvent<HTMLAnchorElement>) {
+    e.preventDefault();
+    if (opening) return;
+    const win = window.open("about:blank", "_blank");
+    setOpening(true);
+    try {
+      const res = await fetch(`/api/rentals/${rentalId}/refresh`, {
+        method: "POST",
+        cache: "no-store",
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        // Non-fatal: fall back to the last stored link — better than nothing.
+        toast.error(data.error ?? "Couldn't refresh the live link — opening the last one.");
+      }
+    } catch {
+      toast.error("Network error — opening the last known link.");
+    } finally {
+      setOpening(false);
+      if (win && !win.closed) {
+        try {
+          win.opener = null;
+        } catch {
+          /* cross-origin guard already severed it */
+        }
+        win.location.href = streamSrc;
+      } else {
+        // Popup was blocked despite the up-front open — retry within the gesture.
+        window.open(streamSrc, "_blank", "noopener,noreferrer");
+      }
+    }
+  }
+
   const platformLabel = platform === "iphone" ? "iPhone" : "Android";
 
   return (
@@ -134,7 +176,7 @@ export default function StreamViewer({
           ) : (
             <TriangleAlert className="h-3.5 w-3.5" aria-hidden="true" />
           )}
-          {tokenFresh ? "Live link" : "Session expired — rent again"}
+          {tokenFresh ? "Live link" : "Idle — tap Open to reconnect"}
         </span>
 
         <span className="text-xs text-white/50">Expires in {countdown}</span>
@@ -206,21 +248,27 @@ export default function StreamViewer({
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
               </span>
-              {tokenFresh ? "Live · ready to control" : "Session expired — rent again"}
+              {tokenFresh ? "Live · ready to control" : "Idle · tap Open to reconnect"}
             </p>
           </div>
           <a
             href={streamSrc}
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft px-8 text-sm font-semibold text-white shadow-glow ring-1 ring-white/20 transition-all duration-300 hover:-translate-y-0.5"
+            onClick={openLive}
+            aria-busy={opening}
+            className="group relative inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-brand via-brand-2 to-brand-soft px-8 text-sm font-semibold text-white shadow-glow ring-1 ring-white/20 transition-all duration-300 hover:-translate-y-0.5 aria-busy:opacity-80"
           >
-            <Radio className="h-4 w-4" aria-hidden="true" />
-            Open live phone
+            {opening ? (
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            ) : (
+              <Radio className="h-4 w-4" aria-hidden="true" />
+            )}
+            {opening ? "Reconnecting…" : "Open live phone"}
           </a>
           <p className="relative max-w-[32ch] text-xs leading-relaxed text-white/50">
-            Opens full-screen in a new window for live control. If it asks for a
-            code, use your PIN above.
+            Refreshes the live link and opens full-screen in a new window. If it
+            asks for a code, use your PIN above.
           </p>
         </div>
       </div>

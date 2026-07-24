@@ -288,6 +288,47 @@ export async function finalizeActivation(
     );
 }
 
+/** Volatile session fields re-minted by a customer "reconnect" (§5.5 E). */
+export type RefreshSessionInput = {
+  cellgodsOrderId: string; // order id returned by the re-`activate` (same for pool devices)
+  streamUrl: string; // fresh stream page URL
+  pinCiphertext: string; // AES-256-GCM blob, never plaintext
+  expiresAt: Date; // rental expiry from the fresh activate.expires_at
+};
+
+/**
+ * Re-mint an ALREADY-live rental's session after the upstream stream token
+ * expired (the `iphone.devicecontrol.app` host returns 403 "expired" even while
+ * the order is active). Refreshes ONLY the volatile session fields — stream URL,
+ * encrypted PIN, expiry — and re-stamps `streamMintedAt`. Deliberately does NOT
+ * touch `status`, `retailCents`, or `chargedCents`: the retail/margin book records
+ * the ORIGINAL wholesale spent, and a re-mint of a pool (prepaid) device charges
+ * nothing, so overwriting `chargedCents` with the refresh's 0 would corrupt margin.
+ * CAS-guarded to `active`/`pooled` so it can never resurrect a terminal rental.
+ */
+export async function refreshRentalSession(
+  id: string,
+  a: RefreshSessionInput,
+): Promise<Rental | undefined> {
+  if (!isDbConfigured) return undefined;
+  const now = new Date();
+  const rows = await db
+    .update(rentals)
+    .set({
+      cellgodsOrderId: a.cellgodsOrderId,
+      streamUrl: a.streamUrl,
+      pinCiphertext: a.pinCiphertext,
+      streamMintedAt: now,
+      expiresAt: a.expiresAt,
+      updatedAt: now,
+    })
+    .where(
+      and(eq(rentals.id, id), inArray(rentals.status, ["active", "pooled"])),
+    )
+    .returning();
+  return rows[0];
+}
+
 /**
  * 402 path: CAS `activating → activation_pending_credit`. Payment is captured
  * but reseller credit is too low; ops is alerted and top-up/cron recovery takes
